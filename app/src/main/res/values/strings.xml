@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">TrainDriver</string>
+
+    // SignIn Screen
+    <string name="title_input_element">Вход в аккаунт</string>
+    <string name="placeholder_input_number">Номер телефона</string>
+    <string name="divider_text">или</string>
+    <string name="text_entrance_button">Вход</string>
+    <string name="text_skip_button">ПРОПУСТИТЬ</string>
+    <string name="cont_desc_google_button">Log in with Google</string>
+    <string name="cont_desc_vk_button">Log in with Google</string>
+    <string name="cont_desc_email_button">Log in with Google</string>
 </resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    // General
+    <dimen name="min_size_view">48dp</dimen>
+
+    // Input Field
+    <dimen name="padding_start_input_field">12dp</dimen>
+    <dimen name="width_border_input_field">1dp</dimen>
+
+    // SignIn Screen
+    <dimen name="elevation_input_element">6dp</dimen>
+    <dimen name="padding_all_input_element">32dp</dimen>
+    <dimen name="primary_padding_between_view">24dp</dimen>
+    <dimen name="secondary_padding_between_view">12dp</dimen>
+    <dimen name="padding_divider">24dp</dimen>
+</resources>
