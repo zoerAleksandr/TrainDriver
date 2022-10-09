@@ -7,6 +7,10 @@
     <dimen name="padding_start_input_field">12dp</dimen>
     <dimen name="width_border_input_field">1dp</dimen>
 
+    // Loading Screen
+    <dimen name="size_background_progress_bar">120dp</dimen>
+    <dimen name="stroke_width_progress_bar">7dp</dimen>
+
     // SignIn Screen
     <dimen name="elevation_input_element">6dp</dimen>
     <dimen name="padding_all_input_element">32dp</dimen>

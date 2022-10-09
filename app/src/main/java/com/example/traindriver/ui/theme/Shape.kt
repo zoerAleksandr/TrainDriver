@@ -10,7 +10,8 @@ val ShapeInputData = Shapes(
 
 val ShapeBackground = Shapes(
     small = RoundedCornerShape(5.dp),
-    medium = RoundedCornerShape(
+    medium = RoundedCornerShape(15.dp),
+    large = RoundedCornerShape(
         bottomStart = 35.dp,
         bottomEnd = 35.dp,
         topStart = 0.dp,

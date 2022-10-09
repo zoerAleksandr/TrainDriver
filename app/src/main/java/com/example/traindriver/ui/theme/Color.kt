@@ -25,3 +25,6 @@ val Red600 = Color(0xFFE53935)
 val Red700 = Color(0xFFD32F2F)
 val Red800 = Color(0xFFC62828)
 val Red900 = Color(0xFFB71C1C)
+
+// Helper color
+val BackgroundLoadingScreen = Color(0x99727272)

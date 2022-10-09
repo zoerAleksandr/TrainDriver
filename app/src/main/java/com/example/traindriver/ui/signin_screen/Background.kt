@@ -25,7 +25,7 @@ fun Background() {
                 .fillMaxWidth()
                 .background(
                     color = MaterialTheme.colors.primaryVariant,
-                    shape = ShapeBackground.medium
+                    shape = ShapeBackground.large
                 )
         )
     }
@@ -33,7 +33,7 @@ fun Background() {
 
 @DarkLightPreviews
 @Composable
-fun Prev() {
+private fun BackgroundPrev() {
     TrainDriverTheme {
         Background()
     }
