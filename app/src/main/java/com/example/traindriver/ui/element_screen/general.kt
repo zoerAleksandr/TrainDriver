@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -25,6 +26,7 @@ import com.example.traindriver.R
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.theme.overpassFontFamily
+import com.example.traindriver.ui.util.transformedNumberRussia
 
 @Composable
 fun CustomTextField(
@@ -46,8 +48,9 @@ fun CustomTextField(
             ),
         value = data.value,
         onValueChange = {
-            data.value = it
+            if (it.length <= 12) data.value = it
         },
+        visualTransformation = { transformedNumberRussia(it) },
         textStyle = TextStyle(
             color = MaterialTheme.colors.onBackground,
             fontSize = 18.sp,
@@ -74,6 +77,9 @@ fun CustomTextField(
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Phone,
             imeAction = ImeAction.Go
+        ),
+        keyboardActions = KeyboardActions(
+            // TODO
         ),
         singleLine = true
     )

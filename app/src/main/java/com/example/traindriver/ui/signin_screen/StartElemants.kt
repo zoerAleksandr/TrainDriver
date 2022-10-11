@@ -72,12 +72,12 @@ fun InputDataElement() {
             )
 
             PrimarySpacer()
-            val numberOrEmail = remember {
+            val number = remember {
                 mutableStateOf("+7")
             }
             CustomTextField(
                 placeholderText = stringResource(id = R.string.placeholder_input_number),
-                data = numberOrEmail,
+                data = number,
             )
 
             SecondarySpacer()

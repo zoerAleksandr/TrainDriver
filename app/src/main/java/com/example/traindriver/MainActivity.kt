@@ -18,7 +18,6 @@ class MainActivity : ComponentActivity() {
             TrainDriverTheme {
                 Background()
                 StartElements()
-                LoadingElement()
             }
         }
     }
