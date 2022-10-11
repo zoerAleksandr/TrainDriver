@@ -1,7 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">TrainDriver</string>
+    <string name="app_name" translatable="true">Машинистам</string>
 
-    // SignIn Screen
     <string name="title_input_element">Вход в аккаунт</string>
     <string name="placeholder_input_number">Номер телефона</string>
     <string name="divider_text">или</string>
