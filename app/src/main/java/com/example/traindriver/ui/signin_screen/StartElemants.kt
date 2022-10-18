@@ -24,16 +24,17 @@ import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FontScalePreviews
+import com.example.traindriver.ui.util.LocaleState
 
 @Composable
-fun StartElements() {
+fun StartElements(localeState: LocaleState) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceAround
     ) {
         Logo()
-        InputDataElement()
+        InputDataElements(localeState)
         SkipButton()
     }
 }
@@ -41,8 +42,7 @@ fun StartElements() {
 @Composable
 fun Logo() {
     Text(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         text = "Машинистам",
         style = Typography.h1,
         color = MaterialTheme.colors.onPrimary
@@ -50,10 +50,13 @@ fun Logo() {
 }
 
 @Composable
-fun InputDataElement() {
+fun InputDataElements(localeState: LocaleState) {
+    val numberPhone = remember {
+        mutableStateOf(localeState.prefix())
+    }
+
     Surface(
-        modifier = Modifier
-            .wrapContentSize(),
+        modifier = Modifier.wrapContentSize(),
         shape = ShapeInputData.medium,
         color = MaterialTheme.colors.surface,
         elevation = dimensionResource(id = R.dimen.elevation_input_element)
@@ -72,12 +75,13 @@ fun InputDataElement() {
             )
 
             PrimarySpacer()
-            val number = remember {
-                mutableStateOf("+7")
-            }
             CustomTextField(
                 placeholderText = stringResource(id = R.string.placeholder_input_number),
-                data = number,
+                data = numberPhone,
+                transformation = {
+                    localeState.transformedNumber(it)
+                },
+                maxLength = localeState.maxLength()
             )
 
             SecondarySpacer()
@@ -95,26 +99,22 @@ fun InputDataElement() {
 @Composable
 fun AlternativeEnteringMenu() {
     Row(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
         CircleButton(
-            R.drawable.ic_launcher_foreground,
-            stringResource(id = R.string.cont_desc_google_button)
+            R.drawable.ic_launcher_foreground, stringResource(id = R.string.cont_desc_google_button)
         ) {
             Log.d("Debug", "click button login with Google")
         }
         CircleButton(
-            R.drawable.ic_launcher_foreground,
-            stringResource(id = R.string.cont_desc_email_button)
+            R.drawable.ic_launcher_foreground, stringResource(id = R.string.cont_desc_email_button)
         ) {
             Log.d("Debug", "click button login by Email")
         }
         CircleButton(
-            R.drawable.ic_launcher_foreground,
-            stringResource(id = R.string.cont_desc_vk_button)
+            R.drawable.ic_launcher_foreground, stringResource(id = R.string.cont_desc_vk_button)
         ) {
             Log.d("Debug", "click button login by Email")
         }
@@ -133,8 +133,7 @@ fun Divider() {
             color = MaterialTheme.colors.onSurface
         )
         Text(
-            modifier = Modifier
-                .wrapContentWidth(),
+            modifier = Modifier.wrapContentWidth(),
             textAlign = TextAlign.Justify,
             text = stringResource(id = R.string.divider_text),
             style = Typography.body2,
@@ -153,16 +152,14 @@ fun Divider() {
 @Composable
 fun PrimarySpacer() {
     Spacer(
-        modifier = Modifier
-            .padding(dimensionResource(id = R.dimen.primary_padding_between_view))
+        modifier = Modifier.padding(dimensionResource(id = R.dimen.primary_padding_between_view))
     )
 }
 
 @Composable
 fun SecondarySpacer() {
     Spacer(
-        modifier = Modifier
-            .padding(dimensionResource(id = R.dimen.secondary_padding_between_view))
+        modifier = Modifier.padding(dimensionResource(id = R.dimen.secondary_padding_between_view))
     )
 }
 
@@ -208,10 +205,7 @@ fun CircleButton(resId: Int, contentDescription: String?, action: () -> Unit) {
 @Composable
 fun SkipButton() {
     Text(
-        modifier = Modifier
-            .clickable(
-                onClick = {}
-            ),
+        modifier = Modifier.clickable(onClick = {}),
         text = stringResource(id = R.string.text_skip_button),
         style = Typography.body2,
         color = MaterialTheme.colors.onBackground
@@ -223,6 +217,6 @@ fun SkipButton() {
 @FontScalePreviews
 private fun StartScreenPrev() {
     TrainDriverTheme {
-        StartElements()
+        StartElements(localeState = LocaleState.RU)
     }
 }

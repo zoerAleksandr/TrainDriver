@@ -17,21 +17,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.unit.sp
 import com.example.traindriver.R
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.theme.overpassFontFamily
-import com.example.traindriver.ui.util.transformedNumberRussia
+import com.example.traindriver.ui.util.transformedNumberRUAndKZ
 
 @Composable
 fun CustomTextField(
     placeholderText: String,
-    data: MutableState<String>
+    data: MutableState<String>,
+    transformation: (AnnotatedString) -> TransformedText = { transformedNumberRUAndKZ(it) },
+    maxLength: Int
 ) {
     BasicTextField(
         modifier = Modifier
@@ -48,9 +52,9 @@ fun CustomTextField(
             ),
         value = data.value,
         onValueChange = {
-            if (it.length <= 12) data.value = it
+            if (it.length <= maxLength) data.value = it
         },
-        visualTransformation = { transformedNumberRussia(it) },
+        visualTransformation = transformation,
         textStyle = TextStyle(
             color = MaterialTheme.colors.onBackground,
             fontSize = 18.sp,

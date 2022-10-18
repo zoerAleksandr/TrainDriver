@@ -24,7 +24,7 @@ fun Background() {
                 .fillMaxHeight(0.45f)
                 .fillMaxWidth()
                 .background(
-                    color = MaterialTheme.colors.primaryVariant,
+                    color = MaterialTheme.colors.primary,
                     shape = ShapeBackground.large
                 )
         )
