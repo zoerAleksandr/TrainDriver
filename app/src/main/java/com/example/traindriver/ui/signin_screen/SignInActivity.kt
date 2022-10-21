@@ -9,7 +9,7 @@ import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FontScalePreviews
 import com.example.traindriver.ui.util.LocaleState
 
-class MainActivity : ComponentActivity() {
+class SignInActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

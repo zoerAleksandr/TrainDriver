@@ -17,7 +17,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".ui.signin_screen.MainActivity"
+            android:name=".ui.signin_screen.SignInActivity"
             android:exported="true"
             android:theme="@style/Theme.TrainDriver">
             <intent-filter>
