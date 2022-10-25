@@ -10,4 +10,7 @@
     <string name="cont_desc_google_button">Вход с Гугл</string>
     <string name="cont_desc_vk_button">Вход по Вконтакте</string>
     <string name="cont_desc_email_button">Вход по e-mail</string>
+
+    // TAG
+    <string name="ANONYMOUS_WORKER_TAG" translatable="false">ANONYMOUS_WORK_TAG</string>
 </resources>

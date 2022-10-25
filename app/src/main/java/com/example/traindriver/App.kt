@@ -1,13 +1,17 @@
 package com.example.traindriver
 
 import android.app.Application
+import androidx.work.Configuration
+import androidx.work.DelegatingWorkerFactory
+import com.example.traindriver.data.work_manager.WorkManagerFactory
 import com.example.traindriver.di.retrofitModule
 import com.example.traindriver.di.signInModule
 import com.example.traindriver.di.useCaseModule
+import com.example.traindriver.di.workManagerModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
-class App : Application() {
+class App : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         startKoin {
@@ -15,8 +19,18 @@ class App : Application() {
             modules(
                 retrofitModule,
                 useCaseModule,
-                signInModule
+                signInModule,
+                workManagerModule
             )
         }
+    }
+
+    override fun getWorkManagerConfiguration(): Configuration {
+        val workerFactory = DelegatingWorkerFactory()
+        workerFactory.addFactory(WorkManagerFactory())
+
+        return Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
     }
 }

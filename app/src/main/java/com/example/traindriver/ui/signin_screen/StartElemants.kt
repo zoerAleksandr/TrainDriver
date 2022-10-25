@@ -17,8 +17,8 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.traindriver.R
-import com.example.traindriver.data.auth.SignInFirebaseProvider
 import com.example.traindriver.data.auth.SignInMethod
 import com.example.traindriver.ui.element_screen.CustomTextField
 import com.example.traindriver.ui.theme.ShapeInputData
@@ -27,7 +27,6 @@ import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FontScalePreviews
 import com.example.traindriver.ui.util.LocaleState
-import org.koin.androidx.compose.get
 
 @Composable
 fun StartElements(localeState: LocaleState) {
@@ -206,11 +205,10 @@ fun CircleButton(resId: Int, contentDescription: String?, action: () -> Unit) {
 }
 
 @Composable
-fun SkipButton() {
-    val firebaseProvider = get<SignInFirebaseProvider>()
+fun SkipButton(viewModel: SignInViewModel = viewModel()) {
     Text(
         modifier = Modifier.clickable(onClick = {
-            firebaseProvider.signIn(method = SignInMethod.Anonymous)
+            viewModel.signIn(method = SignInMethod.Anonymous)
         }),
         text = stringResource(id = R.string.text_skip_button),
         style = Typography.body2,

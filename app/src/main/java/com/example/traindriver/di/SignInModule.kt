@@ -9,6 +9,7 @@ val signInModule = module {
     single<SignInCallback> {
         object : SignInCallback {
             override fun updateUI() {
+                // Navigation Next Screen
                 Log.d("ZZZ", "update UI from Koin")
             }
         }
