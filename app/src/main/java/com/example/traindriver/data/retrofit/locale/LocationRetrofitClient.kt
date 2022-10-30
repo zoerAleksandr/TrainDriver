@@ -3,7 +3,6 @@ package com.example.traindriver.data.retrofit.locale
 import com.example.traindriver.BuildConfig
 import com.example.traindriver.domain.entity.LocationResponse
 import com.google.gson.GsonBuilder
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import okhttp3.OkHttpClient
@@ -16,7 +15,7 @@ private const val BASE_URL = "http://ip-api.com/"
 class LocationRetrofitClient {
 
     fun getLocation(): Flow<LocationResponse> = flow {
-        createRetrofit().create(LocationApi::class.java).getLocationAsync()
+        emit(createRetrofit().create(LocationApi::class.java).getLocationAsync())
     }
 
     private fun createRetrofit(): Retrofit {
@@ -35,7 +34,6 @@ class LocationRetrofitClient {
                     GsonBuilder().setLenient().create()
                 )
             )
-            .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .client(createClient())
             .build()
     }
@@ -48,7 +46,6 @@ class LocationRetrofitClient {
                     GsonBuilder().setLenient().create()
                 )
             )
-            .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .build()
     }
 

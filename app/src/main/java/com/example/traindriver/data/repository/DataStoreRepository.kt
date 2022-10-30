@@ -13,12 +13,13 @@ import java.io.IOException
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "train_driver_pref")
 
 class DataStoreRepository(context: Context) {
-    private val dataStore = context.dataStore
 
     private object PreferencesKey {
         val isRegistered = booleanPreferencesKey(name = "is_registered")
         val uid = stringPreferencesKey(name = "uid")
     }
+
+    private val dataStore = context.dataStore
 
     suspend fun saveIsRegisteredState(value: Boolean) {
         dataStore.edit { pref ->

@@ -4,10 +4,7 @@ import android.app.Application
 import androidx.work.Configuration
 import androidx.work.DelegatingWorkerFactory
 import com.example.traindriver.data.work_manager.WorkManagerFactory
-import com.example.traindriver.di.retrofitModule
-import com.example.traindriver.di.signInModule
-import com.example.traindriver.di.useCaseModule
-import com.example.traindriver.di.workManagerModule
+import com.example.traindriver.di.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -20,7 +17,9 @@ class App : Application(), Configuration.Provider {
                 retrofitModule,
                 useCaseModule,
                 signInModule,
-                workManagerModule
+                workManagerModule,
+                repositoryModule,
+                viewModelModule
             )
         }
     }

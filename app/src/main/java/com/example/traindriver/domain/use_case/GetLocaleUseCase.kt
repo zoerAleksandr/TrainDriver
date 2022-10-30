@@ -8,10 +8,10 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
 class GetLocaleUseCase(private val retrofitClient: LocationRetrofitClient) {
-   fun execute(): Flow<LocaleState> {
+    fun execute(): Flow<LocaleState> {
         return retrofitClient.getLocation()
             .catch {
-                emit(LocationResponse("OK", "OTHER"))
+                emit(LocationResponse("FAILED", "OTHER"))
             }
             .map { response ->
                 when (response.countryCode) {
