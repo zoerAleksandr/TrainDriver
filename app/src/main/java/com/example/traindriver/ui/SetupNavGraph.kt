@@ -18,7 +18,7 @@ fun SetupNavGraph(
         navController = navController,
         startDestination = startDestination
     ) {
-        composable(ScreenEnum.SIGN_IN.name) { SignInScreen(navController) }
+        composable(ScreenEnum.SIGN_IN.name) { SignInScreen(navController, locale) }
         composable(ScreenEnum.MAIN.name) {
             MainScreen(navController)
         }

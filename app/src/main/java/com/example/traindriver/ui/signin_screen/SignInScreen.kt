@@ -8,9 +8,12 @@ import com.example.traindriver.ui.util.FontScalePreviews
 import com.example.traindriver.ui.util.LocaleState
 
 @Composable
-fun SignInScreen(navController: NavController) {
+fun SignInScreen(
+    navController: NavController,
+    locale: LocaleState
+) {
     Background()
-    StartElements(localeState = LocaleState.OTHER)
+    StartElements(localeState = locale)
 //    LoadingElement()
 }
 
@@ -20,7 +23,7 @@ fun SignInScreen(navController: NavController) {
 fun DefaultPreview() {
     TrainDriverTheme {
         Background()
-        StartElements(localeState = LocaleState.OTHER)
+        StartElements(localeState = LocaleState.RU)
         //    LoadingElement()
     }
 }
