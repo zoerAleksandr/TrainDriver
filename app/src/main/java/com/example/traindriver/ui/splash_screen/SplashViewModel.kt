@@ -6,13 +6,12 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.traindriver.PreferencesApp
 import com.example.traindriver.data.repository.DataStoreRepository
 import com.example.traindriver.domain.use_case.GetLocaleUseCase
 import com.example.traindriver.ui.ScreenEnum
 import com.example.traindriver.ui.util.LocaleState
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -31,44 +30,40 @@ class SplashViewModel : ViewModel(), KoinComponent {
 
     init {
         viewModelScope.launch {
-            initSetting()
+            try {
+                withTimeout(PreferencesApp.startLoading) {
+                    initSetting()
+                }
+            } catch (e: TimeoutCancellationException) {
+                _isLoading.value = false
+            } catch (e: Throwable) {
+                Log.d("ZZZ", "$e")
+            }
         }
     }
 
     private suspend fun initSetting() = coroutineScope {
-        val job = launch {
-            listOf(
-                launch {
-                    getRegisteredStateAsync()
-                },
-                launch {
-                    getLocaleAsync()
-                }
-            )
-        }
-        job.start()
-        delay(2500L)
+        listOf(
+            launch { getLocale() },
+            launch { getRegisteredState() }
+        ).joinAll()
         _isLoading.value = false
-        job.cancel()
     }
 
 
-    private suspend fun getRegisteredStateAsync() {
-        repository.readIsRegisteredState().collect { isRegistered ->
-            if (isRegistered) {
-                _startDestination.value = ScreenEnum.MAIN.name
-            } else {
-                _startDestination.value = ScreenEnum.SIGN_IN.name
-            }
-            Log.d("ZZZ", "from launch ${_startDestination.value}")
+    private suspend fun getRegisteredState() {
+        val isRegistered = repository.readIsRegisteredState()
+        if (isRegistered) {
+            _startDestination.value = ScreenEnum.MAIN.name
+        } else {
+            _startDestination.value = ScreenEnum.SIGN_IN.name
         }
     }
 
-    private suspend fun getLocaleAsync() {
+    private suspend fun getLocale() = coroutineScope {
         getLocaleUseCase.execute()
             .collect {
                 _locale.value = it
-                Log.d("ZZZ", "from launch ${locale.value}")
             }
     }
 }

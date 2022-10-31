@@ -14,19 +14,17 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class StartActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         val viewModel: SplashViewModel by viewModel()
+        val locale by viewModel.locale
+        val screen by viewModel.startDestination
+
         installSplashScreen().setKeepOnScreenCondition {
             viewModel.isLoading.value
         }
-        val locale by viewModel.locale
-        val screen by viewModel.startDestination
 
         setContent {
             TrainDriverTheme {
                 val navController = rememberNavController()
-                Log.d("ZZZ", "main $locale")
-                Log.d("ZZZ", "main $screen")
                 SetupNavGraph(
                     navController = navController,
                     startDestination = screen,
