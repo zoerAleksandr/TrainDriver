@@ -7,6 +7,7 @@ import androidx.work.WorkManager
 import com.example.traindriver.R
 import com.example.traindriver.data.worker.AnonymousSignInWorker
 import com.example.traindriver.data.worker.ConstrainsWorkerEnum
+import com.example.traindriver.data.worker.SignInWorkers
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -18,7 +19,7 @@ val workManagerModule = module {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
     }
-    single {
+    single(named(SignInWorkers.ANONYMOUS_SIGN_IN_WORKER.name)) {
         OneTimeWorkRequestBuilder<AnonymousSignInWorker>()
             .setConstraints(get(named(ConstrainsWorkerEnum.NETWORK_CONNECTED)))
             .addTag(androidContext().resources.getString(R.string.ANONYMOUS_WORKER_TAG))
