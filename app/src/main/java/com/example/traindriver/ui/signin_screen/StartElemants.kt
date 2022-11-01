@@ -89,10 +89,10 @@ fun InputDataElements(localeState: LocaleState) {
             SecondarySpacer()
             LoginButton(false)
 
-            SecondarySpacer()
+            PrimarySpacer()
             Divider()
 
-            SecondarySpacer()
+            PrimarySpacer()
             AlternativeEnteringMenu()
         }
     }

@@ -1,7 +1,6 @@
 package com.example.traindriver.ui
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.getValue
@@ -25,11 +24,13 @@ class StartActivity : ComponentActivity() {
         setContent {
             TrainDriverTheme {
                 val navController = rememberNavController()
-                SetupNavGraph(
-                    navController = navController,
-                    startDestination = screen,
-                    locale = locale
-                )
+                if (!viewModel.isLoading.value) {
+                    SetupNavGraph(
+                        navController = navController,
+                        startDestination = screen,
+                        locale = locale
+                    )
+                }
             }
         }
     }
