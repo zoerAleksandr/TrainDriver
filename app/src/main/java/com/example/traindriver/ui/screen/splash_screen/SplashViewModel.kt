@@ -1,4 +1,4 @@
-package com.example.traindriver.ui.splash_screen
+package com.example.traindriver.ui.screen.splash_screen
 
 import android.util.Log
 import androidx.compose.runtime.MutableState
@@ -38,6 +38,7 @@ class SplashViewModel : ViewModel(), KoinComponent {
                 _isLoading.value = false
             } catch (e: Throwable) {
                 Log.d("ZZZ", "$e")
+                _isLoading.value = false
             }
         }
     }

@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
-import com.example.traindriver.ui.splash_screen.SplashViewModel
+import com.example.traindriver.ui.screen.splash_screen.SplashViewModel
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

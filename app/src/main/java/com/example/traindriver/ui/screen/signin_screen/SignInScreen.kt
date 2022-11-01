@@ -1,4 +1,4 @@
-package com.example.traindriver.ui.signin_screen
+package com.example.traindriver.ui.screen.signin_screen
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController

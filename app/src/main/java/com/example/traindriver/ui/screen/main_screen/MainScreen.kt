@@ -1,4 +1,4 @@
-package com.example.traindriver.ui.main_screen
+package com.example.traindriver.ui.screen.main_screen
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
