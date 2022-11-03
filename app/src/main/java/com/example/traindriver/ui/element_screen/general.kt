@@ -28,14 +28,15 @@ import com.example.traindriver.R
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.theme.overpassFontFamily
-import com.example.traindriver.ui.util.transformedNumberRUAndKZ
+import com.example.traindriver.ui.util.FieldIsFilled
 
 @Composable
 fun CustomTextField(
     placeholderText: String,
     data: MutableState<String>,
-    transformation: (AnnotatedString) -> TransformedText = { transformedNumberRUAndKZ(it) },
-    maxLength: Int
+    transformation: (AnnotatedString) -> TransformedText,
+    maxLength: Int,
+    isFilledCallback: FieldIsFilled? = null
 ) {
     BasicTextField(
         modifier = Modifier
@@ -53,6 +54,7 @@ fun CustomTextField(
         value = data.value,
         onValueChange = {
             if (it.length <= maxLength) data.value = it
+            isFilledCallback?.isFilled(it.length >= maxLength)
         },
         visualTransformation = transformation,
         textStyle = TextStyle(

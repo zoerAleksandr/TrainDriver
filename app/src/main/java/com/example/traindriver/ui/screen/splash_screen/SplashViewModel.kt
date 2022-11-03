@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.traindriver.PreferencesApp
 import com.example.traindriver.data.repository.DataStoreRepository
 import com.example.traindriver.domain.use_case.GetLocaleUseCase
-import com.example.traindriver.ui.ScreenEnum
+import com.example.traindriver.ui.screen.ScreenEnum
 import com.example.traindriver.ui.util.LocaleState
 import kotlinx.coroutines.*
 import org.koin.core.component.KoinComponent
@@ -29,6 +29,7 @@ class SplashViewModel : ViewModel(), KoinComponent {
     val locale: State<LocaleState> = _locale
 
     val number: MutableState<String> = mutableStateOf(LocaleState.OTHER.prefix())
+    val allowEntry: MutableState<Boolean> = mutableStateOf(true)
 
     init {
         viewModelScope.launch {
@@ -65,9 +66,10 @@ class SplashViewModel : ViewModel(), KoinComponent {
 
     private suspend fun getLocale() = coroutineScope {
         getLocaleUseCase.execute()
-            .collect {
-                _locale.value = it
-                number.value = it.prefix()
+            .collect { localeState ->
+                _locale.value = localeState
+                number.value = localeState.prefix()
+                allowEntry.value = localeState == LocaleState.OTHER
             }
     }
 }

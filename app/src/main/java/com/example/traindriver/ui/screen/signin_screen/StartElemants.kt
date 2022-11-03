@@ -24,6 +24,7 @@ import com.example.traindriver.ui.theme.ShapeInputData
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.DarkLightPreviews
+import com.example.traindriver.ui.util.FieldIsFilled
 import com.example.traindriver.ui.util.FontScalePreviews
 import com.example.traindriver.ui.util.LocaleState
 
@@ -56,6 +57,7 @@ fun InputDataElements(
     splashViewModel: SplashViewModel = viewModel()
 ) {
     val number = splashViewModel.number
+    val allowEntry = splashViewModel.allowEntry
 
     Surface(
         modifier = Modifier.wrapContentSize(),
@@ -83,11 +85,18 @@ fun InputDataElements(
                 transformation = {
                     localeState.transformedNumber(it)
                 },
-                maxLength = localeState.maxLength()
+                maxLength = localeState.maxLength(),
+                isFilledCallback = if (localeState != LocaleState.OTHER) {
+                    object : FieldIsFilled {
+                        override fun isFilled(isFilled: Boolean) {
+                            allowEntry.value = isFilled
+                        }
+                    }
+                } else null
             )
 
             SecondarySpacer()
-            LoginButton(false)
+            LoginButton(enabled = allowEntry.value)
 
             PrimarySpacer()
             Divider()
