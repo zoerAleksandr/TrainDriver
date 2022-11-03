@@ -28,6 +28,8 @@ class SplashViewModel : ViewModel(), KoinComponent {
     private val _locale: MutableState<LocaleState> = mutableStateOf(LocaleState.OTHER)
     val locale: State<LocaleState> = _locale
 
+    val number: MutableState<String> = mutableStateOf(LocaleState.OTHER.prefix())
+
     init {
         viewModelScope.launch {
             try {
@@ -65,6 +67,7 @@ class SplashViewModel : ViewModel(), KoinComponent {
         getLocaleUseCase.execute()
             .collect {
                 _locale.value = it
+                number.value = it.prefix()
             }
     }
 }

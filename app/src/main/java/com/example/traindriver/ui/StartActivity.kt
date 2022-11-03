@@ -24,13 +24,11 @@ class StartActivity : ComponentActivity() {
         setContent {
             TrainDriverTheme {
                 val navController = rememberNavController()
-                if (!viewModel.isLoading.value) {
                     SetupNavGraph(
                         navController = navController,
                         startDestination = screen,
                         locale = locale
                     )
-                }
             }
         }
     }

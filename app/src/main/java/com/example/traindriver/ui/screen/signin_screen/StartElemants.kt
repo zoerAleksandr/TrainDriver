@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,6 +19,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.traindriver.R
 import com.example.traindriver.data.auth.SignInMethod
 import com.example.traindriver.ui.element_screen.CustomTextField
+import com.example.traindriver.ui.screen.splash_screen.SplashViewModel
 import com.example.traindriver.ui.theme.ShapeInputData
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
@@ -52,10 +51,11 @@ fun Logo() {
 }
 
 @Composable
-fun InputDataElements(localeState: LocaleState) {
-    val numberPhone = remember {
-        mutableStateOf(localeState.prefix())
-    }
+fun InputDataElements(
+    localeState: LocaleState,
+    splashViewModel: SplashViewModel = viewModel()
+) {
+    val number = splashViewModel.number
 
     Surface(
         modifier = Modifier.wrapContentSize(),
@@ -79,7 +79,7 @@ fun InputDataElements(localeState: LocaleState) {
             PrimarySpacer()
             CustomTextField(
                 placeholderText = stringResource(id = R.string.placeholder_input_number),
-                data = numberPhone,
+                data = number,
                 transformation = {
                     localeState.transformedNumber(it)
                 },
