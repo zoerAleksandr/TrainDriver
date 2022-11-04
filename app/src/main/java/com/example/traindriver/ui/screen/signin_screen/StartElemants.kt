@@ -82,10 +82,7 @@ fun InputDataElements(
             CustomTextField(
                 placeholderText = stringResource(id = R.string.placeholder_input_number),
                 data = number,
-                transformation = {
-                    localeState.transformedNumber(it)
-                },
-                maxLength = localeState.maxLength(),
+                localeState = localeState,
                 isFilledCallback = if (localeState != LocaleState.OTHER) {
                     object : FieldIsFilled {
                         override fun isFilled(isFilled: Boolean) {

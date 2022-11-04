@@ -18,12 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -41,8 +39,7 @@ import com.example.traindriver.ui.util.LocaleState
 fun CustomTextField(
     placeholderText: String,
     data: MutableState<String>,
-    transformation: (AnnotatedString) -> TransformedText,
-    maxLength: Int,
+    localeState: LocaleState,
     isFilledCallback: FieldIsFilled? = null
 ) {
     ConstraintLayout(
@@ -65,7 +62,7 @@ fun CustomTextField(
                 .constrainAs(button) {
                     start.linkTo(parent.start, margin = 0.dp)
                 }
-                .clickable{
+                .clickable {
                     // TODO выпадающий список
                 }
         ) {
@@ -73,8 +70,8 @@ fun CustomTextField(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.russia),
-                    contentDescription = null,
+                    painter = painterResource(id = localeState.icon),
+                    contentDescription = localeState.contentDescription,
                     modifier = Modifier
                         .padding(start = 8.dp, top = 8.dp, bottom = 8.dp)
                 )
@@ -92,10 +89,10 @@ fun CustomTextField(
                 },
             value = data.value,
             onValueChange = {
-                if (it.length <= maxLength) data.value = it
-                isFilledCallback?.isFilled(it.length >= maxLength)
+                if (it.length <= localeState.maxLength()) data.value = it
+                isFilledCallback?.isFilled(it.length >= localeState.maxLength())
             },
-            visualTransformation = transformation,
+            visualTransformation = localeState.transformedNumber,
             textStyle = TextStyle(
                 color = MaterialTheme.colors.onBackground,
                 fontSize = 18.sp,
@@ -139,8 +136,7 @@ private fun StartScreenPrev() {
         CustomTextField(
             "Номер телефона",
             mutableStateOf("+7"),
-            LocaleState.RU.transformedNumber,
-            LocaleState.RU.maxLength()
+            LocaleState.RU,
         )
     }
 }

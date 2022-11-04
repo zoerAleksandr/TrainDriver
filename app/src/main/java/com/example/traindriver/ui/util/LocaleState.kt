@@ -2,6 +2,7 @@ package com.example.traindriver.ui.util
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.TransformedText
+import com.example.traindriver.R
 
 enum class LocaleState : LocaleInterface {
     RU {
@@ -10,6 +11,8 @@ enum class LocaleState : LocaleInterface {
         override val transformedNumber: (AnnotatedString) -> TransformedText = {
             transformedNumberRUAndKZ(it)
         }
+        override val icon = R.drawable.russia
+        override val contentDescription = "Россия"
     },
     BY {
         override fun prefix(): String = "+375"
@@ -17,6 +20,8 @@ enum class LocaleState : LocaleInterface {
         override val transformedNumber: (AnnotatedString) -> TransformedText = {
             transformNumberBY(it)
         }
+        override val icon = R.drawable.belarus
+        override val contentDescription = "Беларусь"
     },
     KZ {
         override fun prefix(): String = "+7"
@@ -24,6 +29,8 @@ enum class LocaleState : LocaleInterface {
         override val transformedNumber: (AnnotatedString) -> TransformedText = {
             transformedNumberRUAndKZ(it)
         }
+        override val icon = R.drawable.kazakhstan
+        override val contentDescription = "Казахстан"
     },
     OTHER {
         override fun prefix(): String = ""
@@ -31,6 +38,8 @@ enum class LocaleState : LocaleInterface {
         override val transformedNumber: (AnnotatedString) -> TransformedText = {
             transformerNumberDefault(it)
         }
+        override val icon = R.drawable.empty_flag
+        override val contentDescription = "Страна не определена"
     }
 }
 
@@ -38,4 +47,6 @@ interface LocaleInterface {
     fun prefix(): String
     fun maxLength(): Int
     val transformedNumber: (AnnotatedString) -> TransformedText
+    val icon: Int
+    val contentDescription: String
 }
