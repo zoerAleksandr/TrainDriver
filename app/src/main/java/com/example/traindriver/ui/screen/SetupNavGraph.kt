@@ -1,6 +1,7 @@
 package com.example.traindriver.ui.screen
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -12,7 +13,7 @@ import com.example.traindriver.ui.util.LocaleState
 fun SetupNavGraph(
     navController: NavHostController,
     startDestination: String,
-    locale: LocaleState
+    locale: MutableState<LocaleState>
 ) {
     NavHost(
         navController = navController,

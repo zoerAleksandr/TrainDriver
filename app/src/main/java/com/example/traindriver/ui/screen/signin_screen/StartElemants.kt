@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,7 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.traindriver.R
 import com.example.traindriver.data.auth.SignInMethod
-import com.example.traindriver.ui.element_screen.CustomTextField
+import com.example.traindriver.ui.element_screen.NumberPhoneTextField
 import com.example.traindriver.ui.screen.splash_screen.SplashViewModel
 import com.example.traindriver.ui.theme.ShapeInputData
 import com.example.traindriver.ui.theme.TrainDriverTheme
@@ -29,7 +31,7 @@ import com.example.traindriver.ui.util.FontScalePreviews
 import com.example.traindriver.ui.util.LocaleState
 
 @Composable
-fun StartElements(localeState: LocaleState) {
+fun StartElements(localeState: MutableState<LocaleState>) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -53,7 +55,7 @@ fun Logo() {
 
 @Composable
 fun InputDataElements(
-    localeState: LocaleState,
+    localeState:  MutableState<LocaleState>,
     splashViewModel: SplashViewModel = viewModel()
 ) {
     val number = splashViewModel.number
@@ -79,11 +81,12 @@ fun InputDataElements(
             )
 
             PrimarySpacer()
-            CustomTextField(
+            NumberPhoneTextField(
                 placeholderText = stringResource(id = R.string.placeholder_input_number),
-                data = number,
+                numberState = number,
                 localeState = localeState,
-                isFilledCallback = if (localeState != LocaleState.OTHER) {
+                allowEntry = allowEntry,
+                isFilledCallback = if (localeState.value != LocaleState.OTHER) {
                     object : FieldIsFilled {
                         override fun isFilled(isFilled: Boolean) {
                             allowEntry.value = isFilled
@@ -96,7 +99,7 @@ fun InputDataElements(
             LoginButton(enabled = allowEntry.value)
 
             PrimarySpacer()
-            Divider()
+            DividerTrainDriver()
 
             PrimarySpacer()
             AlternativeEnteringMenu()
@@ -130,7 +133,7 @@ fun AlternativeEnteringMenu() {
 }
 
 @Composable
-fun Divider() {
+private fun DividerTrainDriver() {
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -227,6 +230,6 @@ fun SkipButton(viewModel: SignInViewModel = viewModel()) {
 @FontScalePreviews
 private fun StartScreenPrev() {
     TrainDriverTheme {
-        StartElements(localeState = LocaleState.RU)
+        StartElements(localeState = mutableStateOf(LocaleState.RU))
     }
 }

@@ -25,8 +25,7 @@ class SplashViewModel : ViewModel(), KoinComponent {
     private val _startDestination: MutableState<String> = mutableStateOf(ScreenEnum.SIGN_IN.name)
     val startDestination: State<String> = _startDestination
 
-    private val _locale: MutableState<LocaleState> = mutableStateOf(LocaleState.OTHER)
-    val locale: State<LocaleState> = _locale
+    val locale: MutableState<LocaleState> = mutableStateOf(LocaleState.OTHER)
 
     val number: MutableState<String> = mutableStateOf(LocaleState.OTHER.prefix())
     val allowEntry: MutableState<Boolean> = mutableStateOf(true)
@@ -67,7 +66,7 @@ class SplashViewModel : ViewModel(), KoinComponent {
     private suspend fun getLocale() = coroutineScope {
         getLocaleUseCase.execute()
             .collect { localeState ->
-                _locale.value = localeState
+                locale.value = localeState
                 number.value = localeState.prefix()
                 allowEntry.value = localeState == LocaleState.OTHER
             }
