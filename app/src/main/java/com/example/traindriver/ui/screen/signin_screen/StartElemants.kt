@@ -33,8 +33,7 @@ import com.example.traindriver.ui.util.LocaleState
 
 @Composable
 fun StartElements(
-    localeState: MutableState<LocaleState>,
-    navController: NavController
+    localeState: MutableState<LocaleState>, navController: NavController
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -179,13 +178,16 @@ fun SecondarySpacer() {
 }
 
 @Composable
-fun LoginButton(enabled: Boolean) {
+fun LoginButton(
+    enabled: Boolean,
+    viewModel: SignInViewModel = viewModel()
+) {
     Button(
         modifier = Modifier
             .fillMaxWidth()
             .height(dimensionResource(id = R.dimen.min_size_view)),
         onClick = {
-            /*TODO*/
+            viewModel.signIn(method = SignInMethod.Phone)
         },
         colors = ButtonDefaults.buttonColors(
             backgroundColor = MaterialTheme.colors.secondaryVariant,
@@ -219,8 +221,7 @@ fun CircleButton(resId: Int, contentDescription: String?, action: () -> Unit) {
 
 @Composable
 fun SkipButton(
-    viewModel: SignInViewModel = viewModel(),
-    navController: NavController
+    viewModel: SignInViewModel = viewModel(), navController: NavController
 ) {
     Text(
         modifier = Modifier.clickable(onClick = {

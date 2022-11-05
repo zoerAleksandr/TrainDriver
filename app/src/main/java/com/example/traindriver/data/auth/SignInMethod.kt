@@ -36,7 +36,7 @@ sealed class SignInMethod : AuthInterface, KoinComponent {
 
     object Phone : SignInMethod() {
         override suspend fun signIn() {
-            TODO("Not yet implemented")
+            TODO()
         }
     }
 }

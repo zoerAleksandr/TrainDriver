@@ -16,7 +16,6 @@ class App : Application(), Configuration.Provider {
             modules(
                 retrofitModule,
                 useCaseModule,
-                signInModule,
                 workManagerModule,
                 repositoryModule,
                 viewModelModule
