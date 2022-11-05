@@ -73,7 +73,8 @@ fun NumberPhoneTextField(
                     state = it,
                     currentLocale = localeState,
                     numberState = numberState,
-                    allowEntry = allowEntry
+                    allowEntry = allowEntry,
+                    dropDownExpanded = dropDownExpanded
                 )
                 if (it == OTHER) {
                     Divider(
@@ -145,7 +146,9 @@ fun NumberPhoneTextField(
                 imeAction = ImeAction.Go
             ),
             keyboardActions = KeyboardActions(
-                // TODO
+                onGo = {
+                    // TODO
+                }
             ),
             singleLine = true
         )
@@ -157,13 +160,15 @@ private fun DropDownLocaleItem(
     state: LocaleState,
     currentLocale: MutableState<LocaleState>,
     numberState: MutableState<String>,
-    allowEntry: MutableState<Boolean>
+    allowEntry: MutableState<Boolean>,
+    dropDownExpanded: MutableState<Boolean>
 ) {
     DropdownMenuItem(
         onClick = {
             currentLocale.value = state
             numberState.value = state.prefix()
             allowEntry.value = (state == OTHER)
+            dropDownExpanded.value = false
         },
         modifier = Modifier
             .height(dimensionResource(id = R.dimen.min_size_view))
@@ -218,7 +223,8 @@ private fun DropDownPrev() {
             LocaleState.BY,
             mutableStateOf(LocaleState.RU),
             mutableStateOf("+7"),
-            mutableStateOf(true)
+            mutableStateOf(true),
+            mutableStateOf(false)
         )
     }
 }
