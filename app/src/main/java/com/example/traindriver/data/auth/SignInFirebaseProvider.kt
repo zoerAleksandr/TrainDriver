@@ -21,7 +21,6 @@ class SignInFirebaseProvider(private val callback: SignInCallback) {
         }
     }
 
-    // изменить на sealed class
     fun signIn(method: SignInMethod) {
         CoroutineScope(Dispatchers.IO + SupervisorJob()).launch {
             method.signIn()

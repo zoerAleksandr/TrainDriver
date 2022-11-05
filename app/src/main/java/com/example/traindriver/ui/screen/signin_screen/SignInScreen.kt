@@ -2,7 +2,6 @@ package com.example.traindriver.ui.screen.signin_screen
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.navigation.NavController
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.util.DarkLightPreviews
@@ -15,7 +14,7 @@ fun SignInScreen(
     locale: MutableState<LocaleState>
 ) {
     Background()
-    StartElements(localeState = locale)
+    StartElements(localeState = locale, navController = navController)
 //    LoadingElement()
 }
 
@@ -25,7 +24,7 @@ fun SignInScreen(
 fun DefaultPreview() {
     TrainDriverTheme {
         Background()
-        StartElements(localeState = mutableStateOf(LocaleState.RU))
+//        StartElements(localeState = mutableStateOf(LocaleState.RU))
         //    LoadingElement()
     }
 }

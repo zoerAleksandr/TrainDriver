@@ -22,7 +22,7 @@ class DataStoreRepository(context: Context) {
 
     private val dataStore = context.dataStore
 
-    suspend fun saveIsRegisteredState(value: Boolean) {
+    private suspend fun saveStateIsRegistered(value: Boolean) {
         dataStore.edit { pref ->
             pref[PreferencesKey.isRegistered] = value
         }
@@ -37,12 +37,14 @@ class DataStoreRepository(context: Context) {
         dataStore.edit { pref ->
             pref[PreferencesKey.uid] = value
         }
+        saveStateIsRegistered(true)
     }
 
     suspend fun clearUid() {
         dataStore.edit { pref ->
             pref.minusAssign(PreferencesKey.uid)
         }
+        saveStateIsRegistered(false)
     }
 
     fun readUid(): Flow<String?> {
