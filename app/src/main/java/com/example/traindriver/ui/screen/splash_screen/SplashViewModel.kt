@@ -46,20 +46,24 @@ class SplashViewModel : ViewModel(), KoinComponent {
     }
 
     private suspend fun initSetting() = coroutineScope {
-        listOf(
-            launch { getLocale() },
-            launch { getRegisteredState() }
-        ).joinAll()
+        val isRegistered = async { getRegisteredState() }.run {
+            this.await()
+        }
+        if (!isRegistered) {
+            launch { getLocale() }.join()
+        }
         _isLoading.value = false
     }
 
 
-    private suspend fun getRegisteredState() {
+    private suspend fun getRegisteredState(): Boolean {
         val isRegistered = repository.readIsRegisteredState()
-        if (isRegistered) {
+        return if (isRegistered) {
             _startDestination.value = ScreenEnum.MAIN.name
+            true
         } else {
             _startDestination.value = ScreenEnum.SIGN_IN.name
+            false
         }
     }
 
