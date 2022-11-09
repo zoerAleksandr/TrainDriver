@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.traindriver.PreferencesApp
 import com.example.traindriver.data.repository.DataStoreRepository
 import com.example.traindriver.domain.use_case.GetLocaleUseCase
+import com.example.traindriver.domain.use_case.SaveLocaleInLocalStorageUseCase
 import com.example.traindriver.ui.screen.ScreenEnum
 import com.example.traindriver.ui.util.LocaleState
 import kotlinx.coroutines.*
@@ -18,6 +19,7 @@ import org.koin.core.component.inject
 class SplashViewModel : ViewModel(), KoinComponent {
     private val getLocaleUseCase: GetLocaleUseCase by inject()
     private val repository: DataStoreRepository by inject()
+    private val saveLocaleUseCase: SaveLocaleInLocalStorageUseCase by inject()
 
     private val _isLoading: MutableState<Boolean> = mutableStateOf(true)
     val isLoading: State<Boolean> = _isLoading
@@ -51,6 +53,7 @@ class SplashViewModel : ViewModel(), KoinComponent {
         }
         if (!isRegistered) {
             launch { getLocale() }.join()
+            launch { saveLocaleUseCase.execute(locale.value) }.join()
         }
         _isLoading.value = false
     }
