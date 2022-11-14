@@ -10,7 +10,7 @@ import com.example.traindriver.PreferencesApp
 import com.example.traindriver.data.auth.SignInMethod
 import com.example.traindriver.domain.use_case.GetLocaleUseCase
 import com.example.traindriver.domain.use_case.SignInUseCase
-import com.example.traindriver.ui.util.LocaleState
+import com.example.traindriver.ui.util.LocaleUser
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -22,8 +22,8 @@ class SignInViewModel(application: Application) : AndroidViewModel(application),
     private val signInUseCase: SignInUseCase by inject()
     private val getLocaleUseCase: GetLocaleUseCase by inject()
 
-    val locale: MutableState<LocaleState> = mutableStateOf(LocaleState.OTHER)
-    val number: MutableState<String> = mutableStateOf(LocaleState.OTHER.prefix())
+    val locale: MutableState<LocaleUser> = mutableStateOf(LocaleUser.OTHER)
+    val number: MutableState<String> = mutableStateOf(LocaleUser.OTHER.prefix())
     val allowEntry: MutableState<Boolean> = mutableStateOf(true)
 
     fun signIn(method: SignInMethod) {
@@ -40,7 +40,7 @@ class SignInViewModel(application: Application) : AndroidViewModel(application),
                         .collect { localeState ->
                             locale.value = localeState
                             number.value = localeState.prefix()
-                            allowEntry.value = localeState == LocaleState.OTHER
+                            allowEntry.value = localeState == LocaleUser.OTHER
                         }
                 }
             } catch (e: TimeoutCancellationException) {

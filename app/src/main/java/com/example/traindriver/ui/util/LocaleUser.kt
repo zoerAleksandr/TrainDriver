@@ -4,8 +4,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.TransformedText
 import com.example.traindriver.R
 
-sealed class LocaleState : LocaleInterface {
-    object RU : LocaleState() {
+sealed class LocaleUser : LocaleInterface {
+    object RU : LocaleUser() {
         override fun prefix(): String = "+7"
         override fun maxLength(): Int = 12
         override val transformedNumber: (AnnotatedString) -> TransformedText = {
@@ -15,7 +15,7 @@ sealed class LocaleState : LocaleInterface {
         override val contentDescription = "Россия"
     }
 
-    object BY : LocaleState() {
+    object BY : LocaleUser() {
         override fun prefix(): String = "+375"
         override fun maxLength(): Int = 13
         override val transformedNumber: (AnnotatedString) -> TransformedText = {
@@ -25,7 +25,7 @@ sealed class LocaleState : LocaleInterface {
         override val contentDescription = "Беларусь"
     }
 
-    object KZ : LocaleState() {
+    object KZ : LocaleUser() {
         override fun prefix(): String = "+7"
         override fun maxLength(): Int = 12
         override val transformedNumber: (AnnotatedString) -> TransformedText = {
@@ -35,7 +35,7 @@ sealed class LocaleState : LocaleInterface {
         override val contentDescription = "Казахстан"
     }
 
-    object OTHER : LocaleState() {
+    object OTHER : LocaleUser() {
         override fun prefix(): String = ""
         override fun maxLength(): Int = 17
         override val transformedNumber: (AnnotatedString) -> TransformedText = {

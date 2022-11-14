@@ -27,7 +27,7 @@ import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FieldIsFilled
 import com.example.traindriver.ui.util.FontScalePreviews
-import com.example.traindriver.ui.util.LocaleState
+import com.example.traindriver.ui.util.LocaleUser
 
 @Composable
 fun StartElements(
@@ -85,9 +85,9 @@ fun InputDataElements(
             NumberPhoneTextField(
                 placeholderText = stringResource(id = R.string.placeholder_input_number),
                 numberState = number,
-                localeState = localeState,
+                localeUser = localeState,
                 allowEntry = allowEntry,
-                isFilledCallback = if (localeState.value != LocaleState.OTHER) {
+                isFilledCallback = if (localeState.value != LocaleUser.OTHER) {
                     object : FieldIsFilled {
                         override fun isFilled(isFilled: Boolean) {
                             allowEntry.value = isFilled

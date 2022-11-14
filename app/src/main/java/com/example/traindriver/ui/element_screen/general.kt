@@ -33,14 +33,14 @@ import com.example.traindriver.ui.theme.overpassFontFamily
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FieldIsFilled
 import com.example.traindriver.ui.util.FontScalePreviews
-import com.example.traindriver.ui.util.LocaleState
-import com.example.traindriver.ui.util.LocaleState.OTHER
+import com.example.traindriver.ui.util.LocaleUser
+import com.example.traindriver.ui.util.LocaleUser.OTHER
 
 @Composable
 fun NumberPhoneTextField(
     placeholderText: String,
     numberState: MutableState<String>,
-    localeState: MutableState<LocaleState>,
+    localeUser: MutableState<LocaleUser>,
     allowEntry: MutableState<Boolean>,
     isFilledCallback: FieldIsFilled? = null
 ) {
@@ -68,10 +68,10 @@ fun NumberPhoneTextField(
             modifier = Modifier
                 .fillMaxWidth(0.72f)
         ) {
-            getAllLocaleExcept(localeState.value).forEach {
+            getAllLocaleExcept(localeUser.value).forEach {
                 DropDownLocaleItem(
                     state = it,
-                    currentLocale = localeState,
+                    currentLocale = localeUser,
                     numberState = numberState,
                     allowEntry = allowEntry,
                     dropDownExpanded = dropDownExpanded
@@ -95,8 +95,8 @@ fun NumberPhoneTextField(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Image(
-                    painter = painterResource(id = localeState.value.icon),
-                    contentDescription = localeState.value.contentDescription,
+                    painter = painterResource(id = localeUser.value.icon),
+                    contentDescription = localeUser.value.contentDescription,
                     modifier = Modifier
                         .padding(start = 8.dp, top = 8.dp, bottom = 8.dp)
                 )
@@ -114,10 +114,10 @@ fun NumberPhoneTextField(
                 },
             value = numberState.value,
             onValueChange = {
-                if (it.length <= localeState.value.maxLength()) numberState.value = it
-                isFilledCallback?.isFilled(it.length >= localeState.value.maxLength())
+                if (it.length <= localeUser.value.maxLength()) numberState.value = it
+                isFilledCallback?.isFilled(it.length >= localeUser.value.maxLength())
             },
-            visualTransformation = localeState.value.transformedNumber,
+            visualTransformation = localeUser.value.transformedNumber,
             textStyle = TextStyle(
                 color = MaterialTheme.colors.onBackground,
                 fontSize = 18.sp,
@@ -157,8 +157,8 @@ fun NumberPhoneTextField(
 
 @Composable
 private fun DropDownLocaleItem(
-    state: LocaleState,
-    currentLocale: MutableState<LocaleState>,
+    state: LocaleUser,
+    currentLocale: MutableState<LocaleUser>,
     numberState: MutableState<String>,
     allowEntry: MutableState<Boolean>,
     dropDownExpanded: MutableState<Boolean>
@@ -208,7 +208,7 @@ private fun StartScreenPrev() {
         NumberPhoneTextField(
             "Номер телефона",
             mutableStateOf("+7"),
-            mutableStateOf(LocaleState.RU),
+            mutableStateOf(LocaleUser.RU),
             mutableStateOf(true)
         )
     }
@@ -220,8 +220,8 @@ private fun StartScreenPrev() {
 private fun DropDownPrev() {
     TrainDriverTheme {
         DropDownLocaleItem(
-            LocaleState.BY,
-            mutableStateOf(LocaleState.RU),
+            LocaleUser.BY,
+            mutableStateOf(LocaleUser.RU),
             mutableStateOf("+7"),
             mutableStateOf(true),
             mutableStateOf(false)
