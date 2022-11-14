@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,23 +25,29 @@ import com.example.traindriver.ui.screen.ScreenEnum
 import com.example.traindriver.ui.theme.ShapeInputData
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
-import com.example.traindriver.ui.util.DarkLightPreviews
-import com.example.traindriver.ui.util.FieldIsFilled
-import com.example.traindriver.ui.util.FontScalePreviews
-import com.example.traindriver.ui.util.LocaleUser
+import com.example.traindriver.ui.util.*
 
 @Composable
 fun StartElements(
-    navController: NavController
+    navController: NavController,
+    signInViewModel: SignInViewModel = viewModel()
 ) {
+    val number = signInViewModel.number
+    val allowEntry = signInViewModel.allowEntry
+    val localeState = signInViewModel.locale
+    val logInToApp = object : LogInToApp {
+        override fun logIn(method: SignInMethod) {
+            signInViewModel.signIn(method)
+        }
+    }
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceAround
     ) {
         Logo()
-        InputDataElements()
-        SkipButton(navController = navController)
+        InputDataElements(number, allowEntry, localeState, logInToApp)
+        SkipButton(navController = navController, logInToApp = logInToApp)
     }
 }
 
@@ -56,12 +63,11 @@ fun Logo() {
 
 @Composable
 fun InputDataElements(
-    signInViewModel: SignInViewModel = viewModel()
+    number: MutableState<String>,
+    allowEntry: MutableState<Boolean>,
+    localeState: MutableState<LocaleUser>,
+    logInToApp: LogInToApp
 ) {
-    val number = signInViewModel.number
-    val allowEntry = signInViewModel.allowEntry
-    val localeState = signInViewModel.locale
-
     Surface(
         modifier = Modifier.wrapContentSize(),
         shape = ShapeInputData.medium,
@@ -97,19 +103,22 @@ fun InputDataElements(
             )
 
             SecondarySpacer()
-            LoginButton(enabled = allowEntry.value)
+            LoginButton(
+                enabled = allowEntry.value,
+                logInToApp = logInToApp
+            )
 
             PrimarySpacer()
             DividerTrainDriver()
 
             PrimarySpacer()
-            AlternativeEnteringMenu()
+            AlternativeEnteringMenu(logInToApp)
         }
     }
 }
 
 @Composable
-fun AlternativeEnteringMenu() {
+fun AlternativeEnteringMenu(logInToApp: LogInToApp) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly,
@@ -118,11 +127,13 @@ fun AlternativeEnteringMenu() {
         CircleButton(
             R.drawable.ic_launcher_foreground, stringResource(id = R.string.cont_desc_google_button)
         ) {
+            logInToApp.logIn(SignInMethod.Google)
             Log.d("Debug", "click button login with Google")
         }
         CircleButton(
             R.drawable.ic_launcher_foreground, stringResource(id = R.string.cont_desc_email_button)
         ) {
+            logInToApp.logIn(SignInMethod.Email)
             Log.d("Debug", "click button login by Email")
         }
         CircleButton(
@@ -178,14 +189,14 @@ fun SecondarySpacer() {
 @Composable
 fun LoginButton(
     enabled: Boolean,
-    viewModel: SignInViewModel = viewModel()
+    logInToApp: LogInToApp
 ) {
     Button(
         modifier = Modifier
             .fillMaxWidth()
             .height(dimensionResource(id = R.dimen.min_size_view)),
         onClick = {
-            viewModel.signIn(method = SignInMethod.Phone)
+            logInToApp.logIn(SignInMethod.Phone)
         },
         colors = ButtonDefaults.buttonColors(
             backgroundColor = MaterialTheme.colors.secondaryVariant,
@@ -218,12 +229,10 @@ fun CircleButton(resId: Int, contentDescription: String?, action: () -> Unit) {
 }
 
 @Composable
-fun SkipButton(
-    viewModel: SignInViewModel = viewModel(), navController: NavController
-) {
+fun SkipButton(navController: NavController, logInToApp: LogInToApp) {
     Text(
         modifier = Modifier.clickable(onClick = {
-            viewModel.signIn(method = SignInMethod.Anonymous)
+            logInToApp.logIn(method = SignInMethod.Anonymous)
             navController.apply {
                 this.popBackStack(ScreenEnum.SIGN_IN.name, true)
                 this.navigate(ScreenEnum.MAIN.name)
