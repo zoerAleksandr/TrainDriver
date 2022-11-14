@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,7 +21,6 @@ import com.example.traindriver.R
 import com.example.traindriver.data.auth.SignInMethod
 import com.example.traindriver.ui.element_screen.NumberPhoneTextField
 import com.example.traindriver.ui.screen.ScreenEnum
-import com.example.traindriver.ui.screen.splash_screen.SplashViewModel
 import com.example.traindriver.ui.theme.ShapeInputData
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
@@ -33,7 +31,7 @@ import com.example.traindriver.ui.util.LocaleState
 
 @Composable
 fun StartElements(
-    localeState: MutableState<LocaleState>, navController: NavController
+    navController: NavController
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -41,7 +39,7 @@ fun StartElements(
         verticalArrangement = Arrangement.SpaceAround
     ) {
         Logo()
-        InputDataElements(localeState)
+        InputDataElements()
         SkipButton(navController = navController)
     }
 }
@@ -58,11 +56,11 @@ fun Logo() {
 
 @Composable
 fun InputDataElements(
-    localeState: MutableState<LocaleState>,
-    splashViewModel: SplashViewModel = viewModel()
+    signInViewModel: SignInViewModel = viewModel()
 ) {
-    val number = splashViewModel.number
-    val allowEntry = splashViewModel.allowEntry
+    val number = signInViewModel.number
+    val allowEntry = signInViewModel.allowEntry
+    val localeState = signInViewModel.locale
 
     Surface(
         modifier = Modifier.wrapContentSize(),

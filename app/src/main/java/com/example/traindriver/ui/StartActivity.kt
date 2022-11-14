@@ -18,7 +18,6 @@ class StartActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val viewModel: SplashViewModel by viewModel()
-        val locale = viewModel.locale
         val screen by viewModel.startDestination
 
         installSplashScreen().setKeepOnScreenCondition {
@@ -31,7 +30,6 @@ class StartActivity : ComponentActivity() {
                 SetupNavGraph(
                     navController = navController,
                     startDestination = screen,
-                    locale = locale
                 )
             }
         }
