@@ -1,5 +1,6 @@
 package com.example.traindriver.ui.screen.signin_screen
 
+import android.app.Activity
 import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.MutableState
@@ -7,7 +8,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traindriver.PreferencesApp
-import com.example.traindriver.data.auth.SignInMethod
 import com.example.traindriver.domain.use_case.GetLocaleUseCase
 import com.example.traindriver.domain.use_case.SignInUseCase
 import com.example.traindriver.ui.util.LocaleUser
@@ -26,11 +26,13 @@ class SignInViewModel(application: Application) : AndroidViewModel(application),
     val number: MutableState<String> = mutableStateOf(LocaleUser.OTHER.prefix())
     val allowEntry: MutableState<Boolean> = mutableStateOf(true)
 
-    fun signIn(method: SignInMethod) {
+    fun signIn() {
         viewModelScope.launch {
-            signInUseCase.execute(method)
+            signInUseCase.anonymousAuth()
         }
     }
+
+    fun signInWithPhone(activity: Activity) = signInUseCase.withPhone(number.value, activity)
 
     init {
         viewModelScope.launch {

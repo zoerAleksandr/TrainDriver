@@ -30,11 +30,11 @@ class StartActivity : ComponentActivity() {
                 SetupNavGraph(
                     navController = navController,
                     startDestination = screen,
+                    activity = this
                 )
             }
         }
     }
-
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         if (currentFocus != null) {

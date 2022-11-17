@@ -1,5 +1,6 @@
 package com.example.traindriver.ui.screen.signin_screen
 
+import android.app.Activity
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -8,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,24 +22,51 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.traindriver.R
 import com.example.traindriver.data.auth.SignInMethod
+import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.ui.element_screen.NumberPhoneTextField
 import com.example.traindriver.ui.screen.ScreenEnum
 import com.example.traindriver.ui.theme.ShapeInputData
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun StartElements(
     navController: NavController,
-    signInViewModel: SignInViewModel = viewModel()
+    signInViewModel: SignInViewModel = viewModel(),
+    activity: Activity
 ) {
+    val scope = rememberCoroutineScope()
     val number = signInViewModel.number
     val allowEntry = signInViewModel.allowEntry
     val localeState = signInViewModel.locale
     val logInToApp = object : LogInToApp {
-        override fun logIn(method: SignInMethod) {
-            signInViewModel.signIn(method)
+        override fun logIn(method: String) {
+            when (method) {
+                SignInMethod.Anonymous.javaClass.name -> {
+                    signInViewModel.signIn()
+                }
+                SignInMethod.Phone.className -> {
+                    scope.launch(Dispatchers.Main) {
+                        signInViewModel.signInWithPhone(activity)
+                            .collect {
+                                when (it) {
+                                    is ResultState.Loading -> {}
+                                    is ResultState.Success -> {
+                                        Log.d("ZZZ", "Открыть экраен ввода СМС Кода")
+                                        // Открыть экраен ввода СМС Кода
+                                    }
+                                    is ResultState.Failure -> {}
+                                }
+                            }
+                    }
+                }
+                SignInMethod.Google.javaClass.name -> {}
+                SignInMethod.Email.javaClass.name -> {}
+            }
+
         }
     }
     Column(
@@ -127,13 +156,13 @@ fun AlternativeEnteringMenu(logInToApp: LogInToApp) {
         CircleButton(
             R.drawable.ic_launcher_foreground, stringResource(id = R.string.cont_desc_google_button)
         ) {
-            logInToApp.logIn(SignInMethod.Google)
+            logInToApp.logIn(SignInMethod.Google.javaClass.name)
             Log.d("Debug", "click button login with Google")
         }
         CircleButton(
             R.drawable.ic_launcher_foreground, stringResource(id = R.string.cont_desc_email_button)
         ) {
-            logInToApp.logIn(SignInMethod.Email)
+            logInToApp.logIn(SignInMethod.Email.javaClass.name)
             Log.d("Debug", "click button login by Email")
         }
         CircleButton(
@@ -196,7 +225,7 @@ fun LoginButton(
             .fillMaxWidth()
             .height(dimensionResource(id = R.dimen.min_size_view)),
         onClick = {
-            logInToApp.logIn(SignInMethod.Phone)
+            logInToApp.logIn(SignInMethod.Phone.className)
         },
         colors = ButtonDefaults.buttonColors(
             backgroundColor = MaterialTheme.colors.secondaryVariant,
@@ -232,7 +261,7 @@ fun CircleButton(resId: Int, contentDescription: String?, action: () -> Unit) {
 fun SkipButton(navController: NavController, logInToApp: LogInToApp) {
     Text(
         modifier = Modifier.clickable(onClick = {
-            logInToApp.logIn(method = SignInMethod.Anonymous)
+            logInToApp.logIn(method = SignInMethod.Anonymous.javaClass.name)
             navController.apply {
                 this.popBackStack(ScreenEnum.SIGN_IN.name, true)
                 this.navigate(ScreenEnum.MAIN.name)
