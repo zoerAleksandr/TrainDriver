@@ -13,11 +13,9 @@ import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.util.DarkLightPreviews
 
 @Composable
-fun Background() {
+fun Background(modifier: Modifier) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.background)
+        modifier = modifier
     ) {
         Box(
             modifier = Modifier
@@ -35,6 +33,10 @@ fun Background() {
 @Composable
 private fun BackgroundPrev() {
     TrainDriverTheme {
-        Background()
+        Background(
+            Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colors.background)
+        )
     }
 }

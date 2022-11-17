@@ -26,7 +26,7 @@ class SignInViewModel(application: Application) : AndroidViewModel(application),
     val number: MutableState<String> = mutableStateOf(LocaleUser.OTHER.prefix())
     val allowEntry: MutableState<Boolean> = mutableStateOf(true)
 
-    fun signIn() {
+    fun signInAnonymous() {
         viewModelScope.launch {
             signInUseCase.anonymousAuth()
         }
