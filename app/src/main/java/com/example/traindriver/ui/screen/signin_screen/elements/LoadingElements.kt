@@ -1,4 +1,4 @@
-package com.example.traindriver.ui.screen.signin_screen
+package com.example.traindriver.ui.screen.signin_screen.elements
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,15 +19,13 @@ import com.example.traindriver.ui.util.DarkLightPreviews
 
 @Composable
 fun LoadingElement() {
-    TrainDriverTheme {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = BackgroundLoadingScreen),
-            contentAlignment = Alignment.Center
-        ) {
-            TrainDriverProgressBar()
-        }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = BackgroundLoadingScreen),
+        contentAlignment = Alignment.Center
+    ) {
+        TrainDriverProgressBar()
     }
 }
 

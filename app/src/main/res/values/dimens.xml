@@ -9,7 +9,7 @@
 
     // Loading Screen
     <dimen name="size_background_progress_bar">120dp</dimen>
-    <dimen name="stroke_width_progress_bar">7dp</dimen>
+    <dimen name="stroke_width_progress_bar">5dp</dimen>
 
     // SignIn Screen
     <dimen name="elevation_input_element">6dp</dimen>
