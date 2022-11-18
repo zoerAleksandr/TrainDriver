@@ -20,19 +20,17 @@ sealed class SignInMethod : AuthInterface, KoinComponent {
         )
 
         override fun signIn(): Flow<ResultState<String>> {
-//            workManager.enqueue(anonymousRequest)
+            var flow = flow<ResultState<String>> { ResultState.Loading }
             workManager.runCatching {
                 this.enqueue(anonymousRequest)
             }
                 .onSuccess {
-                    return flow { ResultState.Success("Anonymous signIn") }
+                    flow = flow { ResultState.Success("Anonymous signIn") }
                 }
                 .onFailure {
-                    return flow { ResultState.Failure(it) }
+                    flow = flow { ResultState.Failure(it) }
                 }
-            return flow {
-                ResultState.Success("Anonymous signIn")
-            }
+            return flow
         }
     }
 
@@ -51,11 +49,7 @@ sealed class SignInMethod : AuthInterface, KoinComponent {
     }
 
     class Phone(private val phone: String, private val activity: Activity) : SignInMethod() {
-        companion object {
-            var className: String = Companion::class.java.name
-        }
-
-        override fun signIn(): Flow<ResultState<String>> =
+         override fun signIn(): Flow<ResultState<String>> =
             PhoneAuth().createUserWithPhone(phone, activity)
     }
 }
