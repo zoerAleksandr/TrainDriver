@@ -1,11 +1,10 @@
 package com.example.traindriver.ui.screen.signin_screen
 
 import android.app.Activity
-import android.app.Application
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traindriver.PreferencesApp
 import com.example.traindriver.domain.use_case.GetLocaleUseCase
@@ -18,7 +17,7 @@ import kotlinx.coroutines.withTimeout
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class SignInViewModel(application: Application) : AndroidViewModel(application), KoinComponent {
+class SignInViewModel : ViewModel(), KoinComponent {
     private val signInUseCase: SignInUseCase by inject()
     private val getLocaleUseCase: GetLocaleUseCase by inject()
 

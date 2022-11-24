@@ -50,7 +50,7 @@ fun SignInScreen(
             SnackbarHost(hostState = it) { snackBarData ->
                 Snackbar(
                     snackbarData = snackBarData,
-                    backgroundColor = MaterialTheme.colors.primaryVariant
+                    backgroundColor = MaterialTheme.colors.background
                 )
             }
         }
@@ -126,6 +126,7 @@ fun SignInScreen(
                                         when (it) {
                                             is ResultState.Loading -> {
                                                 isLoading = true
+                                                navController.navigate(ScreenEnum.PASSWORD_CONFIRMATION.name)
                                             }
                                             is ResultState.Success -> {
                                                 isLoading = false

@@ -28,3 +28,5 @@ val Red900 = Color(0xFFB71C1C)
 
 // Helper color
 val BackgroundLoadingScreen = Color(0x99727272)
+val BackgroundIconLight = Color(0x1A828282)
+val BackgroundIconDark = Color(0x1AFFFFFF)

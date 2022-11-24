@@ -1,10 +1,12 @@
 package com.example.traindriver.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val DarkColorPalette = darkColors(
@@ -12,11 +14,11 @@ private val DarkColorPalette = darkColors(
     primaryVariant = Gray900,
     secondary = Red300,
     secondaryVariant = Red700,
-    background = Gray500,
+    background = Gray600,
     error = Red800,
     surface = Gray600,
     onPrimary = Gray100,
-    onSurface = Gray200,
+    onSurface = Gray700,
     onBackground = Gray100,
     onSecondary = Gray100
 )
@@ -35,12 +37,17 @@ private val LightColorPalette = lightColors(
     onSecondary = Gray100
 )
 
+var BackgroundIcon: Color = BackgroundIconLight
+
 @Composable
 fun TrainDriverTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
-    val colors = if (darkTheme) {
-        DarkColorPalette
+    val colors: Colors
+    if (darkTheme){
+        colors = DarkColorPalette
+        BackgroundIcon = BackgroundIconDark
     } else {
-        LightColorPalette
+        colors = LightColorPalette
+        BackgroundIcon = BackgroundIconLight
     }
 
     val systemUiController = rememberSystemUiController()

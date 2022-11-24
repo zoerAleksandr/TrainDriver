@@ -1,4 +1,4 @@
-package com.example.traindriver.ui.screen.signin_screen
+package com.example.traindriver.ui.screen.signin_screen.elements
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
