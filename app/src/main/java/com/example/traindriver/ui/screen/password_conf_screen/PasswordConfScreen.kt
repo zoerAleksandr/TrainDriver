@@ -20,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,10 +39,14 @@ import com.example.traindriver.ui.util.FontScalePreviews
 @Composable
 fun PasswordConfScreen(
     navController: NavController,
-    signInViewModel: SignInViewModel = viewModel()
+    signInViewModel: SignInViewModel
 ) {
     val enabledResentText by remember {
         mutableStateOf(false)
+    }
+    val number by signInViewModel.number
+    val countdown by remember {
+        mutableStateOf(60)
     }
     TrainDriverTheme {
         ConstraintLayout(
@@ -52,7 +58,7 @@ fun PasswordConfScreen(
             val topGuideLine = createGuidelineFromTop(0.17f)
 
             Button(modifier = Modifier
-                .padding(16.dp)
+                .padding(dimensionResource(id = R.dimen.medium_padding))
                 .size(dimensionResource(id = R.dimen.min_size_view))
                 .constrainAs(closeButton) {
                     start.linkTo(parent.start)
@@ -85,7 +91,7 @@ fun PasswordConfScreen(
                 },
                 style = Typography.h3,
                 color = MaterialTheme.colors.onBackground,
-                text = "Введите код из SMS"
+                text = stringResource(id = R.string.title_passwordConfScreen)
             )
             PasswordEditText(modifier = Modifier
                 .constrainAs(editText) {
@@ -93,7 +99,7 @@ fun PasswordConfScreen(
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-                .padding(top = 28.dp))
+                .padding(top = dimensionResource(id = R.dimen.large_padding)))
             Text(
                 modifier = Modifier
                     .constrainAs(secondaryText) {
@@ -101,22 +107,29 @@ fun PasswordConfScreen(
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                     }
-                    .padding(16.dp)
+                    .padding(top = dimensionResource(id = R.dimen.medium_padding))
                     .wrapContentHeight(),
-                text = "Мы отправили SMS с кодом на номер ${signInViewModel.number.value}",
+                text = stringResource(id = R.string.info_text_passwordConfScreen, number),
                 style = Typography.body2,
                 color = MaterialTheme.colors.onBackground,
+                textAlign = TextAlign.Center
             )
-            Button(modifier = Modifier.constrainAs(button) {
-                top.linkTo(secondaryText.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }, colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.secondaryVariant,
-                disabledBackgroundColor = MaterialTheme.colors.secondary
-            ), onClick = { /*TODO*/ }) {
+            Button(
+                modifier = Modifier
+                    .constrainAs(button) {
+                        top.linkTo(secondaryText.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                    .padding(top = dimensionResource(id = R.dimen.medium_padding)),
+                colors = ButtonDefaults.buttonColors(
+                    backgroundColor = MaterialTheme.colors.secondaryVariant,
+                    disabledBackgroundColor = MaterialTheme.colors.secondary
+                ),
+                onClick = { /*TODO*/ }) {
                 Text(
-                    modifier = Modifier.padding(horizontal = 24.dp), text = "Подтвердить"
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    text = stringResource(id = R.string.button_text_confirm)
                 )
             }
 
@@ -132,10 +145,11 @@ fun PasswordConfScreen(
                     ) {
                         /*TODO*/
                     }
-                    .padding(16.dp),
-                text = "Отправить повторно через 60 с",
+                    .padding(top = dimensionResource(id = R.dimen.medium_padding)),
+                text = stringResource(id = R.string.resent_text_passwordConfScreen, countdown),
                 style = Typography.body2,
                 color = MaterialTheme.colors.onBackground,
+                textAlign = TextAlign.Center
             )
 
         }
@@ -147,6 +161,6 @@ fun PasswordConfScreen(
 @FontScalePreviews
 fun DefaultPreview() {
     TrainDriverTheme {
-        PasswordConfScreen(rememberNavController())
+        PasswordConfScreen(rememberNavController(), viewModel())
     }
 }

@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 fun SignInScreen(
     navController: NavController,
     activity: Activity,
-    signInViewModel: SignInViewModel = viewModel(),
+    signInViewModel: SignInViewModel,
 ) {
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -203,6 +203,6 @@ fun SignInScreen(
 @FontScalePreviews
 fun DefaultPreview() {
     TrainDriverTheme {
-//        SignInScreen(navController = , activity = )
+//        SignInScreen(navController = rememberNavController(), activity = )
     }
 }

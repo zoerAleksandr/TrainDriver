@@ -10,4 +10,11 @@
     <string name="cont_desc_google_button">Google-мен кіру</string>
     <string name="cont_desc_vk_button">Вконтакте бойынша кіру</string>
     <string name="cont_desc_email_button">E-mail арқылы кіру</string>
+
+    // Password Confirmation Screen
+    <string name="title_passwordConfScreen">SMS - тен кодты енгізіңіз</string>
+    <string name="info_text_passwordConfScreen">Біз нөмірге SMS жібердік %1$s</string>
+    <string name="button_text_confirm">Pастау</string>
+    <string name="resent_text_passwordConfScreen">Қайта жіберу арқылы %1$d e</string>
+
 </resources>

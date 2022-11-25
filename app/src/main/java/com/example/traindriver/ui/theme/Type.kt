@@ -11,16 +11,21 @@ import androidx.compose.ui.unit.sp
 val Typography = Typography(
     defaultFontFamily = overpassFontFamily,
     h1 = TextStyle(
-        fontSize = 40.sp,
+        fontSize = 39.06.sp,
         fontStyle = FontStyle.Normal,
         fontFamily = overpassFontFamily,
         fontWeight = FontWeight.Thin,
         textAlign = TextAlign.Center
     ),
+    h2 = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.Normal,
+        fontSize = 31.25.sp
+    ),
     h3 = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
-        fontSize = 24.sp
+        fontSize = 25.sp
     ),
     body1 = TextStyle(
         fontFamily = FontFamily.Default,
