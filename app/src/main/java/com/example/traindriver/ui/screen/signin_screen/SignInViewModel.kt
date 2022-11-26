@@ -1,6 +1,7 @@
 package com.example.traindriver.ui.screen.signin_screen
 
 import android.app.Activity
+import android.os.CountDownTimer
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +25,18 @@ class SignInViewModel : ViewModel(), KoinComponent {
     val locale: MutableState<LocaleUser> = mutableStateOf(LocaleUser.OTHER)
     val number: MutableState<String> = mutableStateOf(LocaleUser.OTHER.prefix())
     val allowEntry: MutableState<Boolean> = mutableStateOf(true)
+    val timer: MutableState<Long> = mutableStateOf(60)
+    val resetTextEnable: MutableState<Boolean> = mutableStateOf(false)
+
+    val countDownTimer = object : CountDownTimer(60_000L, 1_000L){
+        override fun onTick(millisUntilFinished: Long) {
+            timer.value = millisUntilFinished / 1000
+        }
+
+        override fun onFinish() {
+            resetTextEnable.value = true
+        }
+    }
 
     fun signInAnonymous() {
         viewModelScope.launch {

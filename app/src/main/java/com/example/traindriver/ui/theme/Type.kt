@@ -47,4 +47,10 @@ val Typography = Typography(
         fontFamily = overpassFontFamily,
         fontWeight = FontWeight.Light
     ),
+    overline = TextStyle(
+        fontSize = 18.sp,
+        fontFamily = overpassFontFamily,
+        fontWeight = FontWeight.Light,
+        fontStyle = FontStyle(1),
+    )
 )

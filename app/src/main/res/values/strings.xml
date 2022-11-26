@@ -16,6 +16,7 @@
     <string name="info_text_passwordConfScreen">Мы отправили SMS на номер %1$s</string>
     <string name="button_text_confirm">Подтвердить</string>
     <string name="resent_text_passwordConfScreen">Отправить повторно через %1$d с</string>
+    <string name="resent_text_passwordConfScreen_enabled">Отправить повторно</string>
     // TAG
     <string name="ANONYMOUS_WORKER_TAG" translatable="false">ANONYMOUS_WORK_TAG</string>
 </resources>

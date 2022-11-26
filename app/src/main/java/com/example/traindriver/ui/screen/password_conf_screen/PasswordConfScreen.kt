@@ -2,20 +2,14 @@ package com.example.traindriver.ui.screen.password_conf_screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
@@ -41,13 +35,11 @@ fun PasswordConfScreen(
     navController: NavController,
     signInViewModel: SignInViewModel
 ) {
-    val enabledResentText by remember {
-        mutableStateOf(false)
-    }
     val number by signInViewModel.number
-    val countdown by remember {
-        mutableStateOf(60)
-    }
+    val countdown by signInViewModel.timer
+    signInViewModel.countDownTimer.start()
+    val resentTextEnable by signInViewModel.resetTextEnable
+
     TrainDriverTheme {
         ConstraintLayout(
             modifier = Modifier
@@ -126,32 +118,41 @@ fun PasswordConfScreen(
                     backgroundColor = MaterialTheme.colors.secondaryVariant,
                     disabledBackgroundColor = MaterialTheme.colors.secondary
                 ),
-                onClick = { /*TODO*/ }) {
+                onClick = { /*TODO*/ }
+            ) {
                 Text(
                     modifier = Modifier.padding(horizontal = 24.dp),
-                    text = stringResource(id = R.string.button_text_confirm)
+                    text = stringResource(id = R.string.button_text_confirm),
+                    style = Typography.button
                 )
             }
 
-            Text(
+            TextButton(
                 modifier = Modifier
                     .constrainAs(resentText) {
                         top.linkTo(button.bottom)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                     }
-                    .clickable(
-                        enabled = enabledResentText
-                    ) {
-                        /*TODO*/
-                    }
                     .padding(top = dimensionResource(id = R.dimen.medium_padding)),
-                text = stringResource(id = R.string.resent_text_passwordConfScreen, countdown),
-                style = Typography.body2,
-                color = MaterialTheme.colors.onBackground,
-                textAlign = TextAlign.Center
-            )
-
+                enabled = resentTextEnable,
+                onClick = { /*TODO*/ }
+            ) {
+                Text(
+                    text = if (resentTextEnable) {
+                        stringResource(id = R.string.resent_text_passwordConfScreen_enabled)
+                    } else {
+                        stringResource(id = R.string.resent_text_passwordConfScreen, countdown)
+                    },
+                    style = if (resentTextEnable) {
+                        Typography.overline
+                    } else {
+                        Typography.body2
+                    },
+                    color = MaterialTheme.colors.onBackground,
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
