@@ -18,4 +18,7 @@
     <string name="resent_text_passwordConfScreen">%$1d секундтан кейін қайта жіберіңіз</string>
     <string name="resent_text_passwordConfScreen_enabled">Қайта жіберу</string>
 
+    // Сообщения ошибок
+    <string name="invalid_code">Қате код</string>
+    <string name="empty_number">"Телефон нөмірін енгізіңіз"</string>
 </resources>

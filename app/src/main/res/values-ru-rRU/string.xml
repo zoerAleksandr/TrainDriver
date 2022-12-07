@@ -18,4 +18,7 @@
     <string name="resent_text_passwordConfScreen">Отправить повторно через %1$d с</string>
     <string name="resent_text_passwordConfScreen_enabled">Отправить повторно</string>
 
+    // Сообщения ошибок
+    <string name="invalid_code">Неверный код</string>
+    <string name="empty_number">"Введите номер телефона"</string>
 </resources>

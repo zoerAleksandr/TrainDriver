@@ -19,4 +19,8 @@
     <string name="resent_text_passwordConfScreen_enabled">Отправить повторно</string>
     // TAG
     <string name="ANONYMOUS_WORKER_TAG" translatable="false">ANONYMOUS_WORK_TAG</string>
+    
+    // Сообщения ошибок
+    <string name="invalid_code">Неверный код</string>
+    <string name="empty_number">"Введите номер телефона"</string>
 </resources>

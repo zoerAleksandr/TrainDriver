@@ -26,6 +26,6 @@ fun SetupNavGraph(
         composable(ScreenEnum.MAIN.name) {
             MainScreen(navController)
         }
-        composable(ScreenEnum.PASSWORD_CONFIRMATION.name) { PasswordConfScreen(navController, signInViewModel)}
+        composable(ScreenEnum.PASSWORD_CONFIRMATION.name) { PasswordConfScreen(navController, signInViewModel, activity)}
     }
 }

@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.ui.element_screen.NumberPhoneTextField
@@ -41,8 +42,6 @@ fun SignInScreen(
     val number = signInViewModel.number
     val allowEntry = signInViewModel.allowEntry
     val localeState = signInViewModel.locale
-
-    var isLoading by remember { mutableStateOf(false) }
 
     Scaffold(
         scaffoldState = scaffoldState,
@@ -121,19 +120,20 @@ fun SignInScreen(
                         enabled = allowEntry.value,
                         onClick = {
                             scope.launch(Dispatchers.Main) {
-                                signInViewModel.signInWithPhone(activity)
+                                signInViewModel.phoneAuth.createUserWithPhone(activity)
                                     .collect {
                                         when (it) {
                                             is ResultState.Loading -> {
-                                                isLoading = true
-                                                navController.navigate(ScreenEnum.PASSWORD_CONFIRMATION.name)
+                                                allowEntry.value = false
                                             }
                                             is ResultState.Success -> {
-                                                isLoading = false
-                                                Log.d("ZZZ", "Открыть экраен ввода СМС Кода")
+                                                navController.apply {
+                                                    this.popBackStack(ScreenEnum.SIGN_IN.name, true)
+                                                    this.navigate(ScreenEnum.MAIN.name)
+                                                }
                                             }
                                             is ResultState.Failure -> {
-                                                isLoading = false
+                                                allowEntry.value = true
                                                 scaffoldState.snackbarHostState.showSnackbar(it.msg.message.toString())
                                             }
                                         }
@@ -182,7 +182,7 @@ fun SignInScreen(
                     }
                     .clickable(
                         onClick = {
-                            signInViewModel.signInAnonymous()
+                            signInViewModel.anonymousAuth.signIn()
                             navController.apply {
                                 this.popBackStack(ScreenEnum.SIGN_IN.name, true)
                                 this.navigate(ScreenEnum.MAIN.name)
@@ -192,10 +192,6 @@ fun SignInScreen(
             )
         }
     }
-
-    if (isLoading) {
-        LoadingElement()
-    }
 }
 
 @Composable
@@ -203,6 +199,6 @@ fun SignInScreen(
 @FontScalePreviews
 fun DefaultPreview() {
     TrainDriverTheme {
-//        SignInScreen(navController = rememberNavController(), activity = )
+        SignInScreen(rememberNavController(), Activity(), viewModel())
     }
 }
