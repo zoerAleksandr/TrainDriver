@@ -127,10 +127,7 @@ fun SignInScreen(
                                                 allowEntry.value = false
                                             }
                                             is ResultState.Success -> {
-                                                navController.apply {
-                                                    this.popBackStack(ScreenEnum.SIGN_IN.name, true)
-                                                    this.navigate(ScreenEnum.MAIN.name)
-                                                }
+                                                navController.navigate(ScreenEnum.PASSWORD_CONFIRMATION.name)
                                             }
                                             is ResultState.Failure -> {
                                                 allowEntry.value = true

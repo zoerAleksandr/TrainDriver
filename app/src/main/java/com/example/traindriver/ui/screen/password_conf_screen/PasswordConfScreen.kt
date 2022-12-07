@@ -42,10 +42,7 @@ import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.ui.screen.ScreenEnum
 import com.example.traindriver.ui.screen.signin_screen.SignInViewModel
-import com.example.traindriver.ui.theme.BackgroundIcon
-import com.example.traindriver.ui.theme.ShapeBackground
-import com.example.traindriver.ui.theme.TrainDriverTheme
-import com.example.traindriver.ui.theme.Typography
+import com.example.traindriver.ui.theme.*
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FontScalePreviews
 import kotlinx.coroutines.Dispatchers
@@ -485,8 +482,12 @@ fun PasswordConfScreen(
                     } else {
                         stringResource(id = R.string.resent_text_passwordConfScreen, countdown)
                     },
-                    style = Typography.body2,
-                    color = MaterialTheme.colors.onBackground,
+                    style = Typography.body1,
+                    color = if (resentTextEnable) {
+                        ClicableTextColor
+                    } else {
+                        MaterialTheme.colors.onBackground
+                    },
                     textAlign = TextAlign.Center
                 )
             }
