@@ -40,6 +40,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
+import com.example.traindriver.ui.element_screen.TopSnackbar
 import com.example.traindriver.ui.screen.ScreenEnum
 import com.example.traindriver.ui.screen.signin_screen.SignInViewModel
 import com.example.traindriver.ui.theme.*
@@ -59,6 +60,7 @@ fun PasswordConfScreen(
     val number by signInViewModel.number
     val countdown by signInViewModel.timer
     val resentTextEnable by signInViewModel.resetButtonEnable
+    val scaffoldState = rememberScaffoldState()
 
     signInViewModel.countDownTimer.start()
 
@@ -73,423 +75,436 @@ fun PasswordConfScreen(
         v1.value, v2.value, v3.value, v4.value, v5.value, v6.value
     ).joinToString(separator = "")
 
-    if (code.length == 6) {
-        scope.launch(Dispatchers.Main) {
-            signInViewModel.phoneAuth.checkCode(code)
-                .collect { state ->
-                    when (state) {
-                        is ResultState.Loading -> {
-                            Log.d("ZZZ", "Loading")
-                        }
-                        is ResultState.Success -> {
-                            navController.navigate(ScreenEnum.MAIN.name)
-                            Log.d("ZZZ", "Success ${state.data?.uid}")
-                        }
-                        is ResultState.Failure -> {
-                            Log.d("ZZZ", "Failure ${state.msg}")
-                        }
-                    }
-                }
-        }
-    }
-
     TrainDriverTheme {
-        ConstraintLayout(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colors.background)
-        ) {
-            val (titleText, editText, secondaryText, closeButton, resentText) = createRefs()
-            val topGuideLine = createGuidelineFromTop(0.17f)
-
-            Button(modifier = Modifier
-                .padding(dimensionResource(id = R.dimen.medium_padding))
-                .size(dimensionResource(id = R.dimen.min_size_view))
-                .constrainAs(closeButton) {
-                    start.linkTo(parent.start)
-                    top.linkTo(parent.top)
-                },
-                shape = CircleShape,
-                elevation = null,
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = BackgroundIcon
-                ),
-                onClick = {
-                    navController.apply {
-                        popBackStack(ScreenEnum.PASSWORD_CONFIRMATION.name, true)
-                        navigate(ScreenEnum.SIGN_IN.name)
-                    }
+        Scaffold(
+            scaffoldState = scaffoldState,
+            snackbarHost = {
+                SnackbarHost(hostState = it)
+                { snackBarData ->
+                    TopSnackbar(snackBarData)
                 }
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_close_24),
-                    contentDescription = "close",
-                    contentScale = ContentScale.Crop
-                )
+            }
+        ) {
+            if (code.length == 6) {
+                scope.launch(Dispatchers.Main) {
+                    signInViewModel.phoneAuth.checkCode(code)
+                        .collect { state ->
+                            when (state) {
+                                is ResultState.Loading -> {
+                                    scaffoldState.snackbarHostState.showSnackbar("Проверяем код...")
+                                }
+                                is ResultState.Success -> {
+                                    navController.navigate(ScreenEnum.MAIN.name)
+                                }
+                                is ResultState.Failure -> {
+                                    scaffoldState.snackbarHostState.showSnackbar(state.msg.message.toString())
+                                }
+                            }
+                        }
+                }
             }
 
-            Text(
-                modifier = Modifier.constrainAs(titleText) {
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    top.linkTo(topGuideLine)
-                },
-                style = Typography.h3,
-                color = MaterialTheme.colors.onBackground,
-                text = stringResource(id = R.string.title_passwordConfScreen)
-            )
-            Row(
+            ConstraintLayout(
                 modifier = Modifier
-                    .constrainAs(editText) {
-                        top.linkTo(titleText.bottom)
+                    .fillMaxSize()
+                    .background(MaterialTheme.colors.background)
+            ) {
+                val (titleText, editText, secondaryText, closeButton, resentText) = createRefs()
+                val topGuideLine = createGuidelineFromTop(0.17f)
+
+                Button(modifier = Modifier
+                    .padding(dimensionResource(id = R.dimen.medium_padding))
+                    .size(dimensionResource(id = R.dimen.min_size_view))
+                    .constrainAs(closeButton) {
+                        start.linkTo(parent.start)
+                        top.linkTo(parent.top)
+                    },
+                    shape = CircleShape,
+                    elevation = null,
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = BackgroundIcon
+                    ),
+                    onClick = {
+                        navController.apply {
+                            popBackStack(ScreenEnum.PASSWORD_CONFIRMATION.name, true)
+                            navigate(ScreenEnum.SIGN_IN.name)
+                        }
+                    }
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_close_24),
+                        contentDescription = "close",
+                        contentScale = ContentScale.Crop
+                    )
+                }
+
+                Text(
+                    modifier = Modifier.constrainAs(titleText) {
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
-                    }
-                    .padding(top = dimensionResource(id = R.dimen.large_padding)),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                val widthBox = dimensionResource(id = R.dimen.min_size_view)
-                val heightBox = dimensionResource(id = R.dimen.min_size_view) * 1.17f
-                val padding = dimensionResource(id = R.dimen.small_padding)
-                val focusManager = LocalFocusManager.current
-                val focusRequester = remember { FocusRequester() }
-                val keyboard = LocalSoftwareKeyboardController.current
-
-                LaunchedEffect(Unit) {
-                    focusRequester.requestFocus()
-                    keyboard?.show()
-                }
-                val customTextSelectionColors = TextSelectionColors(
-                    handleColor = Color.Transparent,
-                    backgroundColor = Color.Transparent,
+                        top.linkTo(topGuideLine)
+                    },
+                    style = Typography.h3,
+                    color = MaterialTheme.colors.onBackground,
+                    text = stringResource(id = R.string.title_passwordConfScreen)
                 )
-                CompositionLocalProvider(
-                    LocalTextSelectionColors provides customTextSelectionColors
+                Row(
+                    modifier = Modifier
+                        .constrainAs(editText) {
+                            top.linkTo(titleText.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                        .padding(top = dimensionResource(id = R.dimen.large_padding)),
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .padding(end = padding)
-                            .width(widthBox)
-                            .height(heightBox)
-                            .border(
-                                color = MaterialTheme.colors.onSurface,
-                                width = dimensionResource(id = R.dimen.width_border_input_field),
-                                shape = ShapeBackground.small
-                            )
-                            .background(
-                                color = BackgroundIcon, shape = RoundedCornerShape(5.dp)
-                            ), contentAlignment = Alignment.Center
+                    val widthBox = dimensionResource(id = R.dimen.min_size_view)
+                    val heightBox = dimensionResource(id = R.dimen.min_size_view) * 1.17f
+                    val padding = dimensionResource(id = R.dimen.small_padding)
+                    val focusManager = LocalFocusManager.current
+                    val focusRequester = remember { FocusRequester() }
+                    val keyboard = LocalSoftwareKeyboardController.current
+
+                    LaunchedEffect(Unit) {
+                        focusRequester.requestFocus()
+                        keyboard?.show()
+                    }
+                    val customTextSelectionColors = TextSelectionColors(
+                        handleColor = Color.Transparent,
+                        backgroundColor = Color.Transparent,
+                    )
+                    CompositionLocalProvider(
+                        LocalTextSelectionColors provides customTextSelectionColors
                     ) {
-                        BasicTextField(
+                        Box(
                             modifier = Modifier
-                                .focusRequester(focusRequester)
-                                .onFocusEvent {
-                                    if (it.hasFocus && v1.value.isNotEmpty()) {
+                                .padding(end = padding)
+                                .width(widthBox)
+                                .height(heightBox)
+                                .border(
+                                    color = MaterialTheme.colors.onSurface,
+                                    width = dimensionResource(id = R.dimen.width_border_input_field),
+                                    shape = ShapeBackground.small
+                                )
+                                .background(
+                                    color = BackgroundIcon, shape = RoundedCornerShape(5.dp)
+                                ), contentAlignment = Alignment.Center
+                        ) {
+                            BasicTextField(
+                                modifier = Modifier
+                                    .focusRequester(focusRequester)
+                                    .onFocusEvent {
+                                        if (it.hasFocus && v1.value.isNotEmpty()) {
+                                            focusManager.moveFocus(FocusDirection.Next)
+                                        }
+                                    },
+                                value = v1.value,
+                                onValueChange = {
+                                    v1.value = it
+                                    if (it.length == 1) {
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                            value = v1.value,
-                            onValueChange = {
-                                v1.value = it
-                                if (it.length == 1) {
-                                    focusManager.moveFocus(FocusDirection.Next)
-                                }
-                            },
-                            textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
-                            cursorBrush = SolidColor(Color.Unspecified),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
+                                cursorBrush = SolidColor(Color.Unspecified),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number
+                                )
                             )
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .padding(end = padding)
-                            .width(widthBox)
-                            .height(heightBox)
-                            .border(
-                                color = MaterialTheme.colors.onSurface,
-                                width = dimensionResource(id = R.dimen.width_border_input_field),
-                                shape = ShapeBackground.small
-                            )
-                            .background(
-                                color = BackgroundIcon, shape = RoundedCornerShape(5.dp)
-                            ), contentAlignment = Alignment.Center
-                    ) {
-                        BasicTextField(modifier = Modifier
-                            .onKeyEvent {
-                                when (it.nativeKeyEvent.keyCode) {
-                                    KeyEvent.KEYCODE_DEL -> {
-                                        if (v2.value.isEmpty()) {
-                                            v1.value = ""
+                        }
+                        Box(
+                            modifier = Modifier
+                                .padding(end = padding)
+                                .width(widthBox)
+                                .height(heightBox)
+                                .border(
+                                    color = MaterialTheme.colors.onSurface,
+                                    width = dimensionResource(id = R.dimen.width_border_input_field),
+                                    shape = ShapeBackground.small
+                                )
+                                .background(
+                                    color = BackgroundIcon, shape = RoundedCornerShape(5.dp)
+                                ), contentAlignment = Alignment.Center
+                        ) {
+                            BasicTextField(modifier = Modifier
+                                .onKeyEvent {
+                                    when (it.nativeKeyEvent.keyCode) {
+                                        KeyEvent.KEYCODE_DEL -> {
+                                            if (v2.value.isEmpty()) {
+                                                v1.value = ""
+                                            }
+                                            focusManager.moveFocus(FocusDirection.Left)
+                                            true
                                         }
-                                        focusManager.moveFocus(FocusDirection.Left)
-                                        true
+                                        else -> false
                                     }
-                                    else -> false
                                 }
-                            }
-                            .onFocusEvent {
-                                if (it.hasFocus && v1.value.isEmpty()) {
-                                    focusManager.moveFocus(FocusDirection.Left)
-                                }
-                                if (it.hasFocus && v2.value.isNotEmpty()) {
-                                    focusManager.moveFocus(FocusDirection.Next)
-                                }
-                            },
-                            value = v2.value,
-                            onValueChange = {
-                                v2.value = it
-                                if (it.length == 1) {
-                                    focusManager.moveFocus(FocusDirection.Next)
-                                }
-                            },
-                            textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
-                            cursorBrush = SolidColor(Color.Unspecified),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number
+                                .onFocusEvent {
+                                    if (it.hasFocus && v1.value.isEmpty()) {
+                                        focusManager.moveFocus(FocusDirection.Left)
+                                    }
+                                    if (it.hasFocus && v2.value.isNotEmpty()) {
+                                        focusManager.moveFocus(FocusDirection.Next)
+                                    }
+                                },
+                                value = v2.value,
+                                onValueChange = {
+                                    v2.value = it
+                                    if (it.length == 1) {
+                                        focusManager.moveFocus(FocusDirection.Next)
+                                    }
+                                },
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
+                                cursorBrush = SolidColor(Color.Unspecified),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number
+                                )
                             )
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .padding(end = padding)
-                            .width(widthBox)
-                            .height(heightBox)
-                            .border(
-                                color = MaterialTheme.colors.onSurface,
-                                width = dimensionResource(id = R.dimen.width_border_input_field),
-                                shape = ShapeBackground.small
-                            )
-                            .background(
-                                color = BackgroundIcon, shape = RoundedCornerShape(5.dp)
-                            ), contentAlignment = Alignment.Center
-                    ) {
-                        BasicTextField(modifier = Modifier
-                            .onKeyEvent {
-                                when (it.nativeKeyEvent.keyCode) {
-                                    KeyEvent.KEYCODE_DEL -> {
-                                        if (v3.value.isEmpty()) {
-                                            v2.value = ""
+                        }
+                        Box(
+                            modifier = Modifier
+                                .padding(end = padding)
+                                .width(widthBox)
+                                .height(heightBox)
+                                .border(
+                                    color = MaterialTheme.colors.onSurface,
+                                    width = dimensionResource(id = R.dimen.width_border_input_field),
+                                    shape = ShapeBackground.small
+                                )
+                                .background(
+                                    color = BackgroundIcon, shape = RoundedCornerShape(5.dp)
+                                ), contentAlignment = Alignment.Center
+                        ) {
+                            BasicTextField(modifier = Modifier
+                                .onKeyEvent {
+                                    when (it.nativeKeyEvent.keyCode) {
+                                        KeyEvent.KEYCODE_DEL -> {
+                                            if (v3.value.isEmpty()) {
+                                                v2.value = ""
+                                            }
+                                            focusManager.moveFocus(FocusDirection.Left)
+                                            true
                                         }
-                                        focusManager.moveFocus(FocusDirection.Left)
-                                        true
+                                        else -> false
                                     }
-                                    else -> false
                                 }
-                            }
-                            .onFocusEvent {
-                                if (it.hasFocus && v2.value.isEmpty()) {
-                                    focusManager.moveFocus(FocusDirection.Left)
-                                }
-                                if (it.hasFocus && v3.value.isNotEmpty()) {
-                                    focusManager.moveFocus(FocusDirection.Next)
-                                }
-                            },
-                            value = v3.value,
-                            onValueChange = {
-                                v3.value = it
-                                if (it.length == 1) {
-                                    focusManager.moveFocus(FocusDirection.Next)
-                                }
-                            },
-                            textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
-                            cursorBrush = SolidColor(Color.Unspecified),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number
+                                .onFocusEvent {
+                                    if (it.hasFocus && v2.value.isEmpty()) {
+                                        focusManager.moveFocus(FocusDirection.Left)
+                                    }
+                                    if (it.hasFocus && v3.value.isNotEmpty()) {
+                                        focusManager.moveFocus(FocusDirection.Next)
+                                    }
+                                },
+                                value = v3.value,
+                                onValueChange = {
+                                    v3.value = it
+                                    if (it.length == 1) {
+                                        focusManager.moveFocus(FocusDirection.Next)
+                                    }
+                                },
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
+                                cursorBrush = SolidColor(Color.Unspecified),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number
+                                )
                             )
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .padding(end = padding)
-                            .width(widthBox)
-                            .height(heightBox)
-                            .border(
-                                color = MaterialTheme.colors.onSurface,
-                                width = dimensionResource(id = R.dimen.width_border_input_field),
-                                shape = ShapeBackground.small
-                            )
-                            .background(
-                                color = BackgroundIcon, shape = RoundedCornerShape(5.dp)
-                            ), contentAlignment = Alignment.Center
-                    ) {
-                        BasicTextField(modifier = Modifier
-                            .onKeyEvent {
-                                when (it.nativeKeyEvent.keyCode) {
-                                    KeyEvent.KEYCODE_DEL -> {
-                                        if (v4.value.isEmpty()) {
-                                            v3.value = ""
+                        }
+                        Box(
+                            modifier = Modifier
+                                .padding(end = padding)
+                                .width(widthBox)
+                                .height(heightBox)
+                                .border(
+                                    color = MaterialTheme.colors.onSurface,
+                                    width = dimensionResource(id = R.dimen.width_border_input_field),
+                                    shape = ShapeBackground.small
+                                )
+                                .background(
+                                    color = BackgroundIcon, shape = RoundedCornerShape(5.dp)
+                                ), contentAlignment = Alignment.Center
+                        ) {
+                            BasicTextField(modifier = Modifier
+                                .onKeyEvent {
+                                    when (it.nativeKeyEvent.keyCode) {
+                                        KeyEvent.KEYCODE_DEL -> {
+                                            if (v4.value.isEmpty()) {
+                                                v3.value = ""
+                                            }
+                                            focusManager.moveFocus(FocusDirection.Left)
+                                            true
                                         }
-                                        focusManager.moveFocus(FocusDirection.Left)
-                                        true
+                                        else -> false
                                     }
-                                    else -> false
                                 }
-                            }
-                            .onFocusEvent {
-                                if (it.hasFocus && v3.value.isEmpty()) {
-                                    focusManager.moveFocus(FocusDirection.Left)
-                                }
-                                if (it.hasFocus && v4.value.isNotEmpty()) {
-                                    focusManager.moveFocus(FocusDirection.Next)
-                                }
-                            },
-                            value = v4.value,
-                            onValueChange = {
-                                v4.value = it
-                                if (it.length == 1) {
-                                    focusManager.moveFocus(FocusDirection.Next)
-                                }
-                            },
-                            textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
-                            cursorBrush = SolidColor(Color.Unspecified),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number
+                                .onFocusEvent {
+                                    if (it.hasFocus && v3.value.isEmpty()) {
+                                        focusManager.moveFocus(FocusDirection.Left)
+                                    }
+                                    if (it.hasFocus && v4.value.isNotEmpty()) {
+                                        focusManager.moveFocus(FocusDirection.Next)
+                                    }
+                                },
+                                value = v4.value,
+                                onValueChange = {
+                                    v4.value = it
+                                    if (it.length == 1) {
+                                        focusManager.moveFocus(FocusDirection.Next)
+                                    }
+                                },
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
+                                cursorBrush = SolidColor(Color.Unspecified),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number
+                                )
                             )
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .padding(end = padding)
-                            .width(widthBox)
-                            .height(heightBox)
-                            .border(
-                                color = MaterialTheme.colors.onSurface,
-                                width = dimensionResource(id = R.dimen.width_border_input_field),
-                                shape = ShapeBackground.small
-                            )
-                            .background(
-                                color = BackgroundIcon, shape = RoundedCornerShape(5.dp)
-                            ), contentAlignment = Alignment.Center
-                    ) {
-                        BasicTextField(modifier = Modifier
-                            .onKeyEvent {
-                                when (it.nativeKeyEvent.keyCode) {
-                                    KeyEvent.KEYCODE_DEL -> {
-                                        if (v5.value.isEmpty()) {
-                                            v4.value = ""
+                        }
+                        Box(
+                            modifier = Modifier
+                                .padding(end = padding)
+                                .width(widthBox)
+                                .height(heightBox)
+                                .border(
+                                    color = MaterialTheme.colors.onSurface,
+                                    width = dimensionResource(id = R.dimen.width_border_input_field),
+                                    shape = ShapeBackground.small
+                                )
+                                .background(
+                                    color = BackgroundIcon, shape = RoundedCornerShape(5.dp)
+                                ), contentAlignment = Alignment.Center
+                        ) {
+                            BasicTextField(modifier = Modifier
+                                .onKeyEvent {
+                                    when (it.nativeKeyEvent.keyCode) {
+                                        KeyEvent.KEYCODE_DEL -> {
+                                            if (v5.value.isEmpty()) {
+                                                v4.value = ""
+                                            }
+                                            focusManager.moveFocus(FocusDirection.Left)
+                                            true
                                         }
-                                        focusManager.moveFocus(FocusDirection.Left)
-                                        true
+                                        else -> false
                                     }
-                                    else -> false
                                 }
-                            }
-                            .onFocusEvent {
-                                if (it.hasFocus && v4.value.isEmpty()) {
-                                    focusManager.moveFocus(FocusDirection.Left)
-                                }
-                                if (it.hasFocus && v5.value.isNotEmpty()) {
-                                    focusManager.moveFocus(FocusDirection.Next)
-                                }
-                            },
-                            value = v5.value,
-                            onValueChange = {
-                                v5.value = it
-                                if (it.length == 1) {
-                                    focusManager.moveFocus(FocusDirection.Next)
-                                }
-                            },
-                            textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
-                            cursorBrush = SolidColor(Color.Unspecified),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number
+                                .onFocusEvent {
+                                    if (it.hasFocus && v4.value.isEmpty()) {
+                                        focusManager.moveFocus(FocusDirection.Left)
+                                    }
+                                    if (it.hasFocus && v5.value.isNotEmpty()) {
+                                        focusManager.moveFocus(FocusDirection.Next)
+                                    }
+                                },
+                                value = v5.value,
+                                onValueChange = {
+                                    v5.value = it
+                                    if (it.length == 1) {
+                                        focusManager.moveFocus(FocusDirection.Next)
+                                    }
+                                },
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
+                                cursorBrush = SolidColor(Color.Unspecified),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number
+                                )
                             )
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .width(widthBox)
-                            .height(heightBox)
-                            .border(
-                                color = MaterialTheme.colors.onSurface,
-                                width = dimensionResource(id = R.dimen.width_border_input_field),
-                                shape = ShapeBackground.small
+                        }
+                        Box(
+                            modifier = Modifier
+                                .width(widthBox)
+                                .height(heightBox)
+                                .border(
+                                    color = MaterialTheme.colors.onSurface,
+                                    width = dimensionResource(id = R.dimen.width_border_input_field),
+                                    shape = ShapeBackground.small
+                                )
+                                .background(
+                                    color = BackgroundIcon, shape = RoundedCornerShape(5.dp)
+                                ), contentAlignment = Alignment.Center
+                        ) {
+                            BasicTextField(
+                                modifier = Modifier.onFocusEvent {
+                                    if (it.hasFocus && v5.value.isEmpty()) {
+                                        focusManager.moveFocus(FocusDirection.Left)
+                                    }
+                                },
+                                value = v6.value,
+                                onValueChange = {
+                                    if (it.length <= 1) {
+                                        v6.value = it
+                                    }
+                                },
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
+                                cursorBrush = SolidColor(Color.Unspecified),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number
+                                )
                             )
-                            .background(
-                                color = BackgroundIcon, shape = RoundedCornerShape(5.dp)
-                            ), contentAlignment = Alignment.Center
-                    ) {
-                        BasicTextField(
-                            modifier = Modifier.onFocusEvent {
-                                if (it.hasFocus && v5.value.isEmpty()) {
-                                    focusManager.moveFocus(FocusDirection.Left)
-                                }
-                            },
-                            value = v6.value,
-                            onValueChange = {
-                                if (it.length <= 1) {
-                                    v6.value = it
-                                }
-                            },
-                            textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
-                            cursorBrush = SolidColor(Color.Unspecified),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number
-                            )
-                        )
+                        }
                     }
                 }
-            }
 
-            Text(
-                modifier = Modifier
-                    .constrainAs(secondaryText) {
-                        top.linkTo(editText.bottom)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-                    .padding(top = dimensionResource(id = R.dimen.medium_padding))
-                    .wrapContentHeight(),
-                text = stringResource(id = R.string.info_text_passwordConfScreen, number),
-                style = Typography.body2,
-                color = MaterialTheme.colors.onBackground,
-                textAlign = TextAlign.Center
-            )
-
-            TextButton(
-                modifier = Modifier
-                    .constrainAs(resentText) {
-                        top.linkTo(secondaryText.bottom)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-                    .padding(top = 5.dp),
-                enabled = resentTextEnable,
-                onClick = {
-                    scope.launch(Dispatchers.Main) {
-                        signInViewModel.phoneAuth.resendCode(activity)
-                            .collect { state ->
-                                when (state) {
-                                    is ResultState.Loading -> {
-                                        Log.d("ZZZ", "Loading")
-                                    }
-                                    is ResultState.Success -> {
-                                        Log.d("ZZZ", "Success")
-                                    }
-                                    is ResultState.Failure -> {
-                                        Log.d("ZZZ", "Failure ${state.msg}")
-                                    }
-                                }
-                            }
-                    }
-                }
-            ) {
                 Text(
-                    text = if (resentTextEnable) {
-                        stringResource(id = R.string.resent_text_passwordConfScreen_enabled)
-                    } else {
-                        stringResource(id = R.string.resent_text_passwordConfScreen, countdown)
-                    },
-                    style = Typography.body1,
-                    color = if (resentTextEnable) {
-                        ClicableTextColor
-                    } else {
-                        MaterialTheme.colors.onBackground
-                    },
+                    modifier = Modifier
+                        .constrainAs(secondaryText) {
+                            top.linkTo(editText.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                        .padding(top = dimensionResource(id = R.dimen.medium_padding))
+                        .wrapContentHeight(),
+                    text = stringResource(id = R.string.info_text_passwordConfScreen, number),
+                    style = Typography.body2,
+                    color = MaterialTheme.colors.onBackground,
                     textAlign = TextAlign.Center
                 )
+
+                TextButton(
+                    modifier = Modifier
+                        .constrainAs(resentText) {
+                            top.linkTo(secondaryText.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                        .padding(top = 5.dp),
+                    enabled = resentTextEnable,
+                    onClick = {
+                        signInViewModel.resetButtonEnable.value = false
+                        signInViewModel.countDownTimer.start()
+                        scope.launch(Dispatchers.Main) {
+                            signInViewModel.phoneAuth.resendCode(activity)
+                                .collect { state ->
+                                    when (state) {
+                                        is ResultState.Loading -> {
+                                            Log.d("ZZZ", "Loading")
+                                            scaffoldState.snackbarHostState.showSnackbar("Пытаемся отправить СМС...")
+                                        }
+                                        is ResultState.Success -> {
+                                            Log.d("ZZZ", "Success")
+                                        }
+                                        is ResultState.Failure -> {
+                                            Log.d("ZZZ", "Failure ${state.msg}")
+                                            scaffoldState.snackbarHostState.showSnackbar("Ошибка отправки. Проверьте подключение к сети")
+                                        }
+                                    }
+                                }
+                        }
+                    }
+                ) {
+                    Text(
+                        text = if (resentTextEnable) {
+                            stringResource(id = R.string.resent_text_passwordConfScreen_enabled)
+                        } else {
+                            stringResource(id = R.string.resent_text_passwordConfScreen, countdown)
+                        },
+                        style = Typography.body1,
+                        color = if (resentTextEnable) {
+                            ClicableTextColor
+                        } else {
+                            MaterialTheme.colors.onBackground
+                        },
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
     }

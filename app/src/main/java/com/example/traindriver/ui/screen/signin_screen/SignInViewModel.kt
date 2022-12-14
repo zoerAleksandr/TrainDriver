@@ -83,9 +83,9 @@ class SignInViewModel : ViewModel(), KoinComponent {
 }
 
 interface PhoneAuthInterface {
-    fun createUserWithPhone(activity: Activity): Flow<ResultState<String>>
-    fun checkCode(code: String): Flow<ResultState<FirebaseUser?>>
-    fun resendCode(activity: Activity): Flow<ResultState<String>>
+    fun createUserWithPhone(activity: Activity): Flow<ResultState<String?>>
+    fun checkCode(code: String): Flow<ResultState<String?>>
+    fun resendCode(activity: Activity): Flow<ResultState<String?>>
 }
 
 interface AnonymousAuthInterface {

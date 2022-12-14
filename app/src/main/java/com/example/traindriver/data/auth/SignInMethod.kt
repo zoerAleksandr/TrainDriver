@@ -1,6 +1,5 @@
 package com.example.traindriver.data.auth
 
-import android.app.Activity
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.example.traindriver.data.util.ResultState
@@ -11,7 +10,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 
-sealed class SignInMethod:  KoinComponent {
+sealed class SignInMethod : KoinComponent {
     protected val workManager: WorkManager by inject()
 
     object Anonymous : SignInMethod() {
@@ -20,7 +19,8 @@ sealed class SignInMethod:  KoinComponent {
         )
 
         fun signIn(): Flow<ResultState<String>> {
-            var flow = flow<ResultState<String>> { ResultState.Loading }
+            var flow =
+                flow<ResultState<String>> { ResultState.Loading("Выполняется анонимный вход") }
             workManager.runCatching {
                 this.enqueue(anonymousRequest)
             }

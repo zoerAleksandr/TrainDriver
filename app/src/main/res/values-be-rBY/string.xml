@@ -21,4 +21,8 @@
     // Сообщения ошибок
     <string name="invalid_code">Няправільны код</string>
     <string name="empty_number">"Увядзіце нумар тэлефона"</string>
+
+    // Информационные сообщения
+    <string name="sending_SMS">Спрабуем адправіць SMS…</string>
+    <string name="checking_code">Правяраем код …</string>
 </resources>

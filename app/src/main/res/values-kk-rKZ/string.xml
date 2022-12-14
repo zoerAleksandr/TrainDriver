@@ -21,4 +21,8 @@
     // Сообщения ошибок
     <string name="invalid_code">Қате код</string>
     <string name="empty_number">"Телефон нөмірін енгізіңіз"</string>
+
+    // Информационные сообщения
+    <string name="sending_SMS"> Біз SMS жіберуге тырысамыз …</string>
+    <string name="checking_code">Kодты тексеру …</string>
 </resources>

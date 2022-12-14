@@ -5,7 +5,6 @@ import android.content.res.Resources
 import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.google.firebase.FirebaseException
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
@@ -24,11 +23,21 @@ class PhoneAuth : KoinComponent {
     private lateinit var storedVerificationId: String
     private val resources: Resources by inject()
 
-    fun createUserWithPhone(phone: String, activity: Activity): Flow<ResultState<String>> =
+    fun createUserWithPhone(phone: String, activity: Activity): Flow<ResultState<String?>> =
         callbackFlow {
             val onVerificationCallback =
                 object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-                    override fun onVerificationCompleted(p0: PhoneAuthCredential) {}
+                    override fun onVerificationCompleted(p0: PhoneAuthCredential) {
+                        auth.signInWithCredential(p0)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    val uid = task.result.user?.uid
+                                    trySend(ResultState.Success(uid))
+                                } else {
+                                    trySend(ResultState.Failure(Throwable(resources.getString(R.string.invalid_code))))
+                                }
+                            }
+                    }
 
                     override fun onVerificationFailed(p0: FirebaseException) {
                         trySend(ResultState.Failure(p0))
@@ -48,7 +57,7 @@ class PhoneAuth : KoinComponent {
             if (phone.isEmpty()) {
                 trySend(ResultState.Failure(Throwable(message = resources.getString(R.string.empty_number))))
             } else {
-                trySend(ResultState.Loading)
+                trySend(ResultState.Loading(msg = resources.getString(R.string.sending_SMS)))
                 val options = PhoneAuthOptions.newBuilder(auth)
                     .setPhoneNumber(phone)
                     .setTimeout(60L, TimeUnit.SECONDS)
@@ -62,15 +71,15 @@ class PhoneAuth : KoinComponent {
             }
         }
 
-    fun verifyCode(code: String): Flow<ResultState<FirebaseUser?>> =
+    fun verifyCode(code: String): Flow<ResultState<String?>> =
         callbackFlow {
-            trySend(ResultState.Loading)
+            trySend(ResultState.Loading(resources.getString(R.string.checking_code)))
             val credential = PhoneAuthProvider.getCredential(storedVerificationId, code)
-
             auth.signInWithCredential(credential)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        trySend(ResultState.Success(task.result?.user))
+                        val uid = task.result.user?.uid
+                        trySend(ResultState.Success(uid))
                     } else {
                         trySend(ResultState.Failure(Throwable(resources.getString(R.string.invalid_code))))
                     }
@@ -80,11 +89,21 @@ class PhoneAuth : KoinComponent {
             }
         }
 
-    fun resendCode(phone: String, activity: Activity): Flow<ResultState<String>> =
+    fun resendCode(phone: String, activity: Activity): Flow<ResultState<String?>> =
         callbackFlow {
             val onVerificationCallback =
                 object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-                    override fun onVerificationCompleted(p0: PhoneAuthCredential) {}
+                    override fun onVerificationCompleted(p0: PhoneAuthCredential) {
+                        auth.signInWithCredential(p0)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    val uid = task.result.user?.uid
+                                    trySend(ResultState.Success(uid))
+                                } else {
+                                    trySend(ResultState.Failure(Throwable(resources.getString(R.string.invalid_code))))
+                                }
+                            }
+                    }
 
                     override fun onVerificationFailed(p0: FirebaseException) {
                         trySend(ResultState.Failure(p0))
@@ -100,7 +119,7 @@ class PhoneAuth : KoinComponent {
                         storedVerificationId = verificationCode
                     }
                 }
-            trySend(ResultState.Loading)
+            trySend(ResultState.Loading(msg = resources.getString(R.string.sending_SMS)))
             val optionsBuilder = PhoneAuthOptions
                 .newBuilder(auth)
                 .setPhoneNumber(phone)

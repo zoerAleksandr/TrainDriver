@@ -6,7 +6,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -19,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.ui.element_screen.NumberPhoneTextField
+import com.example.traindriver.ui.element_screen.TopSnackbar
 import com.example.traindriver.ui.screen.ScreenEnum
 import com.example.traindriver.ui.screen.signin_screen.elements.*
 import com.example.traindriver.ui.theme.ShapeInputData
@@ -37,6 +41,8 @@ fun SignInScreen(
     activity: Activity,
     signInViewModel: SignInViewModel,
 ) {
+    val loadingState = remember { mutableStateOf(false) }
+
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     val number = signInViewModel.number
@@ -46,11 +52,10 @@ fun SignInScreen(
     Scaffold(
         scaffoldState = scaffoldState,
         snackbarHost = {
-            SnackbarHost(hostState = it) { snackBarData ->
-                Snackbar(
-                    snackbarData = snackBarData,
-                    backgroundColor = MaterialTheme.colors.background
-                )
+            SnackbarHost(
+                hostState = it
+            ) { snackBarData ->
+                TopSnackbar(snackBarData)
             }
         }
     ) {
@@ -59,30 +64,25 @@ fun SignInScreen(
         ) {
             val (background, logo, inputBlock, skipButton) = createRefs()
 
-            Background(
-                modifier = Modifier
-                    .constrainAs(background) { parent }
-                    .fillMaxSize()
-                    .background(MaterialTheme.colors.background)
-            )
-            Logo(
-                modifier = Modifier
-                    .constrainAs(logo) {
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        top.linkTo(parent.top, margin = 40.dp)
-                    }
-                    .fillMaxWidth()
-            )
-            Surface(
-                modifier = Modifier
-                    .constrainAs(inputBlock) {
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                    }
-                    .wrapContentSize(),
+            Background(modifier = Modifier
+                .constrainAs(background) { parent }
+                .fillMaxSize()
+                .background(MaterialTheme.colors.background))
+            Logo(modifier = Modifier
+                .constrainAs(logo) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(parent.top, margin = 40.dp)
+                }
+                .fillMaxWidth())
+            Surface(modifier = Modifier
+                .constrainAs(inputBlock) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                }
+                .wrapContentSize(),
                 shape = ShapeInputData.medium,
                 color = MaterialTheme.colors.surface,
                 elevation = dimensionResource(id = R.dimen.elevation_input_element)
@@ -117,27 +117,29 @@ fun SignInScreen(
 
                     SecondarySpacer()
                     LoginButton(
-                        enabled = allowEntry.value,
-                        onClick = {
-                            scope.launch(Dispatchers.Main) {
-                                signInViewModel.phoneAuth.createUserWithPhone(activity)
-                                    .collect {
-                                        when (it) {
-                                            is ResultState.Loading -> {
-                                                allowEntry.value = false
-                                            }
-                                            is ResultState.Success -> {
-                                                navController.navigate(ScreenEnum.PASSWORD_CONFIRMATION.name)
-                                            }
-                                            is ResultState.Failure -> {
-                                                allowEntry.value = true
-                                                scaffoldState.snackbarHostState.showSnackbar(it.msg.message.toString())
-                                            }
-                                        }
+                        enabled = allowEntry.value, isLoading = loadingState.value
+                    ) {
+                        scope.launch(Dispatchers.Main) {
+                            signInViewModel.phoneAuth.createUserWithPhone(activity).collect {
+                                when (it) {
+                                    is ResultState.Loading -> {
+                                        loadingState.value = true
+                                        allowEntry.value = false
                                     }
+                                    is ResultState.Success -> {
+                                        loadingState.value = false
+                                        allowEntry.value = true
+                                        navController.navigate(ScreenEnum.PASSWORD_CONFIRMATION.name)
+                                    }
+                                    is ResultState.Failure -> {
+                                        loadingState.value = false
+                                        allowEntry.value = true
+                                        scaffoldState.snackbarHostState.showSnackbar(it.msg.message.toString())
+                                    }
+                                }
                             }
                         }
-                    )
+                    }
 
                     PrimarySpacer()
                     DividerSignInScreen()
@@ -170,22 +172,19 @@ fun SignInScreen(
                 }
             }
 
-            SkipButton(
-                modifier = Modifier
-                    .constrainAs(skipButton) {
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                        bottom.linkTo(parent.bottom, margin = 70.dp)
+            SkipButton(modifier = Modifier
+                .constrainAs(skipButton) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    bottom.linkTo(parent.bottom, margin = 70.dp)
+                }
+                .clickable(onClick = {
+                    signInViewModel.anonymousAuth.signIn()
+                    navController.apply {
+                        this.popBackStack(ScreenEnum.SIGN_IN.name, true)
+                        this.navigate(ScreenEnum.MAIN.name)
                     }
-                    .clickable(
-                        onClick = {
-                            signInViewModel.anonymousAuth.signIn()
-                            navController.apply {
-                                this.popBackStack(ScreenEnum.SIGN_IN.name, true)
-                                this.navigate(ScreenEnum.MAIN.name)
-                            }
-                        }
-                    )
+                })
             )
         }
     }
