@@ -1,8 +1,6 @@
 package com.example.traindriver.ui.screen.signin_screen
 
 import android.app.Activity
-import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -25,6 +23,7 @@ import com.example.traindriver.ui.element_screen.NumberPhoneTextField
 import com.example.traindriver.ui.element_screen.TopSnackbar
 import com.example.traindriver.ui.screen.ScreenEnum
 import com.example.traindriver.ui.screen.signin_screen.elements.*
+import com.example.traindriver.ui.theme.ShapeButton
 import com.example.traindriver.ui.theme.ShapeInputData
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
@@ -64,10 +63,10 @@ fun SignInScreen(
         ) {
             val (background, logo, inputBlock, skipButton) = createRefs()
 
-            Background(modifier = Modifier
-                .constrainAs(background) { parent }
-                .fillMaxSize()
-                .background(MaterialTheme.colors.background))
+            Background(
+                modifier = Modifier
+                    .constrainAs(background) { parent }
+            )
             Logo(modifier = Modifier
                 .constrainAs(logo) {
                     start.linkTo(parent.start)
@@ -84,7 +83,7 @@ fun SignInScreen(
                 }
                 .wrapContentSize(),
                 shape = ShapeInputData.medium,
-                color = MaterialTheme.colors.surface,
+                color = MaterialTheme.colors.background,
                 elevation = dimensionResource(id = R.dimen.elevation_input_element)
             ) {
                 Column(
@@ -97,7 +96,7 @@ fun SignInScreen(
                     Text(
                         text = stringResource(id = R.string.title_input_element),
                         style = Typography.h3,
-                        color = MaterialTheme.colors.onBackground
+                        color = MaterialTheme.colors.primary
                     )
 
                     PrimarySpacer()
@@ -141,33 +140,23 @@ fun SignInScreen(
                         }
                     }
 
-                    PrimarySpacer()
+                    SecondarySpacer()
                     DividerSignInScreen()
 
-                    PrimarySpacer()
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
+                    SecondarySpacer()
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        shape = ShapeButton.medium,
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = MaterialTheme.colors.surface
+                        ),
+                        onClick = { /*TODO*/ }
                     ) {
-                        CircleButton(
-                            R.drawable.ic_launcher_foreground,
-                            stringResource(id = R.string.cont_desc_google_button)
-                        ) {
-                            Log.d("Debug", "click button login with Google")
-                        }
-                        CircleButton(
-                            R.drawable.ic_launcher_foreground,
-                            stringResource(id = R.string.cont_desc_email_button)
-                        ) {
-                            Log.d("Debug", "click button login by Email")
-                        }
-                        CircleButton(
-                            R.drawable.ic_launcher_foreground,
-                            stringResource(id = R.string.cont_desc_vk_button)
-                        ) {
-                            Log.d("Debug", "click button login by Email")
-                        }
+                        Text(
+                            text = stringResource(id = R.string.text_entrance_with_google),
+                            color = MaterialTheme.colors.primary
+                        )
                     }
                 }
             }

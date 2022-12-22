@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.example.traindriver.ui.screen.SetupNavGraph
 import com.example.traindriver.ui.screen.splash_screen.SplashViewModel
@@ -16,6 +17,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class StartActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
         val viewModel: SplashViewModel by viewModel()
         val screen by viewModel.startDestination

@@ -16,7 +16,7 @@ fun Logo(modifier: Modifier) {
         modifier = modifier,
         text = "Машинистам",
         style = Typography.h1,
-        color = MaterialTheme.colors.onPrimary
+        color = MaterialTheme.colors.onSecondary
     )
 }
 

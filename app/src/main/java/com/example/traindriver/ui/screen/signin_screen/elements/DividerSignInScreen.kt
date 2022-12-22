@@ -27,20 +27,20 @@ fun DividerSignInScreen() {
             modifier = Modifier
                 .weight(1f)
                 .padding(end = dimensionResource(id = R.dimen.padding_divider)),
-            color = MaterialTheme.colors.onSurface
+            color = MaterialTheme.colors.secondary
         )
         Text(
             modifier = Modifier.wrapContentWidth(),
             textAlign = TextAlign.Justify,
             text = stringResource(id = R.string.divider_text),
             style = Typography.body2,
-            color = MaterialTheme.colors.onSurface
+            color = MaterialTheme.colors.secondary
         )
         Divider(
             modifier = Modifier
                 .weight(1f)
                 .padding(start = dimensionResource(id = R.dimen.padding_divider)),
-            color = MaterialTheme.colors.onSurface
+            color = MaterialTheme.colors.secondary
         )
 
     }

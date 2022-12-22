@@ -10,49 +10,58 @@ import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val DarkColorPalette = darkColors(
-    primary = Gray700,
-    primaryVariant = Gray900,
-    secondary = Red300,
-    secondaryVariant = Red700,
-    background = Gray600,
-    error = Red800,
-    surface = Gray600,
-    onPrimary = Gray200,
-    onSurface = Gray700,
-    onBackground = Gray100,
-    onSecondary = Gray100
+    primary = Color(0xFFDADADA),
+    primaryVariant = Color(0xFFB9B9B9),
+    secondary = Color(0xFFC5C5C5),
+    onSecondary = Color(0xFFFAFAFA),
+    surface = Color(0xFF868686),
+    background = Color(0xFF5F5F5F),
+    onBackground = Color(0xFFC5C5C5),
 )
 
 private val LightColorPalette = lightColors(
-    primary = Gray500,
-    primaryVariant = Gray700,
-    secondary = Red300,
-    secondaryVariant = Red700,
-    background = Gray200,
-    surface = Gray50,
-    error = Red800,
-    onPrimary = Gray900,
-    onSurface = Gray500,
-    onBackground = Gray700,
-    onSecondary = Gray100
+    primary = Color(0xFF434343),
+    primaryVariant = Color(0xFFA8A8A8),
+    secondary = Color(0xFF9E9E9E),
+    onSecondary = Color(0xFFFAFAFA),
+    surface = Color(0xFFDCDCDC),
+    background = Color(0xFFFAFAFA),
+    onBackground = Color(0xFF5F5F5F),
 )
 
 var BackgroundIcon: Color = BackgroundIconLight
+val SpecialColor = Color(0xFFD32F2F)
+val SpecialDisableColor = Color(0xFFFF7979)
+var BackgroundFirst = Color(0xFF9E9E9E)
+var BackgroundSecond = Color(0xFFEEEEEE)
 
 @Composable
 fun TrainDriverTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     val colors: Colors
-    if (darkTheme){
+    if (darkTheme) {
         colors = DarkColorPalette
         BackgroundIcon = BackgroundIconDark
+        BackgroundFirst = Color(0xFF242424)
+        BackgroundSecond = Color(0xFF3D3D3D)
     } else {
         colors = LightColorPalette
         BackgroundIcon = BackgroundIconLight
+        BackgroundFirst = Color(0xFF9E9E9E)
+        BackgroundSecond = Color(0xFFEEEEEE)
     }
 
     val systemUiController = rememberSystemUiController()
-    systemUiController.setNavigationBarColor(color = colors.background)
-    systemUiController.setStatusBarColor(color = colors.primaryVariant)
+    val useDarkIcons = !isSystemInDarkTheme()
+
+    systemUiController.setStatusBarColor(
+        color = Color.Transparent,
+        darkIcons = false,
+    )
+    systemUiController.setNavigationBarColor(
+        color = Color.Transparent,
+        darkIcons = useDarkIcons,
+        navigationBarContrastEnforced = false
+    )
 
     MaterialTheme(
         colors = colors,

@@ -9,8 +9,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.traindriver.R
-import com.example.traindriver.ui.theme.TrainDriverTheme
-import com.example.traindriver.ui.theme.Typography
+import com.example.traindriver.ui.theme.*
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FontScalePreviews
 
@@ -26,9 +25,10 @@ fun LoginButton(
             .height(dimensionResource(id = R.dimen.min_size_view)),
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = MaterialTheme.colors.secondaryVariant,
-            disabledBackgroundColor = MaterialTheme.colors.secondary
+            backgroundColor = SpecialColor,
+            disabledBackgroundColor = SpecialDisableColor
         ),
+        shape = ShapeButton.medium,
         enabled = enabled
     ) {
         if (isLoading) {
@@ -53,6 +53,6 @@ fun LoginButton(
 @FontScalePreviews
 private fun StartScreenPrev() {
     TrainDriverTheme {
-        LoginButton(enabled = false, isLoading = true, {})
+        LoginButton(enabled = false, isLoading = false, {})
     }
 }

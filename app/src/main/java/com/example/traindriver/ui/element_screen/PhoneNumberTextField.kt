@@ -15,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -49,13 +50,12 @@ fun NumberPhoneTextField(
             .fillMaxWidth()
             .height(dimensionResource(id = R.dimen.min_size_view))
             .background(
-                color = MaterialTheme.colors.surface,
-                shape = ShapeBackground.small
+                color = Color.Transparent,
             )
             .border(
-                color = MaterialTheme.colors.onSurface,
+                color = MaterialTheme.colors.onBackground,
                 width = dimensionResource(id = R.dimen.width_border_input_field),
-                shape = ShapeBackground.small
+                shape = ShapeBackground.medium
             )
     ) {
         val (button, editText) = createRefs()
@@ -87,7 +87,7 @@ fun NumberPhoneTextField(
         Box(
             modifier = Modifier
                 .constrainAs(button) {
-                    start.linkTo(parent.start, margin = 0.dp)
+                    start.linkTo(parent.start, margin = 12.dp)
                 }
                 .clickable { dropDownExpanded.value = true }
         ) {
@@ -100,17 +100,13 @@ fun NumberPhoneTextField(
                     modifier = Modifier
                         .padding(start = 8.dp, top = 8.dp, bottom = 8.dp)
                 )
-                Image(
-                    painter = painterResource(id = R.drawable.ic_arrow_drop_down_24),
-                    contentDescription = null
-                )
             }
         }
         BasicTextField(
             modifier = Modifier
                 .fillMaxHeight()
                 .constrainAs(editText) {
-                    start.linkTo(button.end)
+                    start.linkTo(button.end, margin = 12.dp)
                 },
             value = numberState.value,
             onValueChange = {
@@ -119,7 +115,7 @@ fun NumberPhoneTextField(
             },
             visualTransformation = localeUser.value.transformedNumber,
             textStyle = TextStyle(
-                color = MaterialTheme.colors.onBackground,
+                color = MaterialTheme.colors.primary,
                 fontSize = 18.sp,
                 fontFamily = overpassFontFamily,
                 fontWeight = FontWeight.Light
@@ -135,7 +131,7 @@ fun NumberPhoneTextField(
                         Text(
                             text = placeholderText,
                             style = Typography.caption,
-                            color = MaterialTheme.colors.onSurface
+                            color = MaterialTheme.colors.primaryVariant
                         )
                     }
                     innerTextField()
@@ -220,7 +216,7 @@ private fun StartScreenPrev() {
 private fun DropDownPrev() {
     TrainDriverTheme {
         DropDownLocaleItem(
-            LocaleUser.BY,
+            LocaleUser.RU,
             mutableStateOf(LocaleUser.RU),
             mutableStateOf("+7"),
             mutableStateOf(true),

@@ -8,8 +8,6 @@ import androidx.compose.material.SnackbarData
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-
 
 @Composable
 fun TopSnackbar(snackBarData: SnackbarData) {
@@ -19,7 +17,7 @@ fun TopSnackbar(snackBarData: SnackbarData) {
                 .align(Alignment.TopCenter),
             snackbarData = snackBarData,
             backgroundColor = MaterialTheme.colors.background,
-            contentColor = Color.White
+            contentColor = MaterialTheme.colors.onBackground
         )
     }
 }

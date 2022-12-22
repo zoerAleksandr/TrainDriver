@@ -7,9 +7,7 @@
     <string name="divider_text">або</string>
     <string name="text_entrance_button">Уваход</string>
     <string name="text_skip_button">ПРАПУСЦІЦЬ</string>
-    <string name="cont_desc_google_button">Уваход з Google</string>
-    <string name="cont_desc_vk_button">Уваход па Вконтакте</string>
-    <string name="cont_desc_email_button">Уваход па e-mail</string>
+    <string name="text_entrance_with_google">Увайсці з Google</string>
 
     // Password Confirmation Screen
     <string name="title_passwordConfScreen">Увядзіце код з SMS</string>
