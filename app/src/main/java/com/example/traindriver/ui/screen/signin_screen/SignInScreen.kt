@@ -1,8 +1,12 @@
 package com.example.traindriver.ui.screen.signin_screen
 
 import android.app.Activity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -21,12 +25,10 @@ import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.ui.element_screen.NumberPhoneTextField
 import com.example.traindriver.ui.element_screen.TopSnackbar
+import com.example.traindriver.ui.element_screen.getAllLocaleExcept
 import com.example.traindriver.ui.screen.ScreenEnum
 import com.example.traindriver.ui.screen.signin_screen.elements.*
-import com.example.traindriver.ui.theme.ShapeButton
-import com.example.traindriver.ui.theme.ShapeInputData
-import com.example.traindriver.ui.theme.TrainDriverTheme
-import com.example.traindriver.ui.theme.Typography
+import com.example.traindriver.ui.theme.*
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FieldIsFilled
 import com.example.traindriver.ui.util.FontScalePreviews
@@ -34,6 +36,7 @@ import com.example.traindriver.ui.util.LocaleUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SignInScreen(
     navController: NavController,
@@ -42,13 +45,13 @@ fun SignInScreen(
 ) {
     val loadingState = remember { mutableStateOf(false) }
 
-    val scaffoldState = rememberScaffoldState()
+    val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
     val number = signInViewModel.number
     val allowEntry = signInViewModel.allowEntry
     val localeState = signInViewModel.locale
 
-    Scaffold(
+    BottomSheetScaffold(
         scaffoldState = scaffoldState,
         snackbarHost = {
             SnackbarHost(
@@ -56,7 +59,49 @@ fun SignInScreen(
             ) { snackBarData ->
                 TopSnackbar(snackBarData)
             }
-        }
+        },
+        sheetShape = RoundedCornerShape(30.dp),
+        sheetBackgroundColor = BackgroundBottomSheet,
+        sheetElevation = 25.dp,
+        sheetContent = {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Divider(
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .size(width = 50.dp, height = 4.dp),
+                )
+                Text(
+                    modifier = Modifier
+                        .padding(25.dp)
+                        .align(Alignment.Start),
+                    color = MaterialTheme.colors.primary,
+                    text = "Выберите страну",
+                    style = Typography.h4
+                )
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(start = 25.dp)
+                ) {
+                    items(getAllLocaleExcept(localeState.value)) { locale ->
+                        BottomSheetLocaleListItem(
+                            locale = locale,
+                            onItemClick = { currentLocale ->
+                                localeState.value = currentLocale
+                                number.value = currentLocale.prefix()
+                                allowEntry.value = (currentLocale == LocaleUser.OTHER)
+                                scope.launch {
+                                    scaffoldState.bottomSheetState.collapse()
+                                }
+                            }
+                        )
+                    }
+                }
+                PrimarySpacer()
+            }
+        },
+        sheetPeekHeight = 0.dp
     ) {
         ConstraintLayout(
             modifier = Modifier.fillMaxSize()
@@ -101,7 +146,6 @@ fun SignInScreen(
 
                     PrimarySpacer()
                     NumberPhoneTextField(
-                        placeholderText = stringResource(id = R.string.placeholder_input_number),
                         numberState = number,
                         localeUser = localeState,
                         allowEntry = allowEntry,
@@ -111,7 +155,8 @@ fun SignInScreen(
                                     allowEntry.value = isFilled
                                 }
                             }
-                        } else null
+                        } else null,
+                        bottomSheetState = scaffoldState.bottomSheetState
                     )
 
                     SecondarySpacer()

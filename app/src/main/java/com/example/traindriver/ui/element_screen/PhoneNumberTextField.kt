@@ -12,13 +12,14 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -36,15 +37,19 @@ import com.example.traindriver.ui.util.FieldIsFilled
 import com.example.traindriver.ui.util.FontScalePreviews
 import com.example.traindriver.ui.util.LocaleUser
 import com.example.traindriver.ui.util.LocaleUser.OTHER
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NumberPhoneTextField(
-    placeholderText: String,
     numberState: MutableState<String>,
     localeUser: MutableState<LocaleUser>,
     allowEntry: MutableState<Boolean>,
-    isFilledCallback: FieldIsFilled? = null
+    isFilledCallback: FieldIsFilled? = null,
+    bottomSheetState: BottomSheetState
 ) {
+    val scope = rememberCoroutineScope()
+
     ConstraintLayout(
         modifier = Modifier
             .fillMaxWidth()
@@ -59,37 +64,21 @@ fun NumberPhoneTextField(
             )
     ) {
         val (button, editText) = createRefs()
-        val dropDownExpanded = rememberSaveable {
-            mutableStateOf(false)
-        }
-        DropdownMenu(
-            expanded = dropDownExpanded.value,
-            onDismissRequest = { dropDownExpanded.value = false },
-            modifier = Modifier
-                .fillMaxWidth(0.72f)
-        ) {
-            getAllLocaleExcept(localeUser.value).forEach {
-                DropDownLocaleItem(
-                    state = it,
-                    currentLocale = localeUser,
-                    numberState = numberState,
-                    allowEntry = allowEntry,
-                    dropDownExpanded = dropDownExpanded
-                )
-                if (it == OTHER) {
-                    Divider(
-                        color = MaterialTheme.colors.onSurface,
-                        startIndent = 12.dp
-                    )
-                }
-            }
-        }
         Box(
             modifier = Modifier
                 .constrainAs(button) {
                     start.linkTo(parent.start, margin = 12.dp)
                 }
-                .clickable { dropDownExpanded.value = true }
+                .clickable {
+                    scope.launch {
+                        if (bottomSheetState.isCollapsed) {
+                            bottomSheetState.expand()
+                        } else {
+                            bottomSheetState.collapse()
+                        }
+                    }
+//                    dropDownExpanded.value = true
+                }
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -129,7 +118,7 @@ fun NumberPhoneTextField(
                 ) {
                     if (numberState.value.isEmpty()) {
                         Text(
-                            text = placeholderText,
+                            text = stringResource(id = R.string.placeholder_input_number),
                             style = Typography.caption,
                             color = MaterialTheme.colors.primaryVariant
                         )
@@ -193,19 +182,19 @@ inline fun <reified LocaleState> getAllLocaleExcept(except: LocaleState): List<L
             }
         }
     return list
-
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 @DarkLightPreviews
 @FontScalePreviews
 private fun StartScreenPrev() {
     TrainDriverTheme {
         NumberPhoneTextField(
-            "Номер телефона",
             mutableStateOf("+7"),
             mutableStateOf(LocaleUser.RU),
-            mutableStateOf(true)
+            mutableStateOf(true),
+            bottomSheetState = rememberBottomSheetState(initialValue = BottomSheetValue.Collapsed)
         )
     }
 }
