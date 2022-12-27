@@ -1,16 +1,16 @@
 package com.example.traindriver.domain.use_case
 
 import android.app.Activity
-import com.example.traindriver.data.auth.PhoneAuth
+import com.example.traindriver.data.auth.AuthWithPhone
 
 class SignInWithPhoneUseCase {
-    private val phoneAuth = PhoneAuth()
+    private val authWithPhone = AuthWithPhone()
     fun createUserWithPhone(phone: String, activity: Activity) =
-        phoneAuth.createUserWithPhone(phone, activity)
+        authWithPhone.createUserWithPhone(phone, activity)
 
     fun verifyCode(code: String) =
-        phoneAuth.verifyCode(code)
+        authWithPhone.verifyCode(code)
 
     fun resendCode(phone: String, activity: Activity) =
-        phoneAuth.resendCode(phone, activity)
+        authWithPhone.resendCode(phone, activity)
 }

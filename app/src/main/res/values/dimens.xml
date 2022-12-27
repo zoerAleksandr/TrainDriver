@@ -7,7 +7,7 @@
     <dimen name="sheet_handle_width">50dp</dimen>
     <dimen name="sheet_handle_height">6dp</dimen>
 
-    <dimen name="height_item_bottom_sheet">64dp</dimen>
+    <dimen name="height_item_bottom_sheet">58dp</dimen>
     <dimen name="padding_between_item_bottom_sheet">4dp</dimen>
 
     // Input Field

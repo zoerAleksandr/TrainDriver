@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -126,7 +125,8 @@ fun SignInScreen(
                     .constrainAs(logo) {
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
-                        top.linkTo(parent.top, margin = 40.dp)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(inputBlock.top)
                     }
                     .fillMaxWidth())
                 Surface(modifier = Modifier
@@ -158,7 +158,6 @@ fun SignInScreen(
                         NumberPhoneTextField(
                             numberState = number,
                             localeUser = localeState,
-                            allowEntry = allowEntry,
                             isFilledCallback = if (localeState.value != LocaleUser.OTHER) {
                                 object : FieldIsFilled {
                                     override fun isFilled(isFilled: Boolean) {
@@ -220,7 +219,8 @@ fun SignInScreen(
                     .constrainAs(skipButton) {
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
-                        bottom.linkTo(parent.bottom, margin = 70.dp)
+                        bottom.linkTo(parent.bottom)
+                        top.linkTo(inputBlock.bottom)
                     }
                     .clickable(onClick = {
                         signInViewModel.anonymousAuth.signIn()

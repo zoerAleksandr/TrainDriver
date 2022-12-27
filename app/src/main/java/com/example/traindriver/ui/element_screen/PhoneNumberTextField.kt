@@ -44,7 +44,6 @@ import kotlinx.coroutines.launch
 fun NumberPhoneTextField(
     numberState: MutableState<String>,
     localeUser: MutableState<LocaleUser>,
-    allowEntry: MutableState<Boolean>,
     isFilledCallback: FieldIsFilled? = null,
     sheetState: ModalBottomSheetState
 ) {
@@ -71,13 +70,8 @@ fun NumberPhoneTextField(
                 }
                 .clickable {
                     scope.launch {
-                        if (sheetState.isVisible) {
-                            sheetState.hide()
-                        } else {
-                            sheetState.show()
-                        }
+                        sheetState.show()
                     }
-//                    dropDownExpanded.value = true
                 }
         ) {
             Row(
@@ -140,35 +134,6 @@ fun NumberPhoneTextField(
     }
 }
 
-@Composable
-private fun DropDownLocaleItem(
-    state: LocaleUser,
-    currentLocale: MutableState<LocaleUser>,
-    numberState: MutableState<String>,
-    allowEntry: MutableState<Boolean>,
-    dropDownExpanded: MutableState<Boolean>
-) {
-    DropdownMenuItem(
-        onClick = {
-            currentLocale.value = state
-            numberState.value = state.prefix()
-            allowEntry.value = (state == OTHER)
-            dropDownExpanded.value = false
-        },
-        modifier = Modifier
-            .height(dimensionResource(id = R.dimen.min_size_view))
-    ) {
-        Image(
-            painter = painterResource(id = state.icon),
-            contentDescription = state.contentDescription,
-            modifier = Modifier
-                .padding(top = 8.dp, bottom = 8.dp)
-        )
-        Text(text = state.contentDescription, modifier = Modifier.padding(start = 10.dp))
-        Text(text = state.prefix(), modifier = Modifier.padding(start = 10.dp))
-    }
-}
-
 inline fun <reified LocaleState> getAllLocaleExcept(except: LocaleState): List<LocaleState> {
     val list = mutableListOf<LocaleState>()
     LocaleState::class.sealedSubclasses
@@ -193,23 +158,7 @@ private fun StartScreenPrev() {
         NumberPhoneTextField(
             mutableStateOf("+7"),
             mutableStateOf(LocaleUser.RU),
-            mutableStateOf(true),
             sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded)
-        )
-    }
-}
-
-@Composable
-@DarkLightPreviews
-@FontScalePreviews
-private fun DropDownPrev() {
-    TrainDriverTheme {
-        DropDownLocaleItem(
-            LocaleUser.RU,
-            mutableStateOf(LocaleUser.RU),
-            mutableStateOf("+7"),
-            mutableStateOf(true),
-            mutableStateOf(false)
         )
     }
 }

@@ -17,7 +17,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.concurrent.TimeUnit
 
-class PhoneAuth : KoinComponent {
+class AuthWithPhone : KoinComponent {
     private val auth = Firebase.auth
     private lateinit var resendToken: PhoneAuthProvider.ForceResendingToken
     private lateinit var storedVerificationId: String

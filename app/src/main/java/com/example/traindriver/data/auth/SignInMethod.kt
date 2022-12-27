@@ -40,11 +40,4 @@ sealed class SignInMethod : KoinComponent {
         }
 
     }
-
-    object Email : SignInMethod() {
-        fun signIn(): Flow<ResultState<String>> {
-            TODO("Not yet implemented")
-        }
-
-    }
 }
