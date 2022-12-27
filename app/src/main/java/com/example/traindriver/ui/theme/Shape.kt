@@ -4,7 +4,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes
 import androidx.compose.ui.unit.dp
 
-val ShapeInputData = Shapes(
+val ShapeSurface = Shapes(
     medium = RoundedCornerShape(25.dp)
 )
 

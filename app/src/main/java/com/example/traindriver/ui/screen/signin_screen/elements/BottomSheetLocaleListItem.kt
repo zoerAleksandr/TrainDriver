@@ -8,8 +8,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
+import com.example.traindriver.R
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FontScalePreviews
@@ -20,8 +21,8 @@ fun BottomSheetLocaleListItem(locale: LocaleUser, onItemClick: (LocaleUser) -> U
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(64.dp)
-            .padding(bottom = 8.dp)
+            .height(dimensionResource(id = R.dimen.height_item_bottom_sheet))
+            .padding(dimensionResource(id = R.dimen.padding_between_item_bottom_sheet))
             .clickable(onClick = { onItemClick(locale) }),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -33,7 +34,7 @@ fun BottomSheetLocaleListItem(locale: LocaleUser, onItemClick: (LocaleUser) -> U
         )
         Text(
             modifier = Modifier
-                .padding(start = 16.dp),
+                .padding(start = dimensionResource(id = R.dimen.secondary_padding_between_view)),
             text = locale.contentDescription,
             color = MaterialTheme.colors.primary,
         )

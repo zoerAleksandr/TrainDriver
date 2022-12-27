@@ -8,6 +8,7 @@
     <string name="text_entrance_button">Кіру</string>
     <string name="text_skip_button">ӨТКIЗIП ЖIБЕРУ</string>
     <string name="text_entrance_with_google">Google жүйесімен кіру</string>
+    <string name="select_country">Елді таңдаңыз</string>
 
     // Password Confirmation Screen
     <string name="title_passwordConfScreen">SMS - тен кодты енгізіңіз</string>

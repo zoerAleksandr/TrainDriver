@@ -46,7 +46,7 @@ fun NumberPhoneTextField(
     localeUser: MutableState<LocaleUser>,
     allowEntry: MutableState<Boolean>,
     isFilledCallback: FieldIsFilled? = null,
-    bottomSheetState: BottomSheetState
+    sheetState: ModalBottomSheetState
 ) {
     val scope = rememberCoroutineScope()
 
@@ -71,10 +71,10 @@ fun NumberPhoneTextField(
                 }
                 .clickable {
                     scope.launch {
-                        if (bottomSheetState.isCollapsed) {
-                            bottomSheetState.expand()
+                        if (sheetState.isVisible) {
+                            sheetState.hide()
                         } else {
-                            bottomSheetState.collapse()
+                            sheetState.show()
                         }
                     }
 //                    dropDownExpanded.value = true
@@ -194,7 +194,7 @@ private fun StartScreenPrev() {
             mutableStateOf("+7"),
             mutableStateOf(LocaleUser.RU),
             mutableStateOf(true),
-            bottomSheetState = rememberBottomSheetState(initialValue = BottomSheetValue.Collapsed)
+            sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded)
         )
     }
 }
