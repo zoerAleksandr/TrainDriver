@@ -18,26 +18,18 @@ sealed class SignInMethod : KoinComponent {
             named(SignInWorkers.ANONYMOUS_SIGN_IN_WORKER.name)
         )
 
-        fun signIn() =
-//            var flow =
-//                flow<ResultState<String>> { ResultState.Loading("Выполняется анонимный вход") }
-            callbackFlow {
-                trySend(ResultState.Loading("Выполняется анонимный вход"))
-                workManager.runCatching {
-                    this.enqueue(anonymousRequest)
-                }
-                    .onSuccess {
-                        trySend(ResultState.Success("Anonymous signIn"))
-//                        flow = flow { ResultState.Success("Anonymous signIn") }
-                    }
-                    .onFailure {
-                        trySend(ResultState.Failure(it))
-//                        flow = flow { ResultState.Failure(it) }
-                    }
-
-
+        fun signIn() = callbackFlow {
+            trySend(ResultState.Loading("Выполняется анонимный вход"))
+            workManager.runCatching {
+                this.enqueue(anonymousRequest)
             }
-//            return flow
+                .onSuccess {
+                    trySend(ResultState.Success("Anonymous signIn"))
+                }
+                .onFailure {
+                    trySend(ResultState.Failure(it))
+                }
+        }
     }
 }
 

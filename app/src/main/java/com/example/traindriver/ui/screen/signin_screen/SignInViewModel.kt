@@ -13,7 +13,6 @@ import com.example.traindriver.domain.use_case.GetLocaleUseCase
 import com.example.traindriver.domain.use_case.SignInAnonymousUseCase
 import com.example.traindriver.domain.use_case.SignInWithPhoneUseCase
 import com.example.traindriver.ui.util.LocaleUser
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
