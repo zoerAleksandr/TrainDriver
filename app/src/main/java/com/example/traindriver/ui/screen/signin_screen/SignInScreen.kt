@@ -61,6 +61,10 @@ fun SignInScreen(
         scope.launch {
             sheetState.show()
         }
+    } else {
+        scope.launch {
+            sheetState.hide()
+        }
     }
 
     ModalBottomSheetLayout(
@@ -173,24 +177,25 @@ fun SignInScreen(
                             enabled = allowEntry.value, isLoading = loadingState.value
                         ) {
                             scope.launch(Dispatchers.Main) {
-                                signInViewModel.phoneAuth.createUserWithPhone(activity).collect {
-                                    when (it) {
-                                        is ResultState.Loading -> {
-                                            loadingState.value = true
-                                            allowEntry.value = false
-                                        }
-                                        is ResultState.Success -> {
-                                            loadingState.value = false
-                                            allowEntry.value = true
-                                            navController.navigate(ScreenEnum.PASSWORD_CONFIRMATION.name)
-                                        }
-                                        is ResultState.Failure -> {
-                                            loadingState.value = false
-                                            allowEntry.value = true
-                                            scaffoldState.snackbarHostState.showSnackbar(it.msg.message.toString())
+                                signInViewModel.phoneAuth.createUserWithPhone(activity)
+                                    .collect {
+                                        when (it) {
+                                            is ResultState.Loading -> {
+                                                loadingState.value = true
+                                                allowEntry.value = false
+                                            }
+                                            is ResultState.Success -> {
+                                                loadingState.value = false
+                                                allowEntry.value = true
+                                                navController.navigate(ScreenEnum.PASSWORD_CONFIRMATION.name)
+                                            }
+                                            is ResultState.Failure -> {
+                                                loadingState.value = false
+                                                allowEntry.value = true
+                                                scaffoldState.snackbarHostState.showSnackbar(it.msg.message.toString())
+                                            }
                                         }
                                     }
-                                }
                             }
                         }
 
