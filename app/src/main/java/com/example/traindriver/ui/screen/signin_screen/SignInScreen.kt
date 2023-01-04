@@ -1,6 +1,10 @@
 package com.example.traindriver.ui.screen.signin_screen
 
 import android.app.Activity
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +29,8 @@ import com.example.traindriver.ui.element_screen.NumberPhoneTextField
 import com.example.traindriver.ui.element_screen.TopSnackbar
 import com.example.traindriver.ui.element_screen.getAllLocaleExcept
 import com.example.traindriver.ui.screen.ScreenEnum
+import com.example.traindriver.ui.screen.signin_screen.components.OneTapSignIn
+import com.example.traindriver.ui.screen.signin_screen.components.SignInWithGoogle
 import com.example.traindriver.ui.screen.signin_screen.elements.*
 import com.example.traindriver.ui.theme.ShapeButton
 import com.example.traindriver.ui.theme.ShapeSurface
@@ -34,6 +40,9 @@ import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FieldIsFilled
 import com.example.traindriver.ui.util.FontScalePreviews
 import com.example.traindriver.ui.util.LocaleUser
+import com.google.android.gms.auth.api.identity.BeginSignInResult
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -42,7 +51,7 @@ import kotlinx.coroutines.launch
 fun SignInScreen(
     navController: NavController,
     activity: Activity,
-    signInViewModel: SignInViewModel,
+    viewModel: SignInViewModel,
 ) {
     val secondaryPadding = dimensionResource(R.dimen.secondary_padding_between_view)
     val primaryPadding = dimensionResource(R.dimen.primary_padding_between_view)
@@ -53,9 +62,9 @@ fun SignInScreen(
 
     val scope = rememberCoroutineScope()
 
-    val number = signInViewModel.number
-    val allowEntry = signInViewModel.allowEntry
-    val localeState = signInViewModel.locale
+    val number = viewModel.number
+    val allowEntry = viewModel.allowEntry
+    val localeState = viewModel.locale
 
     if (localeState.value == LocaleUser.OTHER) {
         scope.launch {
@@ -67,8 +76,7 @@ fun SignInScreen(
         }
     }
 
-    ModalBottomSheetLayout(
-        sheetState = sheetState,
+    ModalBottomSheetLayout(sheetState = sheetState,
         sheetShape = ShapeSurface.medium,
         sheetBackgroundColor = MaterialTheme.colors.background,
         sheetContent = {
@@ -85,46 +93,35 @@ fun SignInScreen(
                     style = Typography.h4
                 )
                 LazyColumn(
-                    modifier = Modifier
-                        .padding(start = primaryPadding, top = secondaryPadding)
+                    modifier = Modifier.padding(start = primaryPadding, top = secondaryPadding)
                 ) {
                     items(getAllLocaleExcept(localeState.value)) { locale ->
-                        BottomSheetLocaleListItem(
-                            locale = locale,
-                            onItemClick = { currentLocale ->
-                                localeState.value = currentLocale
-                                number.value = currentLocale.prefix()
-                                allowEntry.value = (currentLocale == LocaleUser.OTHER)
-                                scope.launch {
-                                    sheetState.hide()
-                                }
+                        BottomSheetLocaleListItem(locale = locale, onItemClick = { currentLocale ->
+                            localeState.value = currentLocale
+                            number.value = currentLocale.prefix()
+                            allowEntry.value = (currentLocale == LocaleUser.OTHER)
+                            scope.launch {
+                                sheetState.hide()
                             }
-                        )
+                        })
                     }
                 }
                 PrimarySpacer()
             }
-        }
-    ) {
-        Scaffold(
-            scaffoldState = scaffoldState,
-            snackbarHost = {
-                SnackbarHost(
-                    hostState = it
-                ) { snackBarData ->
-                    TopSnackbar(snackBarData)
-                }
+        }) {
+        Scaffold(scaffoldState = scaffoldState, snackbarHost = {
+            SnackbarHost(
+                hostState = it
+            ) { snackBarData ->
+                TopSnackbar(snackBarData)
             }
-        ) {
+        }) {
             ConstraintLayout(
                 modifier = Modifier.fillMaxSize()
             ) {
                 val (background, logo, inputBlock, skipButton) = createRefs()
 
-                Background(
-                    modifier = Modifier
-                        .constrainAs(background) { parent }
-                )
+                Background(modifier = Modifier.constrainAs(background) { parent })
                 Logo(modifier = Modifier
                     .constrainAs(logo) {
                         start.linkTo(parent.start)
@@ -143,8 +140,7 @@ fun SignInScreen(
                     .wrapContentSize(),
                     shape = ShapeSurface.medium,
                     color = MaterialTheme.colors.background,
-                    elevation = dimensionResource(id = R.dimen.elevation_input_element)
-                ) {
+                    elevation = dimensionResource(id = R.dimen.elevation_input_element)) {
                     Column(
                         modifier = Modifier
                             .padding(dimensionResource(id = R.dimen.padding_all_input_element))
@@ -159,8 +155,7 @@ fun SignInScreen(
                         )
 
                         PrimarySpacer()
-                        NumberPhoneTextField(
-                            numberState = number,
+                        NumberPhoneTextField(numberState = number,
                             localeUser = localeState,
                             isFilledCallback = if (localeState.value != LocaleUser.OTHER) {
                                 object : FieldIsFilled {
@@ -169,33 +164,31 @@ fun SignInScreen(
                                     }
                                 }
                             } else null,
-                            sheetState = sheetState
-                        )
+                            sheetState = sheetState)
 
                         SecondarySpacer()
                         LoginButton(
                             enabled = allowEntry.value, isLoading = loadingState.value
                         ) {
                             scope.launch(Dispatchers.Main) {
-                                signInViewModel.phoneAuth.createUserWithPhone(activity)
-                                    .collect {
-                                        when (it) {
-                                            is ResultState.Loading -> {
-                                                loadingState.value = true
-                                                allowEntry.value = false
-                                            }
-                                            is ResultState.Success -> {
-                                                loadingState.value = false
-                                                allowEntry.value = true
-                                                navController.navigate(ScreenEnum.PASSWORD_CONFIRMATION.name)
-                                            }
-                                            is ResultState.Failure -> {
-                                                loadingState.value = false
-                                                allowEntry.value = true
-                                                scaffoldState.snackbarHostState.showSnackbar(it.msg.message.toString())
-                                            }
+                                viewModel.phoneAuth.createUserWithPhone(activity).collect {
+                                    when (it) {
+                                        is ResultState.Loading -> {
+                                            loadingState.value = true
+                                            allowEntry.value = false
+                                        }
+                                        is ResultState.Success -> {
+                                            loadingState.value = false
+                                            allowEntry.value = true
+                                            navController.navigate(ScreenEnum.PASSWORD_CONFIRMATION.name)
+                                        }
+                                        is ResultState.Failure -> {
+                                            loadingState.value = false
+                                            allowEntry.value = true
+                                            scaffoldState.snackbarHostState.showSnackbar(it.msg.message.toString())
                                         }
                                     }
+                                }
                             }
                         }
 
@@ -203,15 +196,14 @@ fun SignInScreen(
                         DividerSignInScreen()
 
                         SecondarySpacer()
-                        Button(
-                            modifier = Modifier
-                                .fillMaxWidth(),
+                        Button(modifier = Modifier.fillMaxWidth(),
                             shape = ShapeButton.medium,
                             colors = ButtonDefaults.buttonColors(
                                 backgroundColor = MaterialTheme.colors.surface
                             ),
-                            onClick = { /*TODO*/ }
-                        ) {
+                            onClick = {
+                                viewModel.oneTapSignIn()
+                            }) {
                             Text(
                                 text = stringResource(id = R.string.text_entrance_with_google),
                                 color = MaterialTheme.colors.primary
@@ -228,15 +220,56 @@ fun SignInScreen(
                         top.linkTo(inputBlock.bottom)
                     }
                     .clickable(onClick = {
-                        signInViewModel.anonymousAuth.signIn()
-                        navController.apply {
-                            this.popBackStack(ScreenEnum.SIGN_IN.name, true)
-                            this.navigate(ScreenEnum.MAIN.name)
-                        }
+                        viewModel.anonymousAuth.signIn()
+                        navigateToMainScreen(navController)
                     })
                 )
             }
         }
+    }
+
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                try {
+                    val credentials =
+                        viewModel.oneTapClient.getSignInCredentialFromIntent(result.data)
+                    val googleIdToken = credentials.googleIdToken
+                    val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
+                    viewModel.signInWithGoogle(googleCredentials)
+                } catch (it: ApiException) {
+                    Log.d("ZZZ", "${it.message}")
+                    TODO()
+                }
+            }
+        }
+
+    fun launch(signInResult: BeginSignInResult) {
+        val intent = IntentSenderRequest.Builder(signInResult.pendingIntent.intentSender).build()
+        launcher.launch(intent)
+    }
+
+    OneTapSignIn(
+        oneTapResponse = viewModel.oneTapSignInResponse,
+        launch = {
+            launch(it)
+        }
+    )
+
+    SignInWithGoogle(
+        signInWithGoogleResponse = viewModel.signInWithGoogleResponse,
+        navigateToMainScreen = { signedIn ->
+            if (signedIn) {
+                navigateToMainScreen(navController)
+            }
+        }
+    )
+}
+
+private fun navigateToMainScreen(navController: NavController) {
+    navController.apply {
+        this.popBackStack(ScreenEnum.SIGN_IN.name, true)
+        this.navigate(ScreenEnum.MAIN.name)
     }
 }
 

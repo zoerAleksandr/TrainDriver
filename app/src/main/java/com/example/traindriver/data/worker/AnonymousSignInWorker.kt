@@ -21,7 +21,7 @@ class AnonymousSignInWorker(
         return try {
             val auth = Firebase.auth
             val user = auth.signInAnonymously().result.user
-            if (user != null) {
+            user?.let {
                 Log.d("ZZZ", "uid = ${user.uid}")
                 dataStore.saveUid(user.uid)
             }

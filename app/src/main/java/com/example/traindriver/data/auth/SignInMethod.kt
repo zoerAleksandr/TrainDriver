@@ -3,8 +3,7 @@ package com.example.traindriver.data.auth
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.example.traindriver.data.util.ResultState
-import com.example.traindriver.data.worker.SignInWorkers
-import kotlinx.coroutines.flow.Flow
+import com.example.traindriver.ui.util.Constants.ANONYMOUS_SIGN_IN_WORKER
 import kotlinx.coroutines.flow.callbackFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -15,7 +14,7 @@ sealed class SignInMethod : KoinComponent {
 
     object Anonymous : SignInMethod() {
         private val anonymousRequest: OneTimeWorkRequest by inject(
-            named(SignInWorkers.ANONYMOUS_SIGN_IN_WORKER.name)
+            named(ANONYMOUS_SIGN_IN_WORKER)
         )
 
         fun signIn() = callbackFlow {
@@ -30,12 +29,5 @@ sealed class SignInMethod : KoinComponent {
                     trySend(ResultState.Failure(it))
                 }
         }
-    }
-}
-
-
-object Google : SignInMethod() {
-    fun signIn(): Flow<ResultState<String>> {
-        TODO("Not yet implemented")
     }
 }

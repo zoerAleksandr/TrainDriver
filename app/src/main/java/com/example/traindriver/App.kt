@@ -18,7 +18,8 @@ class App : Application(), Configuration.Provider {
                 useCaseModule,
                 workManagerModule,
                 repositoryModule,
-                viewModelModule
+                viewModelModule,
+                firebaseModule
             )
         }
     }

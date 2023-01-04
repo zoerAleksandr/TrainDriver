@@ -22,10 +22,14 @@ fun SetupNavGraph(
         navController = navController,
         startDestination = startDestination
     ) {
-        composable(ScreenEnum.SIGN_IN.name) { SignInScreen(navController, activity, signInViewModel) }
+        composable(ScreenEnum.SIGN_IN.name) {
+            SignInScreen(navController, activity, signInViewModel)
+        }
         composable(ScreenEnum.MAIN.name) {
             MainScreen(navController)
         }
-        composable(ScreenEnum.PASSWORD_CONFIRMATION.name) { PasswordConfScreen(navController, signInViewModel, activity)}
+        composable(ScreenEnum.PASSWORD_CONFIRMATION.name) {
+            PasswordConfScreen(navController, signInViewModel, activity)
+        }
     }
 }
