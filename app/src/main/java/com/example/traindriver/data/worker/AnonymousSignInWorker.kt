@@ -1,12 +1,10 @@
 package com.example.traindriver.data.worker
 
 import android.content.Context
-import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.traindriver.data.repository.DataStoreRepository
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -15,15 +13,12 @@ class AnonymousSignInWorker(
     params: WorkerParameters
 ) : CoroutineWorker(ctx, params), KoinComponent {
     private val dataStore: DataStoreRepository by inject()
+    private val auth: FirebaseAuth by inject()
 
     override suspend fun doWork(): Result {
-        Log.d("ZZZ", "anonymous doWork start")
         return try {
-            val auth = Firebase.auth
-            val user = auth.signInAnonymously().result.user
-            user?.let {
-                Log.d("ZZZ", "uid = ${user.uid}")
-                dataStore.saveUid(user.uid)
+            auth.signInAnonymously().result.user?.let {
+                dataStore.saveUid(it.uid)
             }
             Result.success()
         } catch (e: Exception) {

@@ -15,7 +15,7 @@ fun SignInWithGoogle(
     when (signInWithGoogleResponse) {
         is ResultState.Loading -> {
             Log.d("ZZZ", "SignInWithGoogle Loading")
-            TODO()
+//            TODO()
         }
         is ResultState.Success -> signInWithGoogleResponse.data?.let { signedIn ->
             LaunchedEffect(signedIn) {
@@ -24,7 +24,7 @@ fun SignInWithGoogle(
         }
         is ResultState.Failure -> {
             Log.d("ZZZ", "${signInWithGoogleResponse.msg}")
-            TODO()
+//            TODO()
         }
     }
 }

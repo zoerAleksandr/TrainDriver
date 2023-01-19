@@ -4,6 +4,9 @@ import android.app.Activity
 import android.content.res.Resources
 import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
+import com.example.traindriver.ui.screen.signin_screen.CreateUserWithPhoneResponse
+import com.example.traindriver.ui.screen.signin_screen.ResendSmsCodeResponse
+import com.example.traindriver.ui.screen.signin_screen.WithPhoneResponse
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
@@ -23,7 +26,7 @@ class AuthWithPhone : KoinComponent {
     private lateinit var storedVerificationId: String
     private val resources: Resources by inject()
 
-    fun createUserWithPhone(phone: String, activity: Activity): Flow<ResultState<String?>> =
+    fun createUserWithPhone(phone: String, activity: Activity): Flow<CreateUserWithPhoneResponse> =
         callbackFlow {
             val onVerificationCallback =
                 object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
@@ -32,7 +35,7 @@ class AuthWithPhone : KoinComponent {
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
                                     val uid = task.result.user?.uid
-                                    trySend(ResultState.Success(uid))
+                                    trySend(ResultState.Success(WithPhoneResponse.AutoSignIn(uid)))
                                 } else {
                                     trySend(ResultState.Failure(Throwable(resources.getString(R.string.invalid_code))))
                                 }
@@ -48,7 +51,7 @@ class AuthWithPhone : KoinComponent {
                         p1: PhoneAuthProvider.ForceResendingToken
                     ) {
                         super.onCodeSent(verificationCode, p1)
-                        trySend(ResultState.Success("OTP Sent Successfully"))
+                        trySend(ResultState.Success(WithPhoneResponse.SmsSend))
                         resendToken = p1
                         storedVerificationId = verificationCode
                     }
@@ -89,7 +92,7 @@ class AuthWithPhone : KoinComponent {
             }
         }
 
-    fun resendCode(phone: String, activity: Activity): Flow<ResultState<String?>> =
+    fun resendCode(phone: String, activity: Activity): Flow<ResendSmsCodeResponse> =
         callbackFlow {
             val onVerificationCallback =
                 object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
@@ -98,7 +101,7 @@ class AuthWithPhone : KoinComponent {
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
                                     val uid = task.result.user?.uid
-                                    trySend(ResultState.Success(uid))
+                                    trySend(ResultState.Success(WithPhoneResponse.AutoSignIn(uid)))
                                 } else {
                                     trySend(ResultState.Failure(Throwable(resources.getString(R.string.invalid_code))))
                                 }
@@ -114,20 +117,23 @@ class AuthWithPhone : KoinComponent {
                         p1: PhoneAuthProvider.ForceResendingToken
                     ) {
                         super.onCodeSent(verificationCode, p1)
-                        trySend(ResultState.Success("OTP Sent Successfully"))
+                        trySend(ResultState.Success(WithPhoneResponse.SmsSend))
                         resendToken = p1
                         storedVerificationId = verificationCode
                     }
                 }
             trySend(ResultState.Loading(msg = resources.getString(R.string.sending_SMS)))
+
             val optionsBuilder = PhoneAuthOptions
                 .newBuilder(auth)
                 .setPhoneNumber(phone)
                 .setTimeout(60L, TimeUnit.SECONDS)
                 .setActivity(activity)
                 .setCallbacks(onVerificationCallback)
+
             optionsBuilder.setForceResendingToken(resendToken)
             PhoneAuthProvider.verifyPhoneNumber(optionsBuilder.build())
+
             awaitClose {
                 close()
             }

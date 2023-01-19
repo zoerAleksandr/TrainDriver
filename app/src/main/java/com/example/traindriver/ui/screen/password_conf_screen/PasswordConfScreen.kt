@@ -42,7 +42,9 @@ import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.ui.element_screen.TopSnackbar
 import com.example.traindriver.ui.screen.ScreenEnum
+import com.example.traindriver.ui.screen.signin_screen.ResendSmsCodeResponse
 import com.example.traindriver.ui.screen.signin_screen.SignInViewModel
+import com.example.traindriver.ui.screen.signin_screen.WithPhoneResponse
 import com.example.traindriver.ui.theme.*
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FontScalePreviews
@@ -470,24 +472,25 @@ fun PasswordConfScreen(
                     onClick = {
                         signInViewModel.resetButtonEnable.value = false
                         signInViewModel.countDownTimer.start()
-                        scope.launch(Dispatchers.Main) {
-                            signInViewModel.phoneAuth.resendCode(activity)
-                                .collect { state ->
-                                    when (state) {
-                                        is ResultState.Loading -> {
-                                            Log.d("ZZZ", "Loading")
-                                            scaffoldState.snackbarHostState.showSnackbar("Пытаемся отправить СМС...")
-                                        }
-                                        is ResultState.Success -> {
-                                            Log.d("ZZZ", "Success")
-                                        }
-                                        is ResultState.Failure -> {
-                                            Log.d("ZZZ", "Failure ${state.msg}")
-                                            scaffoldState.snackbarHostState.showSnackbar("Ошибка отправки. Проверьте подключение к сети")
-                                        }
-                                    }
-                                }
-                        }
+                        signInViewModel.phoneAuth.resendCode(activity)
+
+//                        scope.launch(Dispatchers.Main) {
+//                            .collect { state ->
+//                            when (state) {
+//                                is ResultState.Loading -> {
+//                                    Log.d("ZZZ", "Loading")
+//                                    scaffoldState.snackbarHostState.showSnackbar("Пытаемся отправить СМС...")
+//                                }
+//                                is ResultState.Success -> {
+//                                    Log.d("ZZZ", "Success")
+//                                }
+//                                is ResultState.Failure -> {
+//                                    Log.d("ZZZ", "Failure ${state.msg}")
+//                                    scaffoldState.snackbarHostState.showSnackbar("Ошибка отправки. Проверьте подключение к сети")
+//                                }
+//                            }
+//                        }
+//                        }
                     }
                 ) {
                     Text(
@@ -506,6 +509,33 @@ fun PasswordConfScreen(
                     )
                 }
             }
+        }
+    }
+
+    ResendCode(resendCode = signInViewModel.resendSmsCodeResponse)
+}
+
+@Composable
+fun ResendCode(
+    resendCode: ResendSmsCodeResponse
+) {
+    when (resendCode) {
+        is ResultState.Loading -> {
+            Log.d("ZZZ", "ResendCode Loading")
+        }
+        is ResultState.Success -> resendCode.data?.let { result ->
+                Log.d("ZZZ", "ResendCode Success")
+            when (result) {
+                is WithPhoneResponse.SmsSend -> {
+                    TODO("SMS отправлено")
+                }
+                is WithPhoneResponse.AutoSignIn -> {
+                    TODO("Вход")
+                }
+            }
+        }
+        is ResultState.Failure -> {
+            Log.d("ZZZ", "ResendCode Failure")
         }
     }
 }

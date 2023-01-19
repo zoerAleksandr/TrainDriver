@@ -35,6 +35,7 @@ class SignInWithGoogleUseCase : KoinComponent {
     private val dataStore: DataStoreRepository by inject()
 
     fun oneTapSignInWithGoogle(): Flow<OneTapSignInResponse> = callbackFlow {
+        trySend(ResultState.Loading(null))
         try {
             val signInResult = oneTapClient.beginSignIn(signInRequest).await()
             trySend(ResultState.Success(signInResult))
@@ -49,9 +50,9 @@ class SignInWithGoogleUseCase : KoinComponent {
         awaitClose { close() }
     }
 
-
     fun firebaseSignInWithGoogle(googleCredential: AuthCredential): Flow<SignInWithGoogleResponse> =
         callbackFlow {
+            trySend(ResultState.Loading(null))
             try {
                 val authResult = auth.signInWithCredential(googleCredential).await()
                 val isNewUser = authResult.additionalUserInfo?.isNewUser ?: false
@@ -67,7 +68,6 @@ class SignInWithGoogleUseCase : KoinComponent {
             }
             awaitClose { close() }
         }
-
 
     private suspend fun addUserToFirestore() {
         auth.currentUser?.apply {

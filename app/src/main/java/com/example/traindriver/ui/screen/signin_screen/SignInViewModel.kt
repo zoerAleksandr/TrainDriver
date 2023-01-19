@@ -7,6 +7,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traindriver.PreferencesApp
@@ -29,6 +30,14 @@ import org.koin.core.component.inject
 
 typealias OneTapSignInResponse = ResultState<BeginSignInResult>
 typealias SignInWithGoogleResponse = ResultState<Boolean>
+typealias ResendSmsCodeResponse = ResultState<WithPhoneResponse>
+typealias CreateUserWithPhoneResponse = ResultState<WithPhoneResponse>
+typealias AnonymousSignInResponse = ResultState<Boolean>
+
+sealed class WithPhoneResponse {
+    object SmsSend : WithPhoneResponse()
+    class AutoSignIn(val uid: String?) : WithPhoneResponse()
+}
 
 class SignInViewModel : ViewModel(), KoinComponent {
     private val getLocaleUseCase: GetLocaleUseCase by inject()
@@ -37,10 +46,19 @@ class SignInViewModel : ViewModel(), KoinComponent {
 
     var oneTapSignInResponse by mutableStateOf<OneTapSignInResponse>(ResultState.Success(null))
         private set
+
     var signInWithGoogleResponse by mutableStateOf<SignInWithGoogleResponse>(
-        ResultState.Success(
-            false
-        )
+        ResultState.Success(false)
+    )
+        private set
+
+    var resendSmsCodeResponse by mutableStateOf<ResendSmsCodeResponse>(
+        ResultState.Success(null)
+    )
+        private set
+
+    var createUserWithPhoneResponse by mutableStateOf<CreateUserWithPhoneResponse>(
+        ResultState.Success(null)
     )
         private set
 
@@ -50,15 +68,19 @@ class SignInViewModel : ViewModel(), KoinComponent {
     val timer: MutableState<Long> = mutableStateOf(60)
     val resetButtonEnable: MutableState<Boolean> = mutableStateOf(false)
 
+    var isRegistered by mutableStateOf(false)
+
     fun oneTapSignIn() = viewModelScope.launch {
-        oneTapSignInResponse = ResultState.Loading(null)
-        signInWithGoogleUseCase.oneTapSignInWithGoogle().collect {
-            oneTapSignInResponse = it
+        if (!isRegistered) {
+            isRegistered = true
+            signInWithGoogleUseCase.oneTapSignInWithGoogle().collect { response ->
+                oneTapSignInResponse = response
+                isRegistered = response is ResultState.Loading
+            }
         }
     }
 
     fun signInWithGoogle(googleCredential: AuthCredential) = viewModelScope.launch {
-        signInWithGoogleResponse = ResultState.Loading(null)
         signInWithGoogleUseCase.firebaseSignInWithGoogle(googleCredential).collect {
             signInWithGoogleResponse = it
         }
@@ -67,14 +89,34 @@ class SignInViewModel : ViewModel(), KoinComponent {
     val phoneAuth = object : PhoneAuthInterface {
         val signInWithPhoneUseCase: SignInWithPhoneUseCase by inject()
 
-        override fun createUserWithPhone(activity: Activity) =
-            signInWithPhoneUseCase.createUserWithPhone(number.value, activity)
+        override fun createUserWithPhone(activity: Activity) {
+            if (!isRegistered) {
+                viewModelScope.launch {
+                    signInWithPhoneUseCase.createUserWithPhone(number.value, activity)
+                        .collect { response ->
+                            createUserWithPhoneResponse = response
+                            isRegistered = response is ResultState.Loading
+                        }
+                }
+            }
+        }
 
         override fun checkCode(code: String) =
             signInWithPhoneUseCase.verifyCode(code)
 
-        override fun resendCode(activity: Activity) =
-            signInWithPhoneUseCase.resendCode(number.value, activity)
+        override fun resendCode(activity: Activity) {
+            if (!isRegistered) {
+                viewModelScope.launch {
+                    signInWithPhoneUseCase.resendCode(number.value, activity).collect { response ->
+                        resendSmsCodeResponse = response
+                        isRegistered = response is ResultState.Loading
+                    }
+                }
+            } else {
+                resendSmsCodeResponse =
+                    ResultState.Failure(Throwable("Выполняется вход другим способом"))
+            }
+        }
     }
 
     val countDownTimer = object : CountDownTimer(60_000L, 1_000L) {
@@ -89,8 +131,14 @@ class SignInViewModel : ViewModel(), KoinComponent {
 
     val anonymousAuth = object : AnonymousAuthInterface {
         val signInAnonymousUseCase: SignInAnonymousUseCase by inject()
-        override fun signIn() {
-            signInAnonymousUseCase.signIn()
+        override fun signIn(owner: LifecycleOwner) {
+            if (!isRegistered) {
+                viewModelScope.launch {
+                    signInAnonymousUseCase.signIn(owner).collect { response ->
+                        isRegistered = response is ResultState.Loading
+                    }
+                }
+            }
         }
     }
 
@@ -116,11 +164,11 @@ class SignInViewModel : ViewModel(), KoinComponent {
 }
 
 interface PhoneAuthInterface {
-    fun createUserWithPhone(activity: Activity): Flow<ResultState<String?>>
+    fun createUserWithPhone(activity: Activity)
     fun checkCode(code: String): Flow<ResultState<String?>>
-    fun resendCode(activity: Activity): Flow<ResultState<String?>>
+    fun resendCode(activity: Activity)
 }
 
 interface AnonymousAuthInterface {
-    fun signIn()
+    fun signIn(owner: LifecycleOwner)
 }

@@ -10,15 +10,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -43,7 +41,6 @@ import com.example.traindriver.ui.util.LocaleUser
 import com.google.android.gms.auth.api.identity.BeginSignInResult
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -170,26 +167,27 @@ fun SignInScreen(
                         LoginButton(
                             enabled = allowEntry.value, isLoading = loadingState.value
                         ) {
-                            scope.launch(Dispatchers.Main) {
-                                viewModel.phoneAuth.createUserWithPhone(activity).collect {
-                                    when (it) {
-                                        is ResultState.Loading -> {
-                                            loadingState.value = true
-                                            allowEntry.value = false
-                                        }
-                                        is ResultState.Success -> {
-                                            loadingState.value = false
-                                            allowEntry.value = true
-                                            navController.navigate(ScreenEnum.PASSWORD_CONFIRMATION.name)
-                                        }
-                                        is ResultState.Failure -> {
-                                            loadingState.value = false
-                                            allowEntry.value = true
-                                            scaffoldState.snackbarHostState.showSnackbar(it.msg.message.toString())
-                                        }
-                                    }
-                                }
-                            }
+                            viewModel.phoneAuth.createUserWithPhone(activity)
+//                            scope.launch(Dispatchers.Main) {
+//                                {
+//                                    when (it) {
+//                                        is ResultState.Loading -> {
+//                                            loadingState.value = true
+//                                            allowEntry.value = false
+//                                        }
+//                                        is ResultState.Success -> {
+//                                            loadingState.value = false
+//                                            allowEntry.value = true
+//                                            navController.navigate(ScreenEnum.PASSWORD_CONFIRMATION.name)
+//                                        }
+//                                        is ResultState.Failure -> {
+//                                            loadingState.value = false
+//                                            allowEntry.value = true
+//                                            scaffoldState.snackbarHostState.showSnackbar(it.msg.message.toString())
+//                                        }
+//                                    }
+//                                }
+//                            }
                         }
 
                         SecondarySpacer()
@@ -220,7 +218,7 @@ fun SignInScreen(
                         top.linkTo(inputBlock.bottom)
                     }
                     .clickable(onClick = {
-                        viewModel.anonymousAuth.signIn()
+                        viewModel.anonymousAuth.signIn(activity as LifecycleOwner)
                         navigateToMainScreen(navController)
                     })
                 )
@@ -264,6 +262,40 @@ fun SignInScreen(
             }
         }
     )
+
+    CreateUserWithPhone(
+        createUserWithPhone = viewModel.createUserWithPhoneResponse,
+        navController = navController
+    )
+}
+
+@Composable
+fun CreateUserWithPhone(
+    createUserWithPhone: CreateUserWithPhoneResponse,
+    navController: NavController
+) {
+    when (createUserWithPhone) {
+        is ResultState.Loading -> {
+            Log.d("ZZZ", "CreateUserWithPhone Loading")
+        }
+        is ResultState.Success -> createUserWithPhone.data?.let { result ->
+            LaunchedEffect(result) {
+                when (result) {
+                    is WithPhoneResponse.SmsSend -> {
+                        Log.d("ZZZ", "CreateUserWithPhone Success SmsSend")
+                        navController.navigate(ScreenEnum.PASSWORD_CONFIRMATION.name)
+                    }
+                    is WithPhoneResponse.AutoSignIn -> {
+                        Log.d("ZZZ", "CreateUserWithPhone Success AutoSignIn")
+                        navController.navigate(ScreenEnum.MAIN.name)
+                    }
+                }
+            }
+        }
+        is ResultState.Failure -> {
+            Log.d("ZZZ", "CreateUserWithPhone Failure")
+        }
+    }
 }
 
 private fun navigateToMainScreen(navController: NavController) {
