@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 
-
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "train_driver_pref")
 
 class DataStoreRepository(context: Context) {
@@ -34,11 +33,16 @@ class DataStoreRepository(context: Context) {
     }
 
     suspend fun saveUid(value: String) {
-        dataStore.edit { pref ->
-            pref[PreferencesKey.uid] = value
+        try {
+            dataStore.edit { pref ->
+                pref[PreferencesKey.uid] = value
+            }
+            saveStateIsRegistered(true)
+        } catch (e: Exception) {
+            saveStateIsRegistered(false)
         }
-        saveStateIsRegistered(true)
     }
+
 
     suspend fun clearUid() {
         dataStore.edit { pref ->
