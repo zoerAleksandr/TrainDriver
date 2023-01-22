@@ -115,7 +115,10 @@ fun PasswordConfScreen(
                 val topGuideLine = createGuidelineFromTop(0.17f)
 
                 Button(modifier = Modifier
-                    .padding(dimensionResource(id = R.dimen.medium_padding))
+                    .padding(
+                        top = dimensionResource(id = R.dimen.large_padding),
+                        start = dimensionResource(id = R.dimen.medium_padding)
+                    )
                     .size(dimensionResource(id = R.dimen.min_size_view))
                     .constrainAs(closeButton) {
                         start.linkTo(parent.start)
@@ -184,7 +187,7 @@ fun PasswordConfScreen(
                                 .width(widthBox)
                                 .height(heightBox)
                                 .border(
-                                    color = MaterialTheme.colors.onSurface,
+                                    color = MaterialTheme.colors.onBackground,
                                     width = dimensionResource(id = R.dimen.width_border_input_field),
                                     shape = ShapeBackground.small
                                 )
@@ -207,7 +210,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -220,7 +223,7 @@ fun PasswordConfScreen(
                                 .width(widthBox)
                                 .height(heightBox)
                                 .border(
-                                    color = MaterialTheme.colors.onSurface,
+                                    color = MaterialTheme.colors.onBackground,
                                     width = dimensionResource(id = R.dimen.width_border_input_field),
                                     shape = ShapeBackground.small
                                 )
@@ -256,7 +259,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -269,7 +272,7 @@ fun PasswordConfScreen(
                                 .width(widthBox)
                                 .height(heightBox)
                                 .border(
-                                    color = MaterialTheme.colors.onSurface,
+                                    color = MaterialTheme.colors.onBackground,
                                     width = dimensionResource(id = R.dimen.width_border_input_field),
                                     shape = ShapeBackground.small
                                 )
@@ -305,7 +308,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -318,7 +321,7 @@ fun PasswordConfScreen(
                                 .width(widthBox)
                                 .height(heightBox)
                                 .border(
-                                    color = MaterialTheme.colors.onSurface,
+                                    color = MaterialTheme.colors.onBackground,
                                     width = dimensionResource(id = R.dimen.width_border_input_field),
                                     shape = ShapeBackground.small
                                 )
@@ -354,7 +357,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -367,7 +370,7 @@ fun PasswordConfScreen(
                                 .width(widthBox)
                                 .height(heightBox)
                                 .border(
-                                    color = MaterialTheme.colors.onSurface,
+                                    color = MaterialTheme.colors.onBackground,
                                     width = dimensionResource(id = R.dimen.width_border_input_field),
                                     shape = ShapeBackground.small
                                 )
@@ -403,7 +406,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -415,7 +418,7 @@ fun PasswordConfScreen(
                                 .width(widthBox)
                                 .height(heightBox)
                                 .border(
-                                    color = MaterialTheme.colors.onSurface,
+                                    color = MaterialTheme.colors.onBackground,
                                     width = dimensionResource(id = R.dimen.width_border_input_field),
                                     shape = ShapeBackground.small
                                 )
@@ -435,7 +438,7 @@ fun PasswordConfScreen(
                                         v6.value = it
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onPrimary),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -473,24 +476,6 @@ fun PasswordConfScreen(
                         signInViewModel.resetButtonEnable.value = false
                         signInViewModel.countDownTimer.start()
                         signInViewModel.phoneAuth.resendCode(activity)
-
-//                        scope.launch(Dispatchers.Main) {
-//                            .collect { state ->
-//                            when (state) {
-//                                is ResultState.Loading -> {
-//                                    Log.d("ZZZ", "Loading")
-//                                    scaffoldState.snackbarHostState.showSnackbar("Пытаемся отправить СМС...")
-//                                }
-//                                is ResultState.Success -> {
-//                                    Log.d("ZZZ", "Success")
-//                                }
-//                                is ResultState.Failure -> {
-//                                    Log.d("ZZZ", "Failure ${state.msg}")
-//                                    scaffoldState.snackbarHostState.showSnackbar("Ошибка отправки. Проверьте подключение к сети")
-//                                }
-//                            }
-//                        }
-//                        }
                     }
                 ) {
                     Text(
