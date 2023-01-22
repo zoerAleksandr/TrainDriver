@@ -168,26 +168,6 @@ fun SignInScreen(
                             enabled = allowEntry.value, isLoading = loadingState.value
                         ) {
                             viewModel.phoneAuth.createUserWithPhone(activity)
-//                            scope.launch(Dispatchers.Main) {
-//                                {
-//                                    when (it) {
-//                                        is ResultState.Loading -> {
-//                                            loadingState.value = true
-//                                            allowEntry.value = false
-//                                        }
-//                                        is ResultState.Success -> {
-//                                            loadingState.value = false
-//                                            allowEntry.value = true
-//                                            navController.navigate(ScreenEnum.PASSWORD_CONFIRMATION.name)
-//                                        }
-//                                        is ResultState.Failure -> {
-//                                            loadingState.value = false
-//                                            allowEntry.value = true
-//                                            scaffoldState.snackbarHostState.showSnackbar(it.msg.message.toString())
-//                                        }
-//                                    }
-//                                }
-//                            }
                         }
 
                         SecondarySpacer()
@@ -200,7 +180,7 @@ fun SignInScreen(
                                 backgroundColor = MaterialTheme.colors.surface
                             ),
                             onClick = {
-                                viewModel.oneTapSignIn()
+                                viewModel.authWithGoogle.oneTap()
                             }) {
                             Text(
                                 text = stringResource(id = R.string.text_entrance_with_google),
@@ -234,7 +214,7 @@ fun SignInScreen(
                         viewModel.oneTapClient.getSignInCredentialFromIntent(result.data)
                     val googleIdToken = credentials.googleIdToken
                     val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
-                    viewModel.signInWithGoogle(googleCredentials)
+                    viewModel.authWithGoogle.signIn(googleCredentials)
                 } catch (it: ApiException) {
                     Log.d("ZZZ", "${it.message}")
                     TODO()

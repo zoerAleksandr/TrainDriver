@@ -5,7 +5,7 @@ import com.example.traindriver.data.auth.AuthWithPhone
 
 class SignInWithPhoneUseCase {
     private val authWithPhone = AuthWithPhone()
-    fun createUserWithPhone(phone: String, activity: Activity) =
+    fun signIn(phone: String, activity: Activity) =
         authWithPhone.createUserWithPhone(phone, activity)
 
     fun verifyCode(code: String) =

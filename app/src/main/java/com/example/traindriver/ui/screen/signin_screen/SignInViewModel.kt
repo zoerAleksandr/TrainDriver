@@ -41,7 +41,6 @@ sealed class WithPhoneResponse {
 
 class SignInViewModel : ViewModel(), KoinComponent {
     private val getLocaleUseCase: GetLocaleUseCase by inject()
-    private val signInWithGoogleUseCase: SignInWithGoogleUseCase by inject()
     val oneTapClient: SignInClient by inject()
 
     var oneTapSignInResponse by mutableStateOf<OneTapSignInResponse>(ResultState.Success(null))
@@ -70,19 +69,27 @@ class SignInViewModel : ViewModel(), KoinComponent {
 
     var isRegistered by mutableStateOf(false)
 
-    fun oneTapSignIn() = viewModelScope.launch {
-        if (!isRegistered) {
-            isRegistered = true
-            signInWithGoogleUseCase.oneTapSignInWithGoogle().collect { response ->
-                oneTapSignInResponse = response
-                isRegistered = response is ResultState.Loading
+    val authWithGoogle = object : GoogleAuthInterface {
+        private val signInWithGoogleUseCase: SignInWithGoogleUseCase by inject()
+
+        override fun oneTap() {
+            viewModelScope.launch {
+                if (!isRegistered) {
+                    isRegistered = true
+                    signInWithGoogleUseCase.oneTapSignInWithGoogle().collect { response ->
+                        oneTapSignInResponse = response
+                        isRegistered = response is ResultState.Loading
+                    }
+                }
             }
         }
-    }
 
-    fun signInWithGoogle(googleCredential: AuthCredential) = viewModelScope.launch {
-        signInWithGoogleUseCase.firebaseSignInWithGoogle(googleCredential).collect {
-            signInWithGoogleResponse = it
+        override fun signIn(googleCredential: AuthCredential) {
+            viewModelScope.launch {
+                signInWithGoogleUseCase.signIn(googleCredential).collect {
+                    signInWithGoogleResponse = it
+                }
+            }
         }
     }
 
@@ -92,7 +99,7 @@ class SignInViewModel : ViewModel(), KoinComponent {
         override fun createUserWithPhone(activity: Activity) {
             if (!isRegistered) {
                 viewModelScope.launch {
-                    signInWithPhoneUseCase.createUserWithPhone(number.value, activity)
+                    signInWithPhoneUseCase.signIn(number.value, activity)
                         .collect { response ->
                             createUserWithPhoneResponse = response
                             isRegistered = response is ResultState.Loading
@@ -167,6 +174,11 @@ interface PhoneAuthInterface {
     fun createUserWithPhone(activity: Activity)
     fun checkCode(code: String): Flow<ResultState<String?>>
     fun resendCode(activity: Activity)
+}
+
+interface GoogleAuthInterface {
+    fun oneTap()
+    fun signIn(googleCredential: AuthCredential)
 }
 
 interface AnonymousAuthInterface {
