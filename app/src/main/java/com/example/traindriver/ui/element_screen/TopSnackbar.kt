@@ -19,8 +19,8 @@ fun TopSnackbar(snackBarData: SnackbarData) {
                 .padding(top = 16.dp)
                 .align(Alignment.TopCenter),
             snackbarData = snackBarData,
-            backgroundColor = MaterialTheme.colors.background,
-            contentColor = MaterialTheme.colors.onBackground
+            backgroundColor = MaterialTheme.colors.secondary,
+            contentColor = MaterialTheme.colors.onSecondary
         )
     }
 }

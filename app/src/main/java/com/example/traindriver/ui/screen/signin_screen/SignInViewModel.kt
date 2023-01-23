@@ -97,7 +97,7 @@ class SignInViewModel : ViewModel(), KoinComponent {
         val signInWithPhoneUseCase: SignInWithPhoneUseCase by inject()
 
         override fun createUserWithPhone(activity: Activity) {
-            if (!isRegistered) {
+            if (!isRegistered && allowEntry.value) {
                 viewModelScope.launch {
                     signInWithPhoneUseCase.signIn(number.value, activity)
                         .collect { response ->

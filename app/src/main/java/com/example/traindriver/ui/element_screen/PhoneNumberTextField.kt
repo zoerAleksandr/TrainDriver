@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -45,7 +46,8 @@ fun NumberPhoneTextField(
     numberState: MutableState<String>,
     localeUser: MutableState<LocaleUser>,
     isFilledCallback: FieldIsFilled? = null,
-    sheetState: ModalBottomSheetState
+    sheetState: ModalBottomSheetState,
+    action: (KeyboardActionScope.() -> Unit)?
 ) {
     val scope = rememberCoroutineScope()
 
@@ -125,9 +127,7 @@ fun NumberPhoneTextField(
                 imeAction = ImeAction.Go
             ),
             keyboardActions = KeyboardActions(
-                onGo = {
-                    // TODO
-                }
+                onGo = action
             ),
             singleLine = true
         )
@@ -159,6 +159,6 @@ private fun StartScreenPrev() {
             mutableStateOf("+7"),
             mutableStateOf(LocaleUser.RU),
             sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded)
-        )
+        ) {}
     }
 }

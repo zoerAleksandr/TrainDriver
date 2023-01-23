@@ -152,7 +152,8 @@ fun SignInScreen(
                         )
 
                         PrimarySpacer()
-                        NumberPhoneTextField(numberState = number,
+                        NumberPhoneTextField(
+                            numberState = number,
                             localeUser = localeState,
                             isFilledCallback = if (localeState.value != LocaleUser.OTHER) {
                                 object : FieldIsFilled {
@@ -161,12 +162,12 @@ fun SignInScreen(
                                     }
                                 }
                             } else null,
-                            sheetState = sheetState)
+                            sheetState = sheetState) {
+                            viewModel.phoneAuth.createUserWithPhone(activity)
+                        }
 
                         SecondarySpacer()
-                        LoginButton(
-                            enabled = allowEntry.value, isLoading = loadingState.value
-                        ) {
+                        LoginButton(enabled = allowEntry.value, isLoading = loadingState.value) {
                             viewModel.phoneAuth.createUserWithPhone(activity)
                         }
 
