@@ -101,7 +101,10 @@ fun PasswordConfScreen(
                                     scaffoldState.snackbarHostState.showSnackbar(CHECKING_CODE_MSG)
                                 }
                                 is ResultState.Success -> {
-                                    navController.navigate(ScreenEnum.MAIN.name)
+                                    navController.apply {
+                                        this.popBackStack(ScreenEnum.SIGN_IN.name, true)
+                                        this.navigate(ScreenEnum.MAIN.name)
+                                    }
                                 }
                                 is ResultState.Failure -> {
                                     scaffoldState.snackbarHostState.showSnackbar(state.msg.message.toString())
