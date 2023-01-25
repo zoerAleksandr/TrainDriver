@@ -32,7 +32,6 @@ import com.example.traindriver.ui.screen.signin_screen.components.CreateUserWith
 import com.example.traindriver.ui.screen.signin_screen.components.OneTapSignIn
 import com.example.traindriver.ui.screen.signin_screen.components.SignInWithGoogle
 import com.example.traindriver.ui.screen.signin_screen.elements.*
-import com.example.traindriver.ui.theme.ShapeButton
 import com.example.traindriver.ui.theme.ShapeSurface
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
@@ -55,7 +54,8 @@ fun SignInScreen(
 ) {
     val secondaryPadding = dimensionResource(R.dimen.secondary_padding_between_view)
     val primaryPadding = dimensionResource(R.dimen.primary_padding_between_view)
-    val loadingState = remember { mutableStateOf(false) }
+    val loadingPhoneAuthState = remember { mutableStateOf(false) }
+    val loadingGoogleAuthState = remember { mutableStateOf(false) }
 
     val scaffoldState = rememberScaffoldState()
     val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
@@ -170,7 +170,10 @@ fun SignInScreen(
                         }
 
                         SecondarySpacer()
-                        LoginButton(enabled = allowEntry.value, isLoading = loadingState.value) {
+                        LoginButton(
+                            enabled = allowEntry.value,
+                            isLoading = loadingPhoneAuthState.value
+                        ) {
                             viewModel.phoneAuth.createUserWithPhone(activity)
                         }
 
@@ -178,18 +181,10 @@ fun SignInScreen(
                         DividerSignInScreen()
 
                         SecondarySpacer()
-                        Button(modifier = Modifier.fillMaxWidth(),
-                            shape = ShapeButton.medium,
-                            colors = ButtonDefaults.buttonColors(
-                                backgroundColor = MaterialTheme.colors.surface
-                            ),
-                            onClick = {
-                                viewModel.authWithGoogle.oneTap()
-                            }) {
-                            Text(
-                                text = stringResource(id = R.string.text_entrance_with_google),
-                                color = MaterialTheme.colors.primary
-                            )
+                        SignInGoogleButton(
+                            isLoading = loadingGoogleAuthState.value
+                        ) {
+                            viewModel.authWithGoogle.oneTap()
                         }
                     }
                 }
@@ -235,6 +230,7 @@ fun SignInScreen(
     OneTapSignIn(
         oneTapResponse = viewModel.oneTapSignInResponse,
         snackbarHostState = scaffoldState.snackbarHostState,
+        loadingState = loadingGoogleAuthState,
         launch = {
             launch(it)
         }
@@ -243,6 +239,7 @@ fun SignInScreen(
     SignInWithGoogle(
         signInWithGoogleResponse = viewModel.signInWithGoogleResponse,
         snackbarHostState = scaffoldState.snackbarHostState,
+        loadingState = loadingGoogleAuthState,
         navigateToMainScreen = { signedIn ->
             if (signedIn) {
                 navigateToMainScreen(navController)
@@ -254,7 +251,7 @@ fun SignInScreen(
         createUserWithPhone = viewModel.createUserWithPhoneResponse,
         snackbarHostState = scaffoldState.snackbarHostState,
         navController = navController,
-        loadingState = loadingState
+        loadingState = loadingPhoneAuthState
     )
 }
 
