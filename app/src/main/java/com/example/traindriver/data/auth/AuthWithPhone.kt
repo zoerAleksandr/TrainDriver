@@ -2,7 +2,6 @@ package com.example.traindriver.data.auth
 
 import android.app.Activity
 import android.content.res.Resources
-import android.util.Log
 import com.example.traindriver.R
 import com.example.traindriver.data.repository.DataStoreRepository
 import com.example.traindriver.data.util.ResultState
@@ -41,11 +40,8 @@ class AuthWithPhone : KoinComponent {
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
                                     task.result.user?.uid?.let { uid ->
-                                        Log.d("ZZZ", "uid = $uid")
-                                        CoroutineScope(Dispatchers.IO).launch {
-                                            dataStore.saveUid(uid)
-                                        }
-                                        trySend(ResultState.Success(WithPhoneResponse.AutoSignIn(uid)))
+                                        saveUidToDataStore(uid)
+                                        trySend(ResultState.Success(WithPhoneResponse.AutoSignIn))
                                     }
                                 } else {
                                     trySend(ResultState.Failure(Throwable(resources.getString(R.string.invalid_code))))
@@ -93,9 +89,7 @@ class AuthWithPhone : KoinComponent {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         task.result.user?.uid?.let { uid ->
-                            CoroutineScope(Dispatchers.IO).launch {
-                                dataStore.saveUid(uid)
-                            }
+                            saveUidToDataStore(uid)
                             trySend(ResultState.Success(uid))
                         }
                     } else {
@@ -115,8 +109,10 @@ class AuthWithPhone : KoinComponent {
                         auth.signInWithCredential(p0)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    val uid = task.result.user?.uid
-                                    trySend(ResultState.Success(WithPhoneResponse.AutoSignIn(uid)))
+                                    task.result.user?.uid?.let {
+                                        saveUidToDataStore(it)
+                                        trySend(ResultState.Success(WithPhoneResponse.AutoSignIn))
+                                    }
                                 } else {
                                     trySend(ResultState.Failure(Throwable(resources.getString(R.string.invalid_code))))
                                 }
@@ -153,4 +149,10 @@ class AuthWithPhone : KoinComponent {
                 close()
             }
         }
+
+    private fun saveUidToDataStore(uid: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            dataStore.saveUid(uid)
+        }
+    }
 }

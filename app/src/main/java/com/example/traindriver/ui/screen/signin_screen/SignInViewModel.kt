@@ -36,7 +36,7 @@ typealias AnonymousSignInResponse = ResultState<Boolean>
 
 sealed class WithPhoneResponse {
     object SmsSend : WithPhoneResponse()
-    class AutoSignIn(val uid: String?) : WithPhoneResponse()
+    object AutoSignIn : WithPhoneResponse()
 }
 
 class SignInViewModel : ViewModel(), KoinComponent {
@@ -91,6 +91,11 @@ class SignInViewModel : ViewModel(), KoinComponent {
                 }
             }
         }
+    }
+
+    fun resetPhoneAuthState() {
+        createUserWithPhoneResponse = ResultState.Success(null)
+        isRegistered = false
     }
 
     val phoneAuth = object : PhoneAuthInterface {

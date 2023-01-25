@@ -253,7 +253,8 @@ fun SignInScreen(
     CreateUserWithPhone(
         createUserWithPhone = viewModel.createUserWithPhoneResponse,
         snackbarHostState = scaffoldState.snackbarHostState,
-        navController = navController
+        navController = navController,
+        loadingState = loadingState
     )
 }
 

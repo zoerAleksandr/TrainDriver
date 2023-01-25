@@ -69,6 +69,7 @@ fun PasswordConfScreen(
     val scaffoldState = rememberScaffoldState()
 
     signInViewModel.countDownTimer.start()
+    signInViewModel.resetPhoneAuthState()
 
     val v1 = remember { mutableStateOf("") }
     val v2 = remember { mutableStateOf("") }
