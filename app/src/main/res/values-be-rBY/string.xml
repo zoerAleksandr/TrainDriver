@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="true">Машыністам</string>
+
+    <string name="title_input_element">Уваход у рахунак</string>
+    <string name="placeholder_input_number">Нумар тэлефона</string>
+    <string name="divider_text">або</string>
+    <string name="text_entrance_button">Уваход</string>
+    <string name="text_skip_button">ПРАПУСЦІЦЬ</string>
+    <string name="text_entrance_with_google">Увайсці з Google</string>
+    <string name="select_country">Выберыце краіну</string>
+
+    // Password Confirmation Screen
+    <string name="title_passwordConfScreen">Увядзіце код з SMS</string>
+    <string name="info_text_passwordConfScreen">Мы адправілі SMS на нумар %1$s</string>
+    <string name="button_text_confirm">Пацвердзіць</string>
+    <string name="resent_text_passwordConfScreen">Адправіць паўторна праз %1$d с</string>
+    <string name="resent_text_passwordConfScreen_enabled">Адправіць паўторна</string>
+
+    // Сообщения ошибок
+    <string name="invalid_code">Няправільны код</string>
+    <string name="empty_number">"Увядзіце нумар тэлефона"</string>
+
+    // Информационные сообщения
+    <string name="trying_to_send_SMS">Спрабуем адправіць SMS…</string>
+    <string name="checking_code">Правяраем код …</string>
+    <string name="connecting_to_server">Злучэнне з серверам…</string>
+    <string name="sms_send">SMS адпраўлена</string>
+    <string name="auto_login">Аўтаматычны ўваход</string>
+    <string name="error_try_again">Адбылася памылка. Паспрабуйце яшчэ раз.</string>
+</resources>

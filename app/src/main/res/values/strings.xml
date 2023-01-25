@@ -1,3 +1,31 @@
 <resources>
-    <string name="app_name">TrainDriver</string>
+    <string name="app_name" translatable="false">TrainDriver</string>
+
+    // SignIn Screen
+    <string name="title_input_element">Вход в аккаунт</string>
+    <string name="placeholder_input_number">Номер телефона</string>
+    <string name="divider_text">или</string>
+    <string name="text_entrance_button">Вход</string>
+    <string name="text_skip_button">ПРОПУСТИТЬ</string>
+    <string name="text_entrance_with_google">Войти с Google</string>
+    <string name="select_country">Выберите страну</string>
+
+    // Password Confirmation Screen
+    <string name="title_passwordConfScreen">Введите код из SMS</string>
+    <string name="info_text_passwordConfScreen">Мы отправили SMS на номер %1$s</string>
+    <string name="button_text_confirm">Подтвердить</string>
+    <string name="resent_text_passwordConfScreen">Отправить повторно через %1$d с</string>
+    <string name="resent_text_passwordConfScreen_enabled">Отправить повторно</string>
+
+    // Сообщения ошибок
+    <string name="invalid_code">Неверный код</string>
+    <string name="empty_number">Введите номер телефона</string>
+    
+    // Информационные сообщения
+    <string name="trying_to_send_SMS">Пытаемся отправить SMS…</string>
+    <string name="checking_code">Проверяем код…</string>
+    <string name="connecting_to_server">Соединение с сервером…</string>
+    <string name="sms_send">SMS отправлено</string>
+    <string name="auto_login">Автоматический вход</string>
+    <string name="error_try_again">Произошла ошибка. Попробуйте ещё раз.</string>
 </resources>

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "276417222202",
+    "project_id": "traindriver-59efd",
+    "storage_bucket": "traindriver-59efd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:276417222202:android:46807bf03ec2f6aabd8703",
+        "android_client_info": {
+          "package_name": "com.zoer.traindriver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "276417222202-f4rr0ml7b8jp7stl7jvs0bdejb19gp5c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zoer.traindriver",
+            "certificate_hash": "e8ff583919beed30e6c63a62ad710673ae2ec075"
+          }
+        },
+        {
+          "client_id": "276417222202-qc4ek8gr9okibqt12r963mi039bevbng.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGCgsXsAQNYtiuGVGwgnQZTwa5fvbFFkE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "276417222202-qc4ek8gr9okibqt12r963mi039bevbng.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

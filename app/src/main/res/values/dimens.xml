@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    // General
+    <dimen name="min_size_view">48dp</dimen>
+
+    // Bottom Sheet
+    <dimen name="sheet_handle_width">50dp</dimen>
+    <dimen name="sheet_handle_height">6dp</dimen>
+
+    <dimen name="height_item_bottom_sheet">58dp</dimen>
+    <dimen name="padding_between_item_bottom_sheet">4dp</dimen>
+
+    // Input Field
+    <dimen name="padding_start_input_field">2dp</dimen>
+    <dimen name="width_border_input_field">1dp</dimen>
+
+    // Loading Screen
+    <dimen name="size_background_progress_bar">120dp</dimen>
+    <dimen name="stroke_width_progress_bar">5dp</dimen>
+
+    // SignIn Screen
+    <dimen name="elevation_input_element">6dp</dimen>
+    <dimen name="padding_all_input_element">32dp</dimen>
+    <dimen name="primary_padding_between_view">24dp</dimen>
+    <dimen name="secondary_padding_between_view">12dp</dimen>
+    <dimen name="padding_divider">24dp</dimen>
+
+    // Password confirmation Screen
+    <dimen name="small_padding">8dp</dimen>
+    <dimen name="medium_padding">16dp</dimen>
+    <dimen name="large_padding">48dp</dimen>
+</resources>

@@ -1,15 +1,16 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
 }
 
 android {
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.traindriver"
+        applicationId "com.zoer.traindriver"
         minSdk 23
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -31,32 +32,84 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+        freeCompilerArgs += ["-Xjvm-default=all",]
     }
     buildFeatures {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion compose_version
+        kotlinCompilerExtensionVersion compose_compiler
     }
     packagingOptions {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+    namespace 'com.example.traindriver'
 }
 
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.7.0'
-    implementation "androidx.compose.ui:ui:$compose_version"
-    implementation "androidx.compose.material:material:$compose_version"
-    implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.1'
-    implementation 'androidx.activity:activity-compose:1.3.1'
+    implementation "androidx.compose.ui:ui:1.3.1"
+    implementation "androidx.compose.material:material:1.3.1"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.3.1"
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    implementation 'androidx.activity:activity-compose:1.6.1'
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.27.0"
+
+    // Coil
+    implementation "io.coil-kt:coil-compose:2.2.2"
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit:2.9.0"
+    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+    implementation "com.squareup.okhttp3:logging-interceptor:4.10.0"
+    implementation "com.google.code.gson:gson:2.9.0"
+    // Constraint Compose
+    implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
+    // Coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1"
+    // WorkManager
+    implementation "androidx.work:work-runtime-ktx:2.7.1"
+    // Koin
+    implementation "io.insert-koin:koin-core:3.2.2"
+    implementation "io.insert-koin:koin-android:3.2.2"
+    implementation "io.insert-koin:koin-androidx-compose:3.2.2"
+    implementation "io.insert-koin:koin-androidx-workmanager:3.2.2"
+    // ViewModel
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
+    implementation 'androidx.compose.runtime:runtime-livedata:1.2.1'
+
+    // OAuth
+    implementation 'com.google.android.gms:play-services-auth:20.3.0'
+
+    // Firebase BoM
+    implementation platform('com.google.firebase:firebase-bom:30.3.2')
+
+    // Firebase Authentication (Kotlin)
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1'
+
+    // Navigation
+    implementation "androidx.navigation:navigation-compose:2.5.3"
+
+    // Splash Screen
+    implementation "androidx.core:core-splashscreen:1.0.0"
+
+    // DataStore Preferences
+    implementation "androidx.datastore:datastore-preferences:1.0.0"
+
+    // Reflection
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.7.10"
+
+    implementation 'androidx.browser:browser:1.4.0'
+    implementation 'com.google.firebase:firebase-firestore-ktx'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
-    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.2.1"
+    debugImplementation "androidx.compose.ui:ui-tooling:1.2.1"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:1.2.1"
 }
