@@ -22,6 +22,10 @@
     <string name="empty_number">"Увядзіце нумар тэлефона"</string>
 
     // Информационные сообщения
-    <string name="sending_SMS">Спрабуем адправіць SMS…</string>
+    <string name="trying_to_send_SMS">Спрабуем адправіць SMS…</string>
     <string name="checking_code">Правяраем код …</string>
+    <string name="connecting_to_server">Злучэнне з серверам…</string>
+    <string name="sms_send">SMS адпраўлена</string>
+    <string name="auto_login">Аўтаматычны ўваход</string>
+    <string name="error_try_again">Адбылася памылка. Паспрабуйце яшчэ раз.</string>
 </resources>

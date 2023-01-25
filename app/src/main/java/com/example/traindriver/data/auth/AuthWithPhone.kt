@@ -71,7 +71,7 @@ class AuthWithPhone : KoinComponent {
             if (phone.isEmpty()) {
                 trySend(ResultState.Failure(Throwable(message = resources.getString(R.string.empty_number))))
             } else {
-                trySend(ResultState.Loading(msg = resources.getString(R.string.sending_SMS)))
+                trySend(ResultState.Loading(msg = resources.getString(R.string.trying_to_send_SMS)))
                 val options = PhoneAuthOptions.newBuilder(auth)
                     .setPhoneNumber(phone)
                     .setTimeout(60L, TimeUnit.SECONDS)
@@ -137,7 +137,7 @@ class AuthWithPhone : KoinComponent {
                         storedVerificationId = verificationCode
                     }
                 }
-            trySend(ResultState.Loading(msg = resources.getString(R.string.sending_SMS)))
+            trySend(ResultState.Loading(msg = resources.getString(R.string.trying_to_send_SMS)))
 
             val optionsBuilder = PhoneAuthOptions
                 .newBuilder(auth)

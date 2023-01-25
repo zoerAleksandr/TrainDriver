@@ -19,9 +19,13 @@
 
     // Сообщения ошибок
     <string name="invalid_code">Неверный код</string>
-    <string name="empty_number">"Введите номер телефона"</string>
+    <string name="empty_number">Введите номер телефона</string>
     
     // Информационные сообщения
-    <string name="sending_SMS">Пытаемся отправить SMS…</string>
+    <string name="trying_to_send_SMS">Пытаемся отправить SMS…</string>
     <string name="checking_code">Проверяем код…</string>
+    <string name="connecting_to_server">Соединение с сервером…</string>
+    <string name="sms_send">SMS отправлено</string>
+    <string name="auto_login">Автоматический вход</string>
+    <string name="error_try_again">Произошла ошибка. Попробуйте ещё раз.</string>
 </resources>

@@ -22,6 +22,10 @@
     <string name="empty_number">"Телефон нөмірін енгізіңіз"</string>
 
     // Информационные сообщения
-    <string name="sending_SMS"> Біз SMS жіберуге тырысамыз …</string>
+    <string name="trying_to_send_SMS"> Біз SMS жіберуге тырысамыз …</string>
     <string name="checking_code">Kодты тексеру …</string>
+    <string name="connecting_to_server">Серверге қосылу…</string>
+    <string name="sms_send">SMS жіберілді</string>
+    <string name="auto_login">Автоматты кіру</string>
+    <string name="error_try_again">Қате пайда болды. Қайталап көріңіз.</string>
 </resources>

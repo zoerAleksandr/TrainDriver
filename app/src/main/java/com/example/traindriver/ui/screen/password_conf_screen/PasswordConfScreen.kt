@@ -1,7 +1,6 @@
 package com.example.traindriver.ui.screen.password_conf_screen
 
 import android.app.Activity
-import android.util.Log
 import android.view.KeyEvent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -48,6 +47,11 @@ import com.example.traindriver.ui.screen.signin_screen.WithPhoneResponse
 import com.example.traindriver.ui.theme.*
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FontScalePreviews
+import com.example.traindriver.ui.util.SnackbarMessage.AUTO_LOGIN_MSG
+import com.example.traindriver.ui.util.SnackbarMessage.CHECKING_CODE_MSG
+import com.example.traindriver.ui.util.SnackbarMessage.CONNECTING_TO_SERVER_MSG
+import com.example.traindriver.ui.util.SnackbarMessage.ERROR_TRY_AGAIN_MSG
+import com.example.traindriver.ui.util.SnackbarMessage.SMS_SEND_MSG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -93,7 +97,7 @@ fun PasswordConfScreen(
                         .collect { state ->
                             when (state) {
                                 is ResultState.Loading -> {
-                                    scaffoldState.snackbarHostState.showSnackbar("Проверяем код...")
+                                    scaffoldState.snackbarHostState.showSnackbar(CHECKING_CODE_MSG)
                                 }
                                 is ResultState.Success -> {
                                     navController.navigate(ScreenEnum.MAIN.name)
@@ -497,30 +501,41 @@ fun PasswordConfScreen(
         }
     }
 
-    ResendCode(resendCode = signInViewModel.resendSmsCodeResponse)
+    ResendCode(
+        resendCode = signInViewModel.resendSmsCodeResponse,
+        snackbarHostState = scaffoldState.snackbarHostState
+    )
 }
 
 @Composable
 fun ResendCode(
-    resendCode: ResendSmsCodeResponse
+    resendCode: ResendSmsCodeResponse,
+    snackbarHostState: SnackbarHostState
 ) {
+    val scope = rememberCoroutineScope()
+
     when (resendCode) {
         is ResultState.Loading -> {
-            Log.d("ZZZ", "ResendCode Loading")
+            scope.launch {
+                snackbarHostState.showSnackbar(CONNECTING_TO_SERVER_MSG)
+            }
         }
         is ResultState.Success -> resendCode.data?.let { result ->
-                Log.d("ZZZ", "ResendCode Success")
-            when (result) {
-                is WithPhoneResponse.SmsSend -> {
-                    TODO("SMS отправлено")
-                }
-                is WithPhoneResponse.AutoSignIn -> {
-                    TODO("Вход")
+            scope.launch {
+                when (result) {
+                    is WithPhoneResponse.SmsSend -> {
+                        snackbarHostState.showSnackbar(SMS_SEND_MSG)
+                    }
+                    is WithPhoneResponse.AutoSignIn -> {
+                        snackbarHostState.showSnackbar(AUTO_LOGIN_MSG)
+                    }
                 }
             }
         }
         is ResultState.Failure -> {
-            Log.d("ZZZ", "ResendCode Failure")
+            scope.launch {
+                snackbarHostState.showSnackbar(ERROR_TRY_AGAIN_MSG)
+            }
         }
     }
 }

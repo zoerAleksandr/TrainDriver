@@ -1,7 +1,6 @@
 package com.example.traindriver.ui.screen.signin_screen
 
 import android.app.Activity
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -10,7 +9,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -21,12 +23,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.traindriver.R
-import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.ui.element_screen.HandleBottomSheet
 import com.example.traindriver.ui.element_screen.NumberPhoneTextField
 import com.example.traindriver.ui.element_screen.TopSnackbar
 import com.example.traindriver.ui.element_screen.getAllLocaleExcept
 import com.example.traindriver.ui.screen.ScreenEnum
+import com.example.traindriver.ui.screen.signin_screen.components.CreateUserWithPhone
 import com.example.traindriver.ui.screen.signin_screen.components.OneTapSignIn
 import com.example.traindriver.ui.screen.signin_screen.components.SignInWithGoogle
 import com.example.traindriver.ui.screen.signin_screen.elements.*
@@ -38,6 +40,7 @@ import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FieldIsFilled
 import com.example.traindriver.ui.util.FontScalePreviews
 import com.example.traindriver.ui.util.LocaleUser
+import com.example.traindriver.ui.util.SnackbarMessage.ERROR_TRY_AGAIN_MSG
 import com.google.android.gms.auth.api.identity.BeginSignInResult
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
@@ -217,8 +220,9 @@ fun SignInScreen(
                     val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
                     viewModel.authWithGoogle.signIn(googleCredentials)
                 } catch (it: ApiException) {
-                    Log.d("ZZZ", "${it.message}")
-                    TODO()
+                    scope.launch {
+                        scaffoldState.snackbarHostState.showSnackbar(ERROR_TRY_AGAIN_MSG)
+                    }
                 }
             }
         }
@@ -230,6 +234,7 @@ fun SignInScreen(
 
     OneTapSignIn(
         oneTapResponse = viewModel.oneTapSignInResponse,
+        snackbarHostState = scaffoldState.snackbarHostState,
         launch = {
             launch(it)
         }
@@ -237,6 +242,7 @@ fun SignInScreen(
 
     SignInWithGoogle(
         signInWithGoogleResponse = viewModel.signInWithGoogleResponse,
+        snackbarHostState = scaffoldState.snackbarHostState,
         navigateToMainScreen = { signedIn ->
             if (signedIn) {
                 navigateToMainScreen(navController)
@@ -246,37 +252,9 @@ fun SignInScreen(
 
     CreateUserWithPhone(
         createUserWithPhone = viewModel.createUserWithPhoneResponse,
+        snackbarHostState = scaffoldState.snackbarHostState,
         navController = navController
     )
-}
-
-@Composable
-fun CreateUserWithPhone(
-    createUserWithPhone: CreateUserWithPhoneResponse,
-    navController: NavController
-) {
-    when (createUserWithPhone) {
-        is ResultState.Loading -> {
-            Log.d("ZZZ", "CreateUserWithPhone Loading")
-        }
-        is ResultState.Success -> createUserWithPhone.data?.let { result ->
-            LaunchedEffect(result) {
-                when (result) {
-                    is WithPhoneResponse.SmsSend -> {
-                        Log.d("ZZZ", "CreateUserWithPhone Success SmsSend")
-                        navController.navigate(ScreenEnum.PASSWORD_CONFIRMATION.name)
-                    }
-                    is WithPhoneResponse.AutoSignIn -> {
-                        Log.d("ZZZ", "CreateUserWithPhone Success AutoSignIn")
-                        navController.navigate(ScreenEnum.MAIN.name)
-                    }
-                }
-            }
-        }
-        is ResultState.Failure -> {
-            Log.d("ZZZ", "CreateUserWithPhone Failure")
-        }
-    }
 }
 
 private fun navigateToMainScreen(navController: NavController) {
