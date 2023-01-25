@@ -55,7 +55,7 @@ fun TrainDriverTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Compo
 
     systemUiController.setStatusBarColor(
         color = Color.Transparent,
-        darkIcons = false,
+        darkIcons = useDarkIcons,
     )
     systemUiController.setNavigationBarColor(
         color = Color.Transparent,
