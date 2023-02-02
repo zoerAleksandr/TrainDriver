@@ -36,8 +36,8 @@ import com.example.traindriver.ui.theme.overpassFontFamily
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FieldIsFilled
 import com.example.traindriver.ui.util.FontScalePreviews
-import com.example.traindriver.ui.util.LocaleUser
-import com.example.traindriver.ui.util.LocaleUser.OTHER
+import com.example.traindriver.domain.entity.LocaleUser
+import com.example.traindriver.domain.entity.LocaleUser.OTHER
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)

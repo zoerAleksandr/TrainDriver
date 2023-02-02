@@ -1,8 +1,11 @@
-package com.example.traindriver.ui.util
+package com.example.traindriver.domain.entity
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.TransformedText
 import com.example.traindriver.R
+import com.example.traindriver.ui.util.transformNumberBY
+import com.example.traindriver.ui.util.transformedNumberRUAndKZ
+import com.example.traindriver.ui.util.transformerNumberDefault
 
 sealed class LocaleUser : LocaleInterface {
     object RU : LocaleUser() {
