@@ -28,4 +28,8 @@
     <string name="sms_send">SMS жіберілді</string>
     <string name="auto_login">Автоматты кіру</string>
     <string name="error_try_again">Қате пайда болды. Қайталап көріңіз.</string>
+
+    // Content Description
+    <string name="account">жеке кабинет</string>
+    <string name="search">Іздеу</string>
 </resources>

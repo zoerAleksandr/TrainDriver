@@ -28,4 +28,8 @@
     <string name="sms_send">SMS адпраўлена</string>
     <string name="auto_login">Аўтаматычны ўваход</string>
     <string name="error_try_again">Адбылася памылка. Паспрабуйце яшчэ раз.</string>
+
+    // Content Description
+    <string name="account">асабісты кабінет</string>
+    <string name="search">пошук</string>
 </resources>

@@ -28,4 +28,8 @@
     <string name="sms_send">SMS отправлено</string>
     <string name="auto_login">Автоматический вход</string>
     <string name="error_try_again">Произошла ошибка. Попробуйте ещё раз.</string>
+
+    // Content Description
+    <string name="account">Личный кабинет</string>
+    <string name="search">Поиск</string>
 </resources>
