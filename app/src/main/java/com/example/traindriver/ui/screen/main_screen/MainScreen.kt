@@ -20,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.traindriver.R
 import com.example.traindriver.ui.element_screen.HandleBottomSheet
 import com.example.traindriver.ui.element_screen.TopSnackbar
+import com.example.traindriver.ui.screen.main_screen.elements.CircularIndicator
 import com.example.traindriver.ui.theme.ShapeSurface
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.util.DarkLightPreviews
@@ -56,7 +57,14 @@ fun MainScreen(
             topBar = {
                 TopBarMainScreen()
             }
-        ) {}
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                CircularIndicator(valueHour = 120)
+            }
+        }
     }
 }
 
