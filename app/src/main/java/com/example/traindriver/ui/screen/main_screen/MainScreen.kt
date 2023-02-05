@@ -1,26 +1,22 @@
 package com.example.traindriver.ui.screen.main_screen
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.traindriver.R
-import com.example.traindriver.ui.element_screen.HandleBottomSheet
 import com.example.traindriver.ui.element_screen.TopSnackbar
+import com.example.traindriver.ui.screen.main_screen.elements.BottomSheetContent
 import com.example.traindriver.ui.screen.main_screen.elements.CircularIndicator
+import com.example.traindriver.ui.screen.main_screen.elements.TopBarMainScreen
 import com.example.traindriver.ui.theme.*
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.changeAlphaWithScroll
@@ -83,68 +79,6 @@ fun MainScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun BottomSheetContent() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.88f),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        HandleBottomSheet()
-        LazyColumn {
-            //TODO items
-        }
-    }
-}
-
-@Composable
-private fun TopBarMainScreen() {
-    Row(
-        modifier = Modifier
-            .fillMaxHeight(0.12f)
-            .fillMaxWidth()
-            .padding(dimensionResource(id = R.dimen.medium_padding)),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Bottom
-    ) {
-        IconButton(modifier = Modifier
-            .size(dimensionResource(id = R.dimen.min_size_view))
-            .background(
-                color = MaterialTheme.colors.surface, shape = CircleShape
-            ), onClick = { /*TODO*/ }) {
-            Image(
-                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size)),
-                painter = painterResource(id = R.drawable.person_icon),
-                contentDescription = stringResource(id = R.string.account)
-            )
-        }
-        MonthButton(modifier = Modifier.clickable {
-            // TODO
-        })
-        IconButton(modifier = Modifier
-            .size(dimensionResource(id = R.dimen.min_size_view))
-            .background(
-                color = MaterialTheme.colors.surface, shape = CircleShape
-            ), onClick = { /*TODO*/ }) {
-            Image(
-                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size)),
-                painter = painterResource(id = R.drawable.search_icon),
-                contentDescription = stringResource(id = R.string.search)
-            )
-        }
-    }
-}
-
-@Composable
-fun MonthButton(modifier: Modifier) {
-    Row(modifier = modifier) {
-        Text(text = "ЯНВАРЬ")
-        Text(text = " ")
-        Text(text = "2023")
     }
 }
 
