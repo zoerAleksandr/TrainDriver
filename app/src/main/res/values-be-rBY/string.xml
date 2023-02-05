@@ -17,6 +17,9 @@
     <string name="resent_text_passwordConfScreen">Адправіць паўторна праз %1$d с</string>
     <string name="resent_text_passwordConfScreen_enabled">Адправіць паўторна</string>
 
+    // Main Screen
+    <string name="add_itinerary">Дабавіць</string>
+
     // Сообщения ошибок
     <string name="invalid_code">Няправільны код</string>
     <string name="empty_number">"Увядзіце нумар тэлефона"</string>

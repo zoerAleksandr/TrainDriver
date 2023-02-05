@@ -21,8 +21,7 @@ import com.example.traindriver.R
 import com.example.traindriver.ui.element_screen.HandleBottomSheet
 import com.example.traindriver.ui.element_screen.TopSnackbar
 import com.example.traindriver.ui.screen.main_screen.elements.CircularIndicator
-import com.example.traindriver.ui.theme.ShapeSurface
-import com.example.traindriver.ui.theme.TrainDriverTheme
+import com.example.traindriver.ui.theme.*
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.changeAlphaWithScroll
 
@@ -59,10 +58,29 @@ fun MainScreen(
             }
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 40.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 CircularIndicator(valueHour = 120)
+
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth(0.75f),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = SpecialColor,
+                        disabledBackgroundColor = SpecialDisableColor,
+                        contentColor = MaterialTheme.colors.onSecondary
+                    ),
+                    shape = ShapeButton.medium,
+                    onClick = { /*TODO*/ }
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.add_itinerary),
+                        style = Typography.button
+                    )
+                }
             }
         }
     }
