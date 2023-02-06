@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.traindriver.domain.entity.Itinerary
 import com.example.traindriver.ui.element_screen.HandleBottomSheet
 
 @Composable
@@ -22,7 +23,7 @@ fun BottomSheetContent() {
         HandleBottomSheet()
         LazyColumn(modifier = Modifier.padding(top = 32.dp)) {
             items(20) {
-                ItemMainScreen()
+                ItemMainScreen(Itinerary())
             }
             //TODO items
         }
