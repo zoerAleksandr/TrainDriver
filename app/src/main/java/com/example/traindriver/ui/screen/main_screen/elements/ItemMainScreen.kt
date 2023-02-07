@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension.Companion.fillToConstraints
 import com.example.traindriver.domain.entity.Itinerary
-import com.example.traindriver.ui.element_screen.HorizontalDividerTrainDriver
 import com.example.traindriver.ui.element_screen.VerticalDividerTrainDriver
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
@@ -40,7 +39,7 @@ fun ItemMainScreen(itinerary: Itinerary, onClick: () -> Unit) {
 
             DateElementItem(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 12.dp)
                     .constrainAs(date) {
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
@@ -79,7 +78,7 @@ fun ItemMainScreen(itinerary: Itinerary, onClick: () -> Unit) {
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
                 }
-                .padding(horizontal = 16.dp), itinerary = itinerary)
+                .padding(horizontal = 12.dp), itinerary = itinerary)
         }
     }
 }
@@ -162,9 +161,8 @@ fun DateElementItem(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = day, fontSize = MaterialTheme.typography.h3.fontSize)
-        HorizontalDividerTrainDriver(modifier = Modifier.width(30.dp))
-        Text(text = month, fontSize = MaterialTheme.typography.h3.fontSize)
+        Text(text = day)
+        Text(text = month)
     }
 }
 

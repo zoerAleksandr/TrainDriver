@@ -19,6 +19,18 @@
 
     // Main Screen
     <string name="add_itinerary">Қосу</string>
+    <string name="january">КАН</string>
+    <string name="february">АКП</string>
+    <string name="march">НАУ</string>
+    <string name="april">САУ</string>
+    <string name="may">МАМ</string>
+    <string name="june">МАУ</string>
+    <string name="july">ШЭЛ</string>
+    <string name="august">ТАМ</string>
+    <string name="september">КЫР</string>
+    <string name="october">КАЗ</string>
+    <string name="november">КАР</string>
+    <string name="december">ЖЕЛ</string>
 
     // Сообщения ошибок
     <string name="invalid_code">Қате код</string>

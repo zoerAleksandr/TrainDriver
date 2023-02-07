@@ -19,6 +19,18 @@
 
     // Main Screen
     <string name="add_itinerary">Дабавіць</string>
+    <string name="january">СТУ</string>
+    <string name="february">ЛЮТ</string>
+    <string name="march">САК</string>
+    <string name="april">КРА</string>
+    <string name="may">ТРА</string>
+    <string name="june">ЧЭР</string>
+    <string name="july">ЛИП</string>
+    <string name="august">ЖНИ</string>
+    <string name="september">ВЕР</string>
+    <string name="october">КАС</string>
+    <string name="november">ЛИС</string>
+    <string name="december">СНЕ</string>
 
     // Сообщения ошибок
     <string name="invalid_code">Няправільны код</string>

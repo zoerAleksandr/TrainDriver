@@ -33,7 +33,7 @@ fun BottomSheetContent() {
                         timeEndWork = currentTimeInLong() + 10000000,
                         stationList = mutableListOf(
                             Station(stationName = "Луга"),
-                            Station(stationName = "Санкт-Петербург Сортировочный Московский")
+                            Station(stationName = "СПБСМ")
                         ),
                         trainList = mutableListOf(
                             Train(number = "2220")

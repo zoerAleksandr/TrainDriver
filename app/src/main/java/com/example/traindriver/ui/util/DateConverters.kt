@@ -9,14 +9,59 @@ fun getDay(date: Long?): String {
         timeInMillis = date ?: currentTimeInLong()
     }.get(Calendar.DAY_OF_MONTH).toString()
 
-    return if (day.length == 1) { "0$day" } else { day }
+    return if (day.length == 1) {
+        "0$day"
+    } else {
+        day
+    }
 }
 
 fun getMonth(date: Long?): String {
-    val month = Calendar.getInstance().apply {
+    return Calendar.getInstance().apply {
         timeInMillis = date ?: currentTimeInLong()
-    }.get(Calendar.MONTH).toString()
-
-    return if (month.length == 1) { "0$month" } else { month }
+    }.get(Calendar.MONTH).getMonth()
 }
 
+private fun Int.getMonth(): String {
+    return when (this) {
+        0 -> {
+            Month.JANUARY
+        }
+        1 -> {
+            Month.FEBRUARY
+        }
+        2 -> {
+            Month.MARCH
+        }
+        3 -> {
+            Month.APRIL
+        }
+        4 -> {
+            Month.MAY
+        }
+        5 -> {
+            Month.JUNE
+        }
+        6 -> {
+            Month.JULY
+        }
+        7 -> {
+            Month.AUGUST
+        }
+        8 -> {
+            Month.SEPTEMBER
+        }
+        9 -> {
+            Month.OCTOBER
+        }
+        10 -> {
+            Month.NOVEMBER
+        }
+        11 -> {
+            Month.DECEMBER
+        }
+        else -> {
+            ""
+        }
+    }
+}
