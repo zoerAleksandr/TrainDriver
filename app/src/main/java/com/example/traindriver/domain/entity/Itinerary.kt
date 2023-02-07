@@ -15,7 +15,17 @@ data class Itinerary(
     val trainList: MutableList<Train> = mutableListOf(),
     val stationList: MutableList<Station> = mutableListOf(),
     val passengerList: MutableList<Passenger> = mutableListOf()
-)
+) {
+    fun getWorkTime(): Long? {
+        val timeEnd = timeEndWork
+        val timeStart = timeStartWork
+        return if (timeEnd != null && timeStart != null) {
+            timeEnd - timeStart
+        } else {
+            null
+        }
+    }
+}
 
 data class Train(
     val id: String = generateUid(),
@@ -46,19 +56,19 @@ data class Station(
  * */
 data class Locomotive(
     val id: String = generateUid(),
-    var series: String?,
-    var number: String?,
+    var series: String? = null,
+    var number: String? = null,
     var type: Boolean = true,
     var sectionList: List<Section> = listOf(),
 
     var timeStartOfAcceptance: Long? = currentTimeInLong(),
-    var timeEndOfAcceptance: Long?,
-    var timeStartOfDelivery: Long?,
-    var timeEndOfDelivery: Long?
+    var timeEndOfAcceptance: Long? = null,
+    var timeStartOfDelivery: Long? = null,
+    var timeEndOfDelivery: Long? = null
 )
 
 data class Section(
     val id: String = generateUid(),
-    var acceptedEnergy: Double?,
-    var deliveryEnergy: Double?
+    var acceptedEnergy: Double? = null,
+    var deliveryEnergy: Double? = null
 )

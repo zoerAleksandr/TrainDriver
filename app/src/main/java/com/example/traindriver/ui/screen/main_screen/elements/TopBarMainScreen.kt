@@ -10,6 +10,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -33,7 +34,8 @@ fun TopBarMainScreen() {
             Image(
                 modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size)),
                 painter = painterResource(id = R.drawable.person_icon),
-                contentDescription = stringResource(id = R.string.account)
+                contentDescription = stringResource(id = R.string.account),
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary)
             )
         }
         MonthButton(modifier = Modifier.clickable {
@@ -47,7 +49,8 @@ fun TopBarMainScreen() {
             Image(
                 modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size)),
                 painter = painterResource(id = R.drawable.search_icon),
-                contentDescription = stringResource(id = R.string.search)
+                contentDescription = stringResource(id = R.string.search),
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary)
             )
         }
     }

@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -98,7 +99,7 @@ fun CircularIndicator(
                 }
                 .padding(bottom = canvasSize / 5),
             text = "$maxIndicatorValue",
-            fontSize = MaterialTheme.typography.h3.fontSize
+            fontSize = MaterialTheme.typography.h4.fontSize
         )
     }
 
@@ -171,6 +172,7 @@ fun EmbeddedText(
         modifier = modifier,
         text = "$hour : $minute",
         fontSize = MaterialTheme.typography.h1.fontSize,
+        fontWeight = FontWeight.Bold
     )
 }
 
