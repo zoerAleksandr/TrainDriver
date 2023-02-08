@@ -31,10 +31,12 @@
     <string name="october">КАС</string>
     <string name="november">ЛИС</string>
     <string name="december">СНЕ</string>
+    <string name="empty_route_list">Няма маршрутаў</string>
 
     // Сообщения ошибок
     <string name="invalid_code">Няправільны код</string>
     <string name="empty_number">"Увядзіце нумар тэлефона"</string>
+    <string name="data_loading_error">Памылка загрузкі дадзеных</string>
 
     // Информационные сообщения
     <string name="trying_to_send_SMS">Спрабуем адправіць SMS…</string>

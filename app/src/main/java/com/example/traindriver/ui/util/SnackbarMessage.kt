@@ -12,4 +12,6 @@ object SnackbarMessage: KoinComponent {
     val AUTO_LOGIN_MSG = res.getString(R.string.auto_login)
     val ERROR_TRY_AGAIN_MSG = res.getString(R.string.error_try_again)
     val CHECKING_CODE_MSG = res.getString(R.string.checking_code)
+
+    val DATA_LOADING_ERROR = res.getString(R.string.data_loading_error)
 }

@@ -32,9 +32,12 @@
     <string name="october">ОКТ</string>
     <string name="november">НОЯ</string>
     <string name="december">ДЕК</string>
+    <string name="empty_route_list">Нет маршрутов</string>
+
     // Сообщения ошибок
     <string name="invalid_code">Неверный код</string>
     <string name="empty_number">"Введите номер телефона"</string>
+    <string name="data_loading_error">Ошибка загрузки данных</string>
 
     // Информационные сообщения
     <string name="trying_to_send_SMS">Пытаемся отправить SMS…</string>

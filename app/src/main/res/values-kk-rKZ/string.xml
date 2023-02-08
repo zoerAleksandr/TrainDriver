@@ -31,10 +31,12 @@
     <string name="october">КАЗ</string>
     <string name="november">КАР</string>
     <string name="december">ЖЕЛ</string>
+    <string name="empty_route_list">Маршруттар жоқ</string>
 
     // Сообщения ошибок
     <string name="invalid_code">Қате код</string>
     <string name="empty_number">"Телефон нөмірін енгізіңіз"</string>
+    <string name="data_loading_error">Деректерді жүктеу қатесі</string>
 
     // Информационные сообщения
     <string name="trying_to_send_SMS"> Біз SMS жіберуге тырысамыз …</string>
