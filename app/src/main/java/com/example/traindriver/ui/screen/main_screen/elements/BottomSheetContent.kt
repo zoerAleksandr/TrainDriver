@@ -34,7 +34,7 @@ fun BottomSheetContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         HandleBottomSheet()
-        LazyColumn(modifier = Modifier.padding(top = 32.dp)) {
+        LazyColumn(modifier = Modifier.padding(top = 32.dp, bottom = 8.dp)) {
             when (listRoute) {
                 is ResultState.Loading -> {
                     item {
@@ -56,6 +56,7 @@ fun BottomSheetContent(
                     } else {
                         items(list) { route ->
                             ItemMainScreen(itinerary = route) {
+                                // TODO
                                 Log.d("ZZZ", "uid = ${route.id}")
                             }
                         }

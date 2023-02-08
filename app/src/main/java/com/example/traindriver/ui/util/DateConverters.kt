@@ -22,6 +22,16 @@ fun getMonth(date: Long?): String {
     }.get(Calendar.MONTH).getMonth()
 }
 
+fun Long.getHour(): Int {
+    val totalMinute = this / 60_000
+    return (totalMinute / 60).toInt()
+}
+
+fun Long.getMinute(): Int {
+    val totalMinute = this / 60_000
+    return (totalMinute.rem(60)).toInt()
+}
+
 private fun Int.getMonth(): String {
     return when (this) {
         0 -> {

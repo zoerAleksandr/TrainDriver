@@ -20,6 +20,8 @@ import com.example.traindriver.ui.screen.main_screen.elements.TopBarMainScreen
 import com.example.traindriver.ui.theme.*
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.changeAlphaWithScroll
+import com.example.traindriver.ui.util.getHour
+import com.example.traindriver.ui.util.getMinute
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -29,6 +31,7 @@ fun MainScreen(
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
     val scaffoldState = rememberScaffoldState()
     val offset = bottomSheetScaffoldState.bottomSheetState.offset
+    val totalTime = mainViewModel.totalTime
 
     BottomSheetScaffold(sheetBackgroundColor = changeAlphaWithScroll(
         offset = offset.value, initColor = MaterialTheme.colors.surface
@@ -59,7 +62,10 @@ fun MainScreen(
                     .padding(top = 40.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                CircularIndicator(valueHour = 120)
+                CircularIndicator(
+                    valueHour = totalTime.getHour(),
+                    valueMinute = totalTime.getMinute()
+                )
 
                 Button(
                     modifier = Modifier

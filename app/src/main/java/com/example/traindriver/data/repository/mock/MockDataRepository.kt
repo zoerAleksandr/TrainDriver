@@ -8,7 +8,6 @@ import com.example.traindriver.domain.entity.Station
 import com.example.traindriver.domain.entity.Train
 import com.example.traindriver.ui.screen.main_screen.RouteListByMonthResponse
 import com.example.traindriver.ui.screen.main_screen.RouteResponse
-import com.example.traindriver.ui.util.currentTimeInLong
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +15,8 @@ import kotlinx.coroutines.flow.callbackFlow
 
 class MockDataRepository : DataRepository {
     private val one = Itinerary(
-        timeEndWork = currentTimeInLong() + 10000000,
+        timeStartWork = 1_675_789_800_000,
+        timeEndWork = 1_675_876_200_000,
         stationList = mutableListOf(
             Station(stationName = "Луга"),
             Station(stationName = "СПБСМ")
@@ -29,7 +29,8 @@ class MockDataRepository : DataRepository {
         )
     )
     private val two = Itinerary(
-        timeEndWork = currentTimeInLong() + 10000000,
+        timeStartWork = 1_675_857_000_000,
+        timeEndWork = 1_675_876_200_000,
         stationList = mutableListOf(
             Station(stationName = "Лужская"),
             Station(stationName = "Луга")
@@ -42,7 +43,8 @@ class MockDataRepository : DataRepository {
         )
     )
     private val three = Itinerary(
-        timeEndWork = currentTimeInLong() + 10000000,
+        timeStartWork = 1_675_857_000_000,
+        timeEndWork = 1_675_876_200_000,
         stationList = mutableListOf(
             Station(stationName = "Лужская"),
             Station(stationName = "Будогощь")
@@ -61,7 +63,7 @@ class MockDataRepository : DataRepository {
             trySend(ResultState.Loading())
             delay(4000)
             val list = listOf(one, two, three)
-            trySend(ResultState.Success(listOf()))
+            trySend(ResultState.Success(list))
             awaitClose { close() }
         }
 

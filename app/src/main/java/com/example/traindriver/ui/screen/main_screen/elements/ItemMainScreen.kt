@@ -16,10 +16,7 @@ import com.example.traindriver.domain.entity.Itinerary
 import com.example.traindriver.ui.element_screen.VerticalDividerTrainDriver
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
-import com.example.traindriver.ui.util.DarkLightPreviews
-import com.example.traindriver.ui.util.FontScalePreviews
-import com.example.traindriver.ui.util.getDay
-import com.example.traindriver.ui.util.getMonth
+import com.example.traindriver.ui.util.*
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -89,10 +86,9 @@ fun WorkTimeElementItem(
 ) {
     val workTime = itinerary.getWorkTime()
 
-    val textTime = if (workTime != null) {
-        val totalMinute = workTime / 60_000
-        val hour: Long = totalMinute / 60
-        val minute: Long = totalMinute.rem(60)
+    val textTime = if (workTime != 0L) {
+        val hour = workTime.getHour()
+        val minute = workTime.getMinute()
         "$hour:$minute"
     } else {
         "--:--"
