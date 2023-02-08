@@ -34,7 +34,7 @@ fun BottomSheetContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         HandleBottomSheet()
-        LazyColumn(modifier = Modifier.padding(top = 32.dp, bottom = 8.dp)) {
+        LazyColumn(modifier = Modifier.padding(top = 32.dp)) {
             when (listRoute) {
                 is ResultState.Loading -> {
                     item {

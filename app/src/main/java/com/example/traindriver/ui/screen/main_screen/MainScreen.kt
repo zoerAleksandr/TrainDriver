@@ -21,7 +21,7 @@ import com.example.traindriver.ui.theme.*
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.changeAlphaWithScroll
 import com.example.traindriver.ui.util.getHour
-import com.example.traindriver.ui.util.getMinute
+import com.example.traindriver.ui.util.getRemainingMinuteFromHour
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -64,7 +64,7 @@ fun MainScreen(
             ) {
                 CircularIndicator(
                     valueHour = totalTime.getHour(),
-                    valueMinute = totalTime.getMinute()
+                    valueMinute = totalTime.getRemainingMinuteFromHour()
                 )
 
                 Button(

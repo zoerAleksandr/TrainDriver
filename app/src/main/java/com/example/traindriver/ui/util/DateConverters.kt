@@ -27,7 +27,7 @@ fun Long.getHour(): Int {
     return (totalMinute / 60).toInt()
 }
 
-fun Long.getMinute(): Int {
+fun Long.getRemainingMinuteFromHour(): Int {
     val totalMinute = this / 60_000
     return (totalMinute.rem(60)).toInt()
 }

@@ -24,7 +24,7 @@ fun ItemMainScreen(itinerary: Itinerary, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp, start = 8.dp, end = 8.dp)
+            .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 2.dp)
             .height(80.dp),
         backgroundColor = MaterialTheme.colors.background,
         shape = ShapeBackground.medium,
@@ -36,7 +36,7 @@ fun ItemMainScreen(itinerary: Itinerary, onClick: () -> Unit) {
 
             DateElementItem(
                 modifier = Modifier
-                    .padding(horizontal = 12.dp)
+                    .padding(horizontal = 14.dp)
                     .constrainAs(date) {
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
@@ -67,7 +67,7 @@ fun ItemMainScreen(itinerary: Itinerary, onClick: () -> Unit) {
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
                 }
-                .padding(vertical = 10.dp),
+                .padding(vertical = 10.dp, horizontal = 2.dp),
                 thickness = 0.5.dp)
             WorkTimeElementItem(modifier = Modifier
                 .constrainAs(workTime) {
@@ -88,8 +88,19 @@ fun WorkTimeElementItem(
 
     val textTime = if (workTime != 0L) {
         val hour = workTime.getHour()
-        val minute = workTime.getMinute()
-        "$hour:$minute"
+        val hourText = if (hour < 10) {
+            "0$hour"
+        } else {
+            hour.toString()
+        }
+
+        val minute = workTime.getRemainingMinuteFromHour()
+        val minuteText = if (minute < 10) {
+            "0$minute"
+        } else {
+            minute.toString()
+        }
+        "$hourText:$minuteText"
     } else {
         "--:--"
     }
