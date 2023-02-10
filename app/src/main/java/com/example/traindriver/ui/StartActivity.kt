@@ -9,7 +9,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
-import androidx.navigation.compose.rememberNavController
 import com.example.traindriver.ui.screen.SetupNavGraph
 import com.example.traindriver.ui.screen.splash_screen.SplashViewModel
 import com.example.traindriver.ui.theme.TrainDriverTheme
@@ -28,9 +27,7 @@ class StartActivity : ComponentActivity() {
 
         setContent {
             TrainDriverTheme {
-                val navController = rememberNavController()
                 SetupNavGraph(
-                    navController = navController,
                     startDestination = screen,
                     activity = this
                 )

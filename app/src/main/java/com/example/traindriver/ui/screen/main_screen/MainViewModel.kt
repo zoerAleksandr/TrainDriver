@@ -1,6 +1,5 @@
 package com.example.traindriver.ui.screen.main_screen
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -38,8 +37,8 @@ class MainViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    private fun calculationOfTotalTime(listRoute: List<Itinerary>){
-        for (item in listRoute){
+    private fun calculationOfTotalTime(listRoute: List<Itinerary>) {
+        for (item in listRoute) {
             item.getWorkTime().let { routeTime ->
                 totalTime += routeTime
             }

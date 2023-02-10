@@ -14,4 +14,6 @@ object Constants {
     const val ANONYMOUS_SIGN_IN_WORKER = "anonymousSignIn"
 
     const val NETWORK_CONNECTED = "networkConnected"
+
+    const val ROUTE = "route"
 }
