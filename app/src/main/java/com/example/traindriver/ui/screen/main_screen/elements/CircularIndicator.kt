@@ -2,6 +2,7 @@ package com.example.traindriver.ui.screen.main_screen.elements
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -79,6 +80,16 @@ fun CircularIndicator(
     ) {
         val (embeddedText, externalText) = createRefs()
 
+        val animatedHour by animateIntAsState(
+            targetValue = valueHour,
+            animationSpec = tween(1000)
+        )
+
+        val animatedMinute by animateIntAsState(
+            targetValue = valueMinute,
+            animationSpec = tween(1000)
+        )
+
         EmbeddedText(
             modifier = Modifier
                 .constrainAs(embeddedText) {
@@ -87,8 +98,8 @@ fun CircularIndicator(
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
                 },
-            valueHour = valueHour,
-            valueMinute = valueMinute
+            valueHour = animatedHour,
+            valueMinute = animatedMinute
         )
 
         Text(

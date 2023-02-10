@@ -66,7 +66,6 @@ fun MainScreen(
                     valueHour = totalTime.getHour(),
                     valueMinute = totalTime.getRemainingMinuteFromHour()
                 )
-
                 Button(
                     modifier = Modifier
                         .fillMaxWidth(0.75f),
