@@ -2,7 +2,7 @@ package com.example.traindriver.data.repository.mock
 
 import com.example.traindriver.data.repository.DataRepository
 import com.example.traindriver.data.util.ResultState
-import com.example.traindriver.domain.entity.Itinerary
+import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.domain.entity.Locomotive
 import com.example.traindriver.domain.entity.Station
 import com.example.traindriver.domain.entity.Train
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
 class MockDataRepository : DataRepository {
-    private val one = Itinerary(
+    private val one = Route(
         timeStartWork = 1675789800000,
         timeEndWork = 1_675_876_200_000,
         stationList = mutableListOf(
@@ -28,7 +28,7 @@ class MockDataRepository : DataRepository {
             Locomotive(series = "2эс4к", number = "104")
         )
     )
-    private val two = Itinerary(
+    private val two = Route(
         timeStartWork = 1_675_857_000_000,
         timeEndWork = 1_675_876_200_000,
         stationList = mutableListOf(
@@ -42,7 +42,7 @@ class MockDataRepository : DataRepository {
             Locomotive(series = "ВЛ10", number = "598")
         )
     )
-    private val three = Itinerary(
+    private val three = Route(
         timeStartWork = 1_675_857_000_000,
         timeEndWork = 1_675_876_200_000,
         stationList = mutableListOf(

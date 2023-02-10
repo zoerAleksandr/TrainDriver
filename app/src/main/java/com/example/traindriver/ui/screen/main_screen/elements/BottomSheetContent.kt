@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
-import com.example.traindriver.domain.entity.Itinerary
+import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.ui.element_screen.HandleBottomSheet
 import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.util.SnackbarMessage.DATA_LOADING_ERROR
@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun BottomSheetContent(
-    listRoute: ResultState<List<Itinerary>>,
+    listRoute: ResultState<List<Route>>,
     snackbarHostState: SnackbarHostState,
     navController: NavController
 ) {
@@ -57,9 +57,9 @@ fun BottomSheetContent(
                         }
                     } else {
                         items(list) { route ->
-                            ItemMainScreen(itinerary = route) {
+                            ItemMainScreen(route = route) {
                                 navController
-                                    .navigate(Screen.ViewingRoute.route + route.id)
+                                    .navigate(Screen.ViewingRoute.passId(route.id))
                             }
                         }
                     }

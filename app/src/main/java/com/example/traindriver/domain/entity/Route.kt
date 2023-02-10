@@ -5,7 +5,7 @@ import java.util.*
 
 fun generateUid() = UUID.randomUUID().toString()
 
-data class Itinerary(
+data class Route(
     val id: String = generateUid(),
 
     var timeStartWork: Long? = currentTimeInLong(),

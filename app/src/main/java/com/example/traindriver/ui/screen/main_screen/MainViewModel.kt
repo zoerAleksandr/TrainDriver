@@ -6,15 +6,15 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traindriver.data.util.ResultState
-import com.example.traindriver.domain.entity.Itinerary
+import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.domain.use_case.GetRouteListByMonthUseCase
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.*
 
-typealias RouteListByMonthResponse = ResultState<List<Itinerary>>
-typealias RouteResponse = ResultState<Itinerary>
+typealias RouteListByMonthResponse = ResultState<List<Route>>
+typealias RouteResponse = ResultState<Route>
 
 class MainViewModel : ViewModel(), KoinComponent {
     private val getRouteListByMonthUseCase: GetRouteListByMonthUseCase by inject()
@@ -37,7 +37,7 @@ class MainViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    private fun calculationOfTotalTime(listRoute: List<Itinerary>) {
+    private fun calculationOfTotalTime(listRoute: List<Route>) {
         for (item in listRoute) {
             item.getWorkTime().let { routeTime ->
                 totalTime += routeTime

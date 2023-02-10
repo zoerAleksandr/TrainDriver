@@ -12,7 +12,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension.Companion.fillToConstraints
-import com.example.traindriver.domain.entity.Itinerary
+import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.ui.element_screen.VerticalDividerTrainDriver
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
@@ -20,7 +20,7 @@ import com.example.traindriver.ui.util.*
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ItemMainScreen(itinerary: Itinerary, onClick: () -> Unit) {
+fun ItemMainScreen(route: Route, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -41,7 +41,7 @@ fun ItemMainScreen(itinerary: Itinerary, onClick: () -> Unit) {
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
                         start.linkTo(parent.start)
-                    }, date = itinerary.timeStartWork
+                    }, date = route.timeStartWork
             )
             VerticalDividerTrainDriver(modifier = Modifier
                 .constrainAs(verticalDividerFirst) {
@@ -60,7 +60,7 @@ fun ItemMainScreen(itinerary: Itinerary, onClick: () -> Unit) {
                     width = fillToConstraints
                     height = fillToConstraints
                 }
-                .padding(horizontal = 16.dp), itinerary = itinerary)
+                .padding(horizontal = 16.dp), route = route)
             VerticalDividerTrainDriver(modifier = Modifier
                 .constrainAs(verticalDividerSecond) {
                     end.linkTo(workTime.start)
@@ -75,16 +75,16 @@ fun ItemMainScreen(itinerary: Itinerary, onClick: () -> Unit) {
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
                 }
-                .padding(horizontal = 12.dp), itinerary = itinerary)
+                .padding(horizontal = 12.dp), route = route)
         }
     }
 }
 
 @Composable
 fun WorkTimeElementItem(
-    modifier: Modifier = Modifier, itinerary: Itinerary
+    modifier: Modifier = Modifier, route: Route
 ) {
-    val workTime = itinerary.getWorkTime()
+    val workTime = route.getWorkTime()
 
     val textTime = if (workTime != 0L) {
         val hour = workTime.getHour()
@@ -109,33 +109,33 @@ fun WorkTimeElementItem(
 
 @Composable
 fun StationElementItem(
-    modifier: Modifier = Modifier, itinerary: Itinerary
+    modifier: Modifier = Modifier, route: Route
 ) {
-    val textFirstStation = if (itinerary.stationList.isNotEmpty()) {
-        itinerary.stationList.first().stationName ?: ""
+    val textFirstStation = if (route.stationList.isNotEmpty()) {
+        route.stationList.first().stationName ?: ""
     } else {
         ""
     }
 
     val textLastStation =
-        if (itinerary.stationList.isNotEmpty() && itinerary.stationList.size > 1) {
-            "- ${itinerary.stationList.last().stationName ?: ""}"
+        if (route.stationList.isNotEmpty() && route.stationList.size > 1) {
+            "- ${route.stationList.last().stationName ?: ""}"
         } else {
             ""
         }
     val textStation = "$textFirstStation $textLastStation"
 
-    val textLocoSeries = if (itinerary.locoList.isNotEmpty()) {
-        itinerary.locoList.first().series ?: ""
+    val textLocoSeries = if (route.locoList.isNotEmpty()) {
+        route.locoList.first().series ?: ""
     } else {
         ""
     }
-    val textLocoNumber = if (itinerary.locoList.isNotEmpty()) {
-        "№${itinerary.locoList.first().number ?: ""}"
+    val textLocoNumber = if (route.locoList.isNotEmpty()) {
+        "№${route.locoList.first().number ?: ""}"
     } else {
         ""
     }
-    val dots = if (itinerary.locoList.size > 1) {
+    val dots = if (route.locoList.size > 1) {
         "..."
     } else {
         ""
@@ -179,7 +179,7 @@ fun DateElementItem(
 private fun PreviewItem() {
     TrainDriverTheme {
         ItemMainScreen(
-            Itinerary(),
+            Route(),
             {}
         )
     }
