@@ -15,6 +15,7 @@ private val DarkColorPalette = darkColors(
     secondary = Color(0xFFC5C5C5),
     onSecondary = Color(0xFFFAFAFA),
     surface = Color(0xFF868686),
+    onSurface = Color(0xFF656565),
     background = Color(0xFF5F5F5F),
     onBackground = Color(0xFFC5C5C5),
 )
@@ -24,13 +25,14 @@ private val LightColorPalette = lightColors(
     primaryVariant = Color(0xFFA8A8A8),
     secondary = Color(0xFF9E9E9E),
     onSecondary = Color(0xFFFAFAFA),
-    surface = Color(0xFFDCDCDC),
+    surface = Color(0xFFEEEEEE),
+    onSurface = Color(0xFFC5C5C5),
     background = Color(0xFFFAFAFA),
     onBackground = Color(0xFF5F5F5F),
 )
 
 var BackgroundIcon: Color = BackgroundIconLight
-val SpecialColor = Color(0xFFD32F2F)
+val SpecialColor = Color(0xFFAD2727)
 val SpecialDisableColor = Color(0xFFFF7979)
 var BackgroundFirst = Color(0xFF9E9E9E)
 var BackgroundSecond = Color(0xFFEEEEEE)

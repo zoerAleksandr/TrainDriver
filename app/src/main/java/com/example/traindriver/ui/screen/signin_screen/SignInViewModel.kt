@@ -16,7 +16,7 @@ import com.example.traindriver.domain.use_case.GetLocaleUseCase
 import com.example.traindriver.domain.use_case.SignInAnonymousUseCase
 import com.example.traindriver.domain.use_case.SignInWithGoogleUseCase
 import com.example.traindriver.domain.use_case.SignInWithPhoneUseCase
-import com.example.traindriver.ui.util.LocaleUser
+import com.example.traindriver.domain.entity.LocaleUser
 import com.google.android.gms.auth.api.identity.BeginSignInResult
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.AuthCredential

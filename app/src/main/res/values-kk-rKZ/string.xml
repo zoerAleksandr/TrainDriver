@@ -17,9 +17,26 @@
     <string name="resent_text_passwordConfScreen">%$1d секундтан кейін қайта жіберіңіз</string>
     <string name="resent_text_passwordConfScreen_enabled">Қайта жіберу</string>
 
+    // Main Screen
+    <string name="add_itinerary">Қосу</string>
+    <string name="january">КАН</string>
+    <string name="february">АКП</string>
+    <string name="march">НАУ</string>
+    <string name="april">САУ</string>
+    <string name="may">МАМ</string>
+    <string name="june">МАУ</string>
+    <string name="july">ШЭЛ</string>
+    <string name="august">ТАМ</string>
+    <string name="september">КЫР</string>
+    <string name="october">КАЗ</string>
+    <string name="november">КАР</string>
+    <string name="december">ЖЕЛ</string>
+    <string name="empty_route_list">Маршруттар жоқ</string>
+
     // Сообщения ошибок
     <string name="invalid_code">Қате код</string>
     <string name="empty_number">"Телефон нөмірін енгізіңіз"</string>
+    <string name="data_loading_error">Деректерді жүктеу қатесі</string>
 
     // Информационные сообщения
     <string name="trying_to_send_SMS"> Біз SMS жіберуге тырысамыз …</string>
@@ -28,4 +45,8 @@
     <string name="sms_send">SMS жіберілді</string>
     <string name="auto_login">Автоматты кіру</string>
     <string name="error_try_again">Қате пайда болды. Қайталап көріңіз.</string>
+
+    // Content Description
+    <string name="account">жеке кабинет</string>
+    <string name="search">Іздеу</string>
 </resources>

@@ -14,7 +14,7 @@ import com.example.traindriver.R
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FontScalePreviews
-import com.example.traindriver.ui.util.LocaleUser
+import com.example.traindriver.domain.entity.LocaleUser
 
 @Composable
 fun BottomSheetLocaleListItem(locale: LocaleUser, onItemClick: (LocaleUser) -> Unit) {

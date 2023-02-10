@@ -30,9 +30,9 @@ fun LoadingElement() {
 }
 
 @Composable
-fun TrainDriverProgressBar() {
+fun TrainDriverProgressBar(modifier: Modifier = Modifier) {
     CircularProgressIndicator(
-        modifier = Modifier
+        modifier = modifier
             .size(dimensionResource(id = R.dimen.size_background_progress_bar))
             .background(
                 shape = ShapeBackground.medium,

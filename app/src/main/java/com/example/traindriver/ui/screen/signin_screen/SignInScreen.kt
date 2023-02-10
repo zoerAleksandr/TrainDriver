@@ -38,7 +38,7 @@ import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FieldIsFilled
 import com.example.traindriver.ui.util.FontScalePreviews
-import com.example.traindriver.ui.util.LocaleUser
+import com.example.traindriver.domain.entity.LocaleUser
 import com.example.traindriver.ui.util.SnackbarMessage.ERROR_TRY_AGAIN_MSG
 import com.google.android.gms.auth.api.identity.BeginSignInResult
 import com.google.android.gms.common.api.ApiException
@@ -108,7 +108,8 @@ fun SignInScreen(
                 }
                 PrimarySpacer()
             }
-        }) {
+        }
+    ) {
         Scaffold(scaffoldState = scaffoldState, snackbarHost = {
             SnackbarHost(
                 hostState = it

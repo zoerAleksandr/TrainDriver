@@ -17,9 +17,27 @@
     <string name="resent_text_passwordConfScreen">Отправить повторно через %1$d с</string>
     <string name="resent_text_passwordConfScreen_enabled">Отправить повторно</string>
 
+
+    // Main Screen
+    <string name="add_itinerary">Добавить</string>
+    <string name="january">ЯНВ</string>
+    <string name="february">ФЕВ</string>
+    <string name="march">МАР</string>
+    <string name="april">АПР</string>
+    <string name="may">МАЙ</string>
+    <string name="june">ИЮН</string>
+    <string name="july">ИЮЛ</string>
+    <string name="august">АВГ</string>
+    <string name="september">СЕН</string>
+    <string name="october">ОКТ</string>
+    <string name="november">НОЯ</string>
+    <string name="december">ДЕК</string>
+    <string name="empty_route_list">Нет маршрутов</string>
+
     // Сообщения ошибок
     <string name="invalid_code">Неверный код</string>
     <string name="empty_number">"Введите номер телефона"</string>
+    <string name="data_loading_error">Ошибка загрузки данных</string>
 
     // Информационные сообщения
     <string name="trying_to_send_SMS">Пытаемся отправить SMS…</string>
@@ -28,4 +46,8 @@
     <string name="sms_send">SMS отправлено</string>
     <string name="auto_login">Автоматический вход</string>
     <string name="error_try_again">Произошла ошибка. Попробуйте ещё раз.</string>
+
+    // Content Description
+    <string name="account">Личный кабинет</string>
+    <string name="search">Поиск</string>
 </resources>

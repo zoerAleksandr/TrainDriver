@@ -17,9 +17,26 @@
     <string name="resent_text_passwordConfScreen">Адправіць паўторна праз %1$d с</string>
     <string name="resent_text_passwordConfScreen_enabled">Адправіць паўторна</string>
 
+    // Main Screen
+    <string name="add_itinerary">Дабавіць</string>
+    <string name="january">СТУ</string>
+    <string name="february">ЛЮТ</string>
+    <string name="march">САК</string>
+    <string name="april">КРА</string>
+    <string name="may">ТРА</string>
+    <string name="june">ЧЭР</string>
+    <string name="july">ЛИП</string>
+    <string name="august">ЖНИ</string>
+    <string name="september">ВЕР</string>
+    <string name="october">КАС</string>
+    <string name="november">ЛИС</string>
+    <string name="december">СНЕ</string>
+    <string name="empty_route_list">Няма маршрутаў</string>
+
     // Сообщения ошибок
     <string name="invalid_code">Няправільны код</string>
     <string name="empty_number">"Увядзіце нумар тэлефона"</string>
+    <string name="data_loading_error">Памылка загрузкі дадзеных</string>
 
     // Информационные сообщения
     <string name="trying_to_send_SMS">Спрабуем адправіць SMS…</string>
@@ -28,4 +45,8 @@
     <string name="sms_send">SMS адпраўлена</string>
     <string name="auto_login">Аўтаматычны ўваход</string>
     <string name="error_try_again">Адбылася памылка. Паспрабуйце яшчэ раз.</string>
+
+    // Content Description
+    <string name="account">асабісты кабінет</string>
+    <string name="search">пошук</string>
 </resources>
