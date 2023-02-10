@@ -7,7 +7,7 @@ import com.example.traindriver.domain.entity.Locomotive
 import com.example.traindriver.domain.entity.Station
 import com.example.traindriver.domain.entity.Train
 import com.example.traindriver.ui.screen.main_screen.RouteListByMonthResponse
-import com.example.traindriver.ui.screen.main_screen.RouteResponse
+import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -61,7 +61,7 @@ class MockDataRepository : DataRepository {
     override fun getListItineraryByMonth(month: Int): Flow<RouteListByMonthResponse> =
         callbackFlow {
             trySend(ResultState.Loading())
-            delay(4000)
+            delay(2000)
             val list = listOf(one, two, three)
             trySend(ResultState.Success(list))
             awaitClose { close() }
@@ -70,7 +70,7 @@ class MockDataRepository : DataRepository {
     override fun getItineraryById(id: String): Flow<RouteResponse> =
         callbackFlow {
             trySend(ResultState.Loading())
-            delay(4000)
+            delay(2000)
             trySend(ResultState.Success(one))
             awaitClose { close() }
         }

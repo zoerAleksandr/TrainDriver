@@ -14,7 +14,6 @@ import org.koin.core.component.inject
 import java.util.*
 
 typealias RouteListByMonthResponse = ResultState<List<Route>>
-typealias RouteResponse = ResultState<Route>
 
 class MainViewModel : ViewModel(), KoinComponent {
     private val getRouteListByMonthUseCase: GetRouteListByMonthUseCase by inject()
