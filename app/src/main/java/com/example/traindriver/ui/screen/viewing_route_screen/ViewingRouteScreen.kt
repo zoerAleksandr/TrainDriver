@@ -1,21 +1,32 @@
 package com.example.traindriver.ui.screen.viewing_route_screen
 
 import android.util.Log
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.traindriver.data.util.ResultState
+import com.example.traindriver.domain.entity.Route
+import com.example.traindriver.ui.element_screen.CustomScrollableTabRow
+import com.example.traindriver.ui.screen.viewing_route_screen.element.LocoScreen
+import com.example.traindriver.ui.screen.viewing_route_screen.element.PassengerScreen
+import com.example.traindriver.ui.screen.viewing_route_screen.element.TrainScreen
+import com.example.traindriver.ui.screen.viewing_route_screen.element.WorkTimeScreen
+import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.util.Constants.ROUTE
+import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.OnLifecycleEvent
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.rememberPagerState
+
 
 @Composable
 fun ViewingRouteScreen(
@@ -35,7 +46,6 @@ fun ViewingRouteScreen(
     }
 
     val state = viewModel.routeState
-    var numberRoute by mutableStateOf("")
 
     Scaffold {
         when (state) {
@@ -43,11 +53,74 @@ fun ViewingRouteScreen(
                 Log.d("ZZZ", "Loading")
             }
             is ResultState.Success -> state.data?.let { route ->
-                Log.d("ZZZ", "!!!! $route")
-                numberRoute = route.id
+                TabScreen(route)
             }
             is ResultState.Failure -> {}
         }
-        Text(modifier = Modifier.padding(top = 16.dp), text = numberRoute)
+    }
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun TabScreen(route: Route) {
+    val pagerState = rememberPagerState(
+        pageCount = 4,
+        initialPage = 0
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 38.dp)
+    ) {
+        Header(route = route)
+        Tabs(pagerState)
+        TabContent(pagerState)
+    }
+}
+
+@Composable
+private fun Header(route: Route) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = "${route.timeStartWork}")
+        Text(text = "№${route.number ?: ""}")
+    }
+}
+
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+private fun Tabs(pagerState: PagerState) {
+    val list = listOf("Время", "Локомотив", "Поезд", "Пассажиром")
+    CustomScrollableTabRow(
+        tabs = list,
+        selectedTabIndex = pagerState.currentPage,
+        pagerState = pagerState
+    )
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+private fun TabContent(pagerState: PagerState) {
+    HorizontalPager(state = pagerState) { page ->
+        when (page) {
+            0 -> WorkTimeScreen()
+            1 -> LocoScreen()
+            2 -> TrainScreen()
+            3 -> PassengerScreen()
+        }
+    }
+}
+
+@Composable
+@DarkLightPreviews
+private fun ViewingPrev() {
+    TrainDriverTheme {
+        ViewingRouteScreen(rememberNavController(), viewModel())
     }
 }

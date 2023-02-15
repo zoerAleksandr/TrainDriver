@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.callbackFlow
 
 class MockDataRepository : DataRepository {
     private val one = Route(
+        number = 139,
         timeStartWork = 1675789800000,
         timeEndWork = 1_675_876_200_000,
         stationList = mutableListOf(
@@ -29,6 +30,7 @@ class MockDataRepository : DataRepository {
         )
     )
     private val two = Route(
+        number = 1989,
         timeStartWork = 1_675_857_000_000,
         timeEndWork = 1_675_876_200_000,
         stationList = mutableListOf(
@@ -43,6 +45,7 @@ class MockDataRepository : DataRepository {
         )
     )
     private val three = Route(
+        number = 4490,
         timeStartWork = 1_675_857_000_000,
         timeEndWork = 1_675_876_200_000,
         stationList = mutableListOf(
