@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.traindriver.ui.theme.Typography
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.launch
@@ -62,6 +63,7 @@ fun CustomScrollableTabRow(
                 text = {
                     Text(
                         text = tab,
+                        style = Typography.subtitle1,
                         onTextLayout = { textLayoutResult ->
                             tabWidths[tabIndex] =
                                 with(density) { textLayoutResult.size.width.toDp() }

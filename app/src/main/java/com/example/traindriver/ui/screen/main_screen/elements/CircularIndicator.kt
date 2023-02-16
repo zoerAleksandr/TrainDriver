@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.traindriver.ui.theme.SpecialColor
 import com.example.traindriver.ui.theme.TrainDriverTheme
+import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FontScalePreviews
 
@@ -110,7 +111,7 @@ fun CircularIndicator(
                 }
                 .padding(bottom = canvasSize / 5),
             text = "$maxIndicatorValue",
-            fontSize = MaterialTheme.typography.h4.fontSize
+            style = MaterialTheme.typography.h3
         )
     }
 
@@ -182,8 +183,7 @@ fun EmbeddedText(
     Text(
         modifier = modifier,
         text = "$hour : $minute",
-        fontSize = MaterialTheme.typography.h1.fontSize,
-        fontWeight = FontWeight.Bold
+        style = Typography.h1.copy(fontWeight = FontWeight.Bold)
     )
 }
 

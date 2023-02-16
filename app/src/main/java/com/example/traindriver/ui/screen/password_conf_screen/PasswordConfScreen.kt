@@ -158,7 +158,7 @@ fun PasswordConfScreen(
                         top.linkTo(topGuideLine)
                     },
                     style = Typography.h3,
-                    color = MaterialTheme.colors.onBackground,
+                    color = MaterialTheme.colors.primary,
                     text = stringResource(id = R.string.title_passwordConfScreen)
                 )
                 Row(
@@ -218,7 +218,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -267,7 +267,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -316,7 +316,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -365,7 +365,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -414,7 +414,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -446,7 +446,7 @@ fun PasswordConfScreen(
                                         v6.value = it
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -492,11 +492,15 @@ fun PasswordConfScreen(
                         } else {
                             stringResource(id = R.string.resent_text_passwordConfScreen, countdown)
                         },
-                        style = Typography.body1,
+                        style = if (resentTextEnable) {
+                            Typography.body1
+                        } else {
+                            Typography.body2
+                        },
                         color = if (resentTextEnable) {
                             ClicableTextColor
                         } else {
-                            MaterialTheme.colors.onBackground
+                            MaterialTheme.colors.primary
                         },
                         textAlign = TextAlign.Center
                     )

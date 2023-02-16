@@ -19,6 +19,7 @@ import com.example.traindriver.ui.screen.viewing_route_screen.element.PassengerS
 import com.example.traindriver.ui.screen.viewing_route_screen.element.TrainScreen
 import com.example.traindriver.ui.screen.viewing_route_screen.element.WorkTimeScreen
 import com.example.traindriver.ui.theme.TrainDriverTheme
+import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.*
 import com.example.traindriver.ui.util.Constants.ROUTE
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -87,10 +88,10 @@ private fun Header(route: Route) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         val millis = route.timeStartWork
-        val dateFormated = SimpleDateFormat("dd.MM.yyyy").format(millis)
+        val dateFormatted = SimpleDateFormat("dd.MM.yyyy").format(millis)
 
-        Text(text = "№ ${route.number ?: ""}")
-        Text(text = "от $dateFormated")
+        Text(text = "№ ${route.number ?: ""}", style = Typography.body1)
+        Text(text = "от $dateFormatted", style = Typography.body1)
     }
 }
 

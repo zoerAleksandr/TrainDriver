@@ -16,6 +16,7 @@ import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.ui.element_screen.VerticalDividerTrainDriver
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
+import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.*
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -104,7 +105,7 @@ fun WorkTimeElementItem(
     } else {
         "--:--"
     }
-    Text(modifier = modifier, text = textTime)
+    Text(modifier = modifier, text = textTime, style = Typography.body2)
 }
 
 @Composable
@@ -149,8 +150,18 @@ fun StationElementItem(
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.Start
     ) {
-        Text(text = textStation, overflow = TextOverflow.Ellipsis, maxLines = 1)
-        Text(text = textLoco, overflow = TextOverflow.Ellipsis, maxLines = 1)
+        Text(
+            text = textStation,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+            style = Typography.body2
+        )
+        Text(
+            text = textLoco,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+            style = Typography.body2
+        )
     }
 }
 
@@ -168,8 +179,8 @@ fun DateElementItem(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = day)
-        Text(text = month)
+        Text(text = day, style = Typography.body2)
+        Text(text = month, style = Typography.body2)
     }
 }
 
