@@ -56,7 +56,7 @@ fun ViewingRouteScreen(
                 Log.d("ZZZ", "Loading")
             }
             is ResultState.Success -> state.data?.let { route ->
-                TabScreen(route)
+                TabScreen(route, navController)
             }
             is ResultState.Failure -> {}
         }
@@ -65,7 +65,7 @@ fun ViewingRouteScreen(
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-fun TabScreen(route: Route) {
+fun TabScreen(route: Route, navController: NavController) {
     val pagerState = rememberPagerState(
         pageCount = 4,
         initialPage = 0
@@ -78,7 +78,7 @@ fun TabScreen(route: Route) {
     ) {
         Header(route = route)
         Tabs(pagerState)
-        TabContent(pagerState)
+        TabContent(pagerState, route, navController)
     }
 }
 
@@ -118,10 +118,10 @@ private fun Tabs(pagerState: PagerState) {
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
-private fun TabContent(pagerState: PagerState) {
+private fun TabContent(pagerState: PagerState, route: Route, navController: NavController) {
     HorizontalPager(state = pagerState) { page ->
         when (page) {
-            0 -> WorkTimeScreen()
+            0 -> WorkTimeScreen(navController, route)
             1 -> LocoScreen()
             2 -> TrainScreen()
             3 -> PassengerScreen()

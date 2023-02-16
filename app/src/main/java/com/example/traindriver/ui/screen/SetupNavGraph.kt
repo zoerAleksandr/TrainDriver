@@ -8,6 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.traindriver.ui.screen.main_screen.MainScreen
 import com.example.traindriver.ui.screen.password_conf_screen.PasswordConfScreen
+import com.example.traindriver.ui.screen.setting_screen.SettingScreen
 import com.example.traindriver.ui.screen.signin_screen.SignInScreen
 import com.example.traindriver.ui.screen.signin_screen.SignInViewModel
 import com.example.traindriver.ui.screen.viewing_route_screen.ViewingRouteScreen
@@ -45,6 +46,9 @@ fun SetupNavGraph(
             })
         ) {
             ViewingRouteScreen(navController)
+        }
+        composable(Screen.Setting.route) {
+            SettingScreen()
         }
     }
 }
