@@ -19,14 +19,13 @@ import com.example.traindriver.ui.screen.viewing_route_screen.element.PassengerS
 import com.example.traindriver.ui.screen.viewing_route_screen.element.TrainScreen
 import com.example.traindriver.ui.screen.viewing_route_screen.element.WorkTimeScreen
 import com.example.traindriver.ui.theme.TrainDriverTheme
+import com.example.traindriver.ui.util.*
 import com.example.traindriver.ui.util.Constants.ROUTE
-import com.example.traindriver.ui.util.DarkLightPreviews
-import com.example.traindriver.ui.util.OnLifecycleEvent
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
-
+import java.text.SimpleDateFormat
 
 @Composable
 fun ViewingRouteScreen(
@@ -87,8 +86,11 @@ private fun Header(route: Route) {
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = "${route.timeStartWork}")
-        Text(text = "№${route.number ?: ""}")
+        val millis = route.timeStartWork
+        val dateFormated = SimpleDateFormat("dd.MM.yyyy").format(millis)
+
+        Text(text = "№ ${route.number ?: ""}")
+        Text(text = "от $dateFormated")
     }
 }
 
