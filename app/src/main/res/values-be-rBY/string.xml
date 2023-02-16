@@ -33,6 +33,12 @@
     <string name="december">СНЕ</string>
     <string name="empty_route_list">Няма маршрутаў</string>
 
+    // Viewing Route Screen
+    <string name="work_time">Час</string>
+    <string name="locomotive">Лакаматыў</string>
+    <string name="train">Цягнік</string>
+    <string name="passenger">Пасажыр</string>
+
     // Сообщения ошибок
     <string name="invalid_code">Няправільны код</string>
     <string name="empty_number">"Увядзіце нумар тэлефона"</string>

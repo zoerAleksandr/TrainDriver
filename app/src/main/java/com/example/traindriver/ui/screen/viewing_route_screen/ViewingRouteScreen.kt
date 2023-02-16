@@ -6,11 +6,13 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.ui.element_screen.CustomScrollableTabRow
@@ -20,8 +22,9 @@ import com.example.traindriver.ui.screen.viewing_route_screen.element.TrainScree
 import com.example.traindriver.ui.screen.viewing_route_screen.element.WorkTimeScreen
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
-import com.example.traindriver.ui.util.*
 import com.example.traindriver.ui.util.Constants.ROUTE
+import com.example.traindriver.ui.util.DarkLightPreviews
+import com.example.traindriver.ui.util.OnLifecycleEvent
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
@@ -89,9 +92,10 @@ private fun Header(route: Route) {
     ) {
         val millis = route.timeStartWork
         val dateFormatted = SimpleDateFormat("dd.MM.yyyy").format(millis)
-
-        Text(text = "№ ${route.number ?: ""}", style = Typography.body1)
-        Text(text = "от $dateFormatted", style = Typography.body1)
+        route.number?.let { number ->
+            Text(text = "№ $number", style = Typography.body1)
+        }
+        Text(text = dateFormatted, style = Typography.body1)
     }
 }
 
@@ -99,9 +103,14 @@ private fun Header(route: Route) {
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun Tabs(pagerState: PagerState) {
-    val list = listOf("Время", "Локомотив", "Поезд", "Пассажиром")
+    val tabsLabel = listOf(
+        stringResource(id = R.string.work_time),
+        stringResource(id = R.string.locomotive),
+        stringResource(id = R.string.train),
+        stringResource(id = R.string.passenger),
+    )
     CustomScrollableTabRow(
-        tabs = list,
+        tabs = tabsLabel,
         selectedTabIndex = pagerState.currentPage,
         pagerState = pagerState
     )

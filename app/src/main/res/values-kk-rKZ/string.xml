@@ -33,6 +33,12 @@
     <string name="december">ЖЕЛ</string>
     <string name="empty_route_list">Маршруттар жоқ</string>
 
+    // Viewing Route Screen
+    <string name="work_time">Уақыт</string>
+    <string name="locomotive">Локомотив</string>
+    <string name="train">Пойыз</string>
+    <string name="passenger">Жолаушы</string>
+
     // Сообщения ошибок
     <string name="invalid_code">Қате код</string>
     <string name="empty_number">"Телефон нөмірін енгізіңіз"</string>

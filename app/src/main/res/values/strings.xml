@@ -33,6 +33,12 @@
     <string name="december">ДЕК</string>
     <string name="empty_route_list">Нет маршрутов</string>
 
+    // Viewing Route Screen
+    <string name="work_time">Время</string>
+    <string name="locomotive">Локомотив</string>
+    <string name="train">Поезд</string>
+    <string name="passenger">Пассажиром</string>
+
     // Сообщения ошибок
     <string name="invalid_code">Неверный код</string>
     <string name="empty_number">Введите номер телефона</string>
