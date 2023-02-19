@@ -39,7 +39,7 @@ class MainViewModel : ViewModel(), KoinComponent {
     private fun calculationOfTotalTime(listRoute: List<Route>) {
         for (item in listRoute) {
             item.getWorkTime().let { routeTime ->
-                totalTime += routeTime
+                totalTime += routeTime ?: 0
             }
         }
     }

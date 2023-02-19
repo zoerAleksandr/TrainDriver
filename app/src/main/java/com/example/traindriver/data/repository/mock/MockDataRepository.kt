@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.callbackFlow
 class MockDataRepository : DataRepository {
     private val one = Route(
         number = 139,
-        timeStartWork = 1675789800000,
+        timeStartWork = 1_675_789_800_000,
         timeEndWork = 1_675_876_200_000,
         stationList = mutableListOf(
             Station(stationName = "Луга"),

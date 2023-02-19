@@ -90,12 +90,14 @@ private fun Header(route: Route) {
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        val millis = route.timeStartWork
-        val dateFormatted = SimpleDateFormat("dd.MM.yyyy").format(millis)
+        route.timeStartWork?.let { millis ->
+            val dateFormatted = SimpleDateFormat("dd.MM.yyyy").format(millis)
+            Text(text = dateFormatted, style = Typography.body1)
+        }
+
         route.number?.let { number ->
             Text(text = "№ $number", style = Typography.body1)
         }
-        Text(text = dateFormatted, style = Typography.body1)
     }
 }
 

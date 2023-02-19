@@ -87,7 +87,7 @@ fun WorkTimeElementItem(
 ) {
     val workTime = route.getWorkTime()
 
-    val textTime = if (workTime != 0L) {
+    val textTime = if (workTime != null) {
         val hour = workTime.getHour()
         val hourText = if (hour < 10) {
             "0$hour"

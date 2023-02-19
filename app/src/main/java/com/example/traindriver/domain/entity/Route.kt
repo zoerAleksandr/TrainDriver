@@ -16,12 +16,12 @@ data class Route(
     val stationList: MutableList<Station> = mutableListOf(),
     val passengerList: MutableList<Passenger> = mutableListOf()
 ) {
-    fun getWorkTime(): Long {
+    fun getWorkTime(): Long? {
         val timeEnd = timeEndWork
         val timeStart = timeStartWork
         return if (timeEnd != null && timeStart != null) {
             timeEnd - timeStart
-        } else { 0 }
+        } else { null }
     }
 }
 

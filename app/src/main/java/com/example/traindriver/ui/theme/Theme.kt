@@ -36,6 +36,7 @@ val SpecialColor = Color(0xFFAD2727)
 val SpecialDisableColor = Color(0xFFFF7979)
 var BackgroundFirst = Color(0xFF9E9E9E)
 var BackgroundSecond = Color(0xFFEEEEEE)
+var ColorClicableText = Color(0xFF0000FF)
 
 @Composable
 fun TrainDriverTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
@@ -45,11 +46,13 @@ fun TrainDriverTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Compo
         BackgroundIcon = BackgroundIconDark
         BackgroundFirst = Color(0xFF242424)
         BackgroundSecond = Color(0xFF3D3D3D)
+        ColorClicableText = Color(0xFF7192D5)
     } else {
         colors = LightColorPalette
         BackgroundIcon = BackgroundIconLight
         BackgroundFirst = Color(0xFF9E9E9E)
         BackgroundSecond = Color(0xFFEEEEEE)
+        ColorClicableText = Color(0xFF0000FF)
     }
 
     val systemUiController = rememberSystemUiController()
