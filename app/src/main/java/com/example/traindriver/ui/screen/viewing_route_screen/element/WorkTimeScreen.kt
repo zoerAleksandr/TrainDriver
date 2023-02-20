@@ -81,10 +81,17 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
         createHorizontalChain(
             startTimeBlock, endTimeBlock, chainStyle = ChainStyle.Spread
         )
+        val minTimeRestText = (minTimeRest / 3_600_000f).let { time ->
+            if (time % 1 == 0f) {
+                time.toInt()
+            } else {
+                time
+            }
+        }
 
         val link = buildAnnotatedString {
             val text =
-                "Время минимального отдыха составляет 3 часа. Изменить это время можно в настройках."
+                "Время минимального отдыха составляет $minTimeRestText часа. Изменить это время можно в настройках."
 
             val endIndex = text.length - 1
             val startIndex = startIndexLastWord(text)
