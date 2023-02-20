@@ -1,6 +1,6 @@
 package com.example.traindriver.di
 
-import com.example.traindriver.data.repository.DataRepository
+import com.example.traindriver.domain.repository.DataRepository
 import com.example.traindriver.data.repository.DataStoreRepository
 import com.example.traindriver.data.repository.mock.MockDataRepository
 import org.koin.android.ext.koin.androidContext

@@ -1,6 +1,6 @@
 package com.example.traindriver.data.repository.mock
 
-import com.example.traindriver.data.repository.DataRepository
+import com.example.traindriver.domain.repository.DataRepository
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.domain.entity.Locomotive

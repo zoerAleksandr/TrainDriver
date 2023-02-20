@@ -18,13 +18,14 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.ui.element_screen.LoadingElement
 import com.example.traindriver.ui.screen.Screen
-import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
+import com.example.traindriver.ui.screen.viewing_route_screen.ViewingRouteViewModel
 import com.example.traindriver.ui.theme.ColorClicableText
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
@@ -44,13 +45,13 @@ operator fun Long?.plus(other: Long?): Long? =
     }
 
 @Composable
-fun WorkTimeScreen(navController: NavController, routeState: RouteResponse) {
-    when (routeState) {
+fun WorkTimeScreen(navController: NavController, viewModel: ViewingRouteViewModel = viewModel()) {
+    when (val routeState = viewModel.routeState) {
         is ResultState.Loading -> {
             LoadingScreen()
         }
         is ResultState.Success -> routeState.data?.let { route ->
-            DataScreen(route, navController)
+            DataScreen(route, navController, viewModel.minTimeRest)
         }
         is ResultState.Failure -> {
             FailureScreen()
@@ -66,7 +67,7 @@ fun FailureScreen() {
 }
 
 @Composable
-private fun DataScreen(route: Route, navController: NavController) {
+private fun DataScreen(route: Route, navController: NavController, minTimeRest: Long) {
     val isDeterminateStartTime = route.timeStartWork != null
     val isDeterminateEndTime = route.timeEndWork != null
 
@@ -103,7 +104,7 @@ private fun DataScreen(route: Route, navController: NavController) {
                 end = endIndex
             )
         }
-        val minRest: Long? = route.timeEndWork + 10_800_000L
+        val minRest: Long? = route.timeEndWork + minTimeRest
         val completeRest: Long? = route.timeEndWork + route.getWorkTime()
 
         Column(
@@ -268,6 +269,6 @@ fun startIndexLastWord(text: String): Int {
 @DarkLightPreviews
 private fun WorkTimeScreenPrev() {
     TrainDriverTheme {
-        WorkTimeScreen(rememberNavController(), ResultState.Loading(null))
+        WorkTimeScreen(rememberNavController(), viewModel())
     }
 }

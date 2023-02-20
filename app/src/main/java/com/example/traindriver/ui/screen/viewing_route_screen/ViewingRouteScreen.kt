@@ -80,7 +80,7 @@ fun TabScreen(
     ) {
         Header(routeState = routeState, snackbarHostState = snackbarHostState)
         Tabs(pagerState)
-        TabContent(pagerState, routeState, navController)
+        TabContent(pagerState, navController)
     }
 }
 
@@ -146,12 +146,11 @@ private fun Tabs(pagerState: PagerState) {
 @Composable
 private fun TabContent(
     pagerState: PagerState,
-    routeState: RouteResponse,
-    navController: NavController
+    navController: NavController,
 ) {
     HorizontalPager(state = pagerState) { page ->
         when (page) {
-            0 -> WorkTimeScreen(navController, routeState)
+            0 -> WorkTimeScreen(navController)
             1 -> LocoScreen()
             2 -> TrainScreen()
             3 -> PassengerScreen()
