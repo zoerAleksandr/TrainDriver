@@ -22,6 +22,7 @@ import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.Constants.ROUTE
 import com.example.traindriver.ui.util.DarkLightPreviews
+import com.example.traindriver.ui.util.DateAndTimeFormat.DATE_FORMAT
 import com.example.traindriver.ui.util.OnLifecycleEvent
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -93,13 +94,13 @@ private fun Header(routeState: RouteResponse, snackbarHostState: SnackbarHostSta
     }
 
     val dateStartWorkText = dateStartWork?.let { millis ->
-        SimpleDateFormat("dd.MM.yyyy").format(millis)
+        SimpleDateFormat(DATE_FORMAT).format(millis)
     } ?: ""
 
     var routeNumber by remember {
         mutableStateOf<Int?>(null)
     }
-    val routeNumberText = routeNumber ?: ""
+    val routeNumberText = routeNumber ?: "0000"
 
     when (routeState) {
         is ResultState.Loading -> {}
@@ -109,7 +110,7 @@ private fun Header(routeState: RouteResponse, snackbarHostState: SnackbarHostSta
         }
         is ResultState.Failure -> {
             scope.launch {
-                snackbarHostState.showSnackbar("Ошибка: ${routeState.msg.message.toString()}")
+                snackbarHostState.showSnackbar(routeState.msg.message.toString())
             }
         }
     }

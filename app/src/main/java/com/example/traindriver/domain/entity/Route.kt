@@ -8,7 +8,7 @@ fun generateUid() = UUID.randomUUID().toString()
 data class Route(
     val id: String = generateUid(),
     var number: Int? = null,
-    var timeStartWork: Long? = currentTimeInLong(),
+    var timeStartWork: Long? = null,
     val timeEndWork: Long? = null,
 
     val locoList: MutableList<Locomotive> = mutableListOf(),

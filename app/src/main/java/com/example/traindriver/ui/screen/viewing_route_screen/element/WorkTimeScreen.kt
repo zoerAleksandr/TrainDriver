@@ -11,6 +11,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -21,9 +22,10 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.Route
-import com.example.traindriver.ui.element_screen.LoadingElement
+import com.example.traindriver.ui.element_screen.TrainDriverProgressBar
 import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.viewing_route_screen.ViewingRouteViewModel
 import com.example.traindriver.ui.theme.ColorClicableText
@@ -31,6 +33,10 @@ import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.DarkLightPreviews
+import com.example.traindriver.ui.util.DateAndTimeFormat.DATE_FORMAT
+import com.example.traindriver.ui.util.DateAndTimeFormat.DEFAULT_DATE_TEXT
+import com.example.traindriver.ui.util.DateAndTimeFormat.DEFAULT_TIME_TEXT
+import com.example.traindriver.ui.util.DateAndTimeFormat.TIME_FORMAT
 import com.example.traindriver.ui.util.getHour
 import com.example.traindriver.ui.util.getRemainingMinuteFromHour
 import java.text.SimpleDateFormat
@@ -62,7 +68,7 @@ fun WorkTimeScreen(navController: NavController, viewModel: ViewingRouteViewMode
 @Composable
 fun FailureScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = "Ошибка открытия маршрута", style = Typography.h3)
+        Text(text = stringResource(id = R.string.route_opening_error), style = Typography.h3)
     }
 }
 
@@ -90,8 +96,7 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
         }
 
         val link = buildAnnotatedString {
-            val text =
-                "Время минимального отдыха составляет $minTimeRestText часа. Изменить это время можно в настройках."
+            val text = stringResource(id = R.string.info_text_min_time_rest, minTimeRestText)
 
             val endIndex = text.length - 1
             val startIndex = startIndexLastWord(text)
@@ -129,11 +134,11 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             val dateStartText = route.timeStartWork?.let { millis ->
-                SimpleDateFormat("dd.MM.yyyy").format(millis)
-            } ?: "00.00.0000"
+                SimpleDateFormat(DATE_FORMAT).format(millis)
+            } ?: DEFAULT_DATE_TEXT
             val timeStartText = route.timeStartWork?.let { millis ->
-                SimpleDateFormat("hh:mm").format(millis)
-            } ?: "00:00"
+                SimpleDateFormat(TIME_FORMAT).format(millis)
+            } ?: DEFAULT_TIME_TEXT
 
             Text(
                 text = dateStartText,
@@ -170,12 +175,12 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             val dateEndText = route.timeEndWork?.let { millis ->
-                SimpleDateFormat("dd.MM.yyyy").format(millis)
-            } ?: "00.00.0000"
+                SimpleDateFormat(DATE_FORMAT).format(millis)
+            } ?: DEFAULT_DATE_TEXT
 
             val timeEndText = route.timeEndWork?.let { millis ->
-                SimpleDateFormat("hh:mm").format(millis)
-            } ?: "00:00"
+                SimpleDateFormat(TIME_FORMAT).format(millis)
+            } ?: DEFAULT_TIME_TEXT
 
             Text(
                 text = dateEndText,
@@ -205,11 +210,22 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
                 }
                 .padding(start = 32.dp, bottom = 64.dp),
             horizontalAlignment = Alignment.Start) {
-            val minRestText = SimpleDateFormat("dd.MM hh:mm").format(minRest)
-            val completeRestText = SimpleDateFormat("dd.MM hh:mm").format(completeRest)
 
-            Text(text = "Минимальный отдых до $minRestText", style = Typography.body2)
-            Text(text = "Полный отдых до $completeRestText", style = Typography.body2)
+            minRest?.let { SimpleDateFormat("$DATE_FORMAT $TIME_FORMAT").format(it) }
+                ?.also {
+                    Text(
+                        text = stringResource(id = R.string.min_time_rest_text, it),
+                        style = Typography.body2
+                    )
+                }
+
+            completeRest?.let { SimpleDateFormat("$DATE_FORMAT $TIME_FORMAT").format(it) }
+                ?.also {
+                    Text(
+                        text = stringResource(id = R.string.complete_time_rest_text, it),
+                        style = Typography.body2
+                    )
+                }
 
             ClickableText(
                 modifier = Modifier.padding(top = 12.dp),
@@ -240,26 +256,27 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
                     "0$hour"
                 } else {
                     hour.toString()
-                }
+                } + stringResource(id = R.string.abbreviated_hour)
 
                 val minute = millis.getRemainingMinuteFromHour()
                 val minuteText = if (minute < 10) {
                     "0$minute"
                 } else {
                     minute.toString()
-                }
-                "${hourText}ч ${minuteText}мин"
+                } + stringResource(id = R.string.abbreviated_minute)
+
+                "$hourText $minuteText"
             } else {
                 ""
             }
-            Text(text = textOverTime, style = Typography.subtitle1)
+            Text(text = textOverTime, style = Typography.body2)
         }
     }
 }
 
 @Composable
 private fun LoadingScreen() {
-    LoadingElement()
+    TrainDriverProgressBar()
 }
 
 fun startIndexLastWord(text: String): Int {

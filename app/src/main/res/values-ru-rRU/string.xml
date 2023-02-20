@@ -39,6 +39,14 @@
     <string name="locomotive">Локомотив</string>
     <string name="train">Поезд</string>
     <string name="passenger">Пассажиром</string>
+    <string name="route_opening_error">Ошибка открытия маршрута</string>
+    <string name="info_text_min_time_rest">
+        Время минимального отдыха составляет %1$s часа.
+        Изменить это время можно в настройках.</string>
+    <string name="min_time_rest_text">Минимальный отдых до %1$s</string>
+    <string name="complete_time_rest_text">Полный отдых до %1$s</string>
+    <string name="abbreviated_hour">ч</string>
+    <string name="abbreviated_minute">мин</string>
 
     // Сообщения ошибок
     <string name="invalid_code">Неверный код</string>
