@@ -20,8 +20,11 @@ import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.Route
+import com.example.traindriver.ui.element_screen.LoadingElement
 import com.example.traindriver.ui.screen.Screen
+import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
 import com.example.traindriver.ui.theme.ColorClicableText
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
@@ -41,7 +44,29 @@ operator fun Long?.plus(other: Long?): Long? =
     }
 
 @Composable
-fun WorkTimeScreen(navController: NavController, route: Route) {
+fun WorkTimeScreen(navController: NavController, routeState: RouteResponse) {
+    when (routeState) {
+        is ResultState.Loading -> {
+            LoadingScreen()
+        }
+        is ResultState.Success -> routeState.data?.let { route ->
+            DataScreen(route, navController)
+        }
+        is ResultState.Failure -> {
+            FailureScreen()
+        }
+    }
+}
+
+@Composable
+fun FailureScreen() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text(text = "Ошибка открытия маршрута", style = Typography.h3)
+    }
+}
+
+@Composable
+private fun DataScreen(route: Route, navController: NavController) {
     val isDeterminateStartTime = route.timeStartWork != null
     val isDeterminateEndTime = route.timeEndWork != null
 
@@ -78,7 +103,7 @@ fun WorkTimeScreen(navController: NavController, route: Route) {
                 end = endIndex
             )
         }
-        val minRest : Long? = route.timeEndWork + 10_800_000L
+        val minRest: Long? = route.timeEndWork + 10_800_000L
         val completeRest: Long? = route.timeEndWork + route.getWorkTime()
 
         Column(
@@ -224,6 +249,11 @@ fun WorkTimeScreen(navController: NavController, route: Route) {
     }
 }
 
+@Composable
+private fun LoadingScreen() {
+    LoadingElement()
+}
+
 fun startIndexLastWord(text: String): Int {
     val overLength = text.length
     for (index in overLength - 1 downTo 0) {
@@ -238,6 +268,6 @@ fun startIndexLastWord(text: String): Int {
 @DarkLightPreviews
 private fun WorkTimeScreenPrev() {
     TrainDriverTheme {
-        WorkTimeScreen(rememberNavController(), Route())
+        WorkTimeScreen(rememberNavController(), ResultState.Loading(null))
     }
 }

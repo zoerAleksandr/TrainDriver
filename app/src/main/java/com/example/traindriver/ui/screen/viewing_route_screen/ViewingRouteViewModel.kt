@@ -1,6 +1,5 @@
 package com.example.traindriver.ui.screen.viewing_route_screen
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -25,7 +24,6 @@ class ViewingRouteViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
             getRouteByIdUseCase.execute(id).collect { response ->
                 routeState = response
-                Log.d("ZZZ", "getRouteById = $routeState")
             }
         }
     }
