@@ -58,7 +58,7 @@ fun ViewingRouteScreen(
             TopSnackbar(snackBarData)
         }
     }) {
-        TabScreen(routeState, navController, scaffoldState.snackbarHostState)
+        TabScreen(routeState, navController, scaffoldState.snackbarHostState, viewModel)
     }
 }
 
@@ -67,7 +67,8 @@ fun ViewingRouteScreen(
 fun TabScreen(
     routeState: RouteResponse,
     navController: NavController,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    viewModel: ViewingRouteViewModel
 ) {
     val pagerState = rememberPagerState(
         pageCount = 4,
@@ -81,7 +82,7 @@ fun TabScreen(
     ) {
         Header(routeState = routeState, snackbarHostState = snackbarHostState)
         Tabs(pagerState)
-        TabContent(pagerState, navController)
+        TabContent(pagerState, navController, viewModel)
     }
 }
 
@@ -148,11 +149,12 @@ private fun Tabs(pagerState: PagerState) {
 private fun TabContent(
     pagerState: PagerState,
     navController: NavController,
+    viewModel: ViewingRouteViewModel
 ) {
     HorizontalPager(state = pagerState) { page ->
         when (page) {
-            0 -> WorkTimeScreen(navController)
-            1 -> LocoScreen()
+            0 -> WorkTimeScreen(navController, viewModel.routeState, viewModel.minTimeRest)
+            1 -> LocoScreen(viewModel)
             2 -> TrainScreen()
             3 -> PassengerScreen()
         }

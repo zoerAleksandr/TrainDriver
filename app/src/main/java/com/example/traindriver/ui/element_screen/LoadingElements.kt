@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import com.example.traindriver.R
-import com.example.traindriver.ui.theme.BackgroundLoadingScreen
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.util.DarkLightPreviews
@@ -22,7 +21,7 @@ fun LoadingElement() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = BackgroundLoadingScreen),
+            .background(color = MaterialTheme.colors.secondary.copy(alpha = 0.15f)),
         contentAlignment = Alignment.Center
     ) {
         TrainDriverProgressBar()

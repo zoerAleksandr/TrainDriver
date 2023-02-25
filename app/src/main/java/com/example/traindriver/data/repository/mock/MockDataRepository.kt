@@ -2,10 +2,7 @@ package com.example.traindriver.data.repository.mock
 
 import com.example.traindriver.domain.repository.DataRepository
 import com.example.traindriver.data.util.ResultState
-import com.example.traindriver.domain.entity.Route
-import com.example.traindriver.domain.entity.Locomotive
-import com.example.traindriver.domain.entity.Station
-import com.example.traindriver.domain.entity.Train
+import com.example.traindriver.domain.entity.*
 import com.example.traindriver.ui.screen.main_screen.RouteListByMonthResponse
 import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
 import kotlinx.coroutines.channels.awaitClose
@@ -26,7 +23,31 @@ class MockDataRepository : DataRepository {
             Train(number = "2220")
         ),
         locoList = mutableListOf(
-            Locomotive(series = "2эс4к", number = "104")
+            Locomotive(
+                series = "2эс4к",
+                number = "104",
+                sectionList = listOf(
+                    SectionElectric(
+                        acceptedEnergy = 122009.0,
+                        deliveryEnergy = 122034.0,
+//                        acceptedRecovery = 9043.0,
+//                        deliveryRecovery = 9049.0
+                    ),
+                    SectionElectric(
+                        acceptedEnergy = 122009.0,
+                        deliveryEnergy = 122034.0,
+//                        acceptedRecovery = 9043.0,
+//                        deliveryRecovery = 9049.0
+                    ),
+                    SectionElectric(
+                        acceptedEnergy = 122009.0,
+                        deliveryEnergy = 122034.0,
+//                        acceptedRecovery = 9043.0,
+//                        deliveryRecovery = 9049.0
+                    ),
+//                    SectionDiesel(acceptedEnergy = 122009.0, deliveryEnergy = 121893.0, coefficient = 0.83)
+                )
+            )
         )
     )
     private val two = Route(

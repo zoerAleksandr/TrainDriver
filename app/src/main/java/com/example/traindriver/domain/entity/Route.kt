@@ -21,7 +21,9 @@ data class Route(
         val timeStart = timeStartWork
         return if (timeEnd != null && timeStart != null) {
             timeEnd - timeStart
-        } else { null }
+        } else {
+            null
+        }
     }
 }
 
@@ -59,14 +61,53 @@ data class Locomotive(
     var type: Boolean = true,
     var sectionList: List<Section> = listOf(),
 
-    var timeStartOfAcceptance: Long? = currentTimeInLong(),
+    var timeStartOfAcceptance: Long? = null,
     var timeEndOfAcceptance: Long? = null,
     var timeStartOfDelivery: Long? = null,
     var timeEndOfDelivery: Long? = null
 )
 
-data class Section(
-    val id: String = generateUid(),
-    var acceptedEnergy: Double? = null,
-    var deliveryEnergy: Double? = null
-)
+operator fun Double?.minus(other: Double?): Double? =
+    if (this != null && other != null) {
+        this - other
+    } else {
+        null
+    }
+
+operator fun Double?.times(other: Double?): Double? =
+    if (this != null && other != null) {
+        this * other
+    } else {
+        null
+    }
+
+data class SectionElectric(
+    override val id: String = generateUid(),
+    override var acceptedEnergy: Double? = null,
+    override var deliveryEnergy: Double? = null,
+    var acceptedRecovery: Double? = null,
+    var deliveryRecovery: Double? = null
+) : Section(id, acceptedEnergy, deliveryEnergy) {
+    override fun getConsumption() = deliveryEnergy - acceptedEnergy
+    fun getRecoveryResult() = deliveryRecovery - acceptedRecovery
+}
+
+data class SectionDiesel(
+    override val id: String = generateUid(),
+    override val acceptedEnergy: Double? = null,
+    override val deliveryEnergy: Double? = null,
+    var coefficient: Double? = null,
+    var acceptedInKilo: Double? = acceptedEnergy * coefficient,
+    var deliveryInKilo: Double? = deliveryEnergy * coefficient
+) : Section(id, acceptedEnergy, deliveryEnergy) {
+    override fun getConsumption(): Double? = acceptedEnergy - deliveryEnergy
+    fun getConsumptionInKilo() = acceptedInKilo - deliveryInKilo
+}
+
+abstract class Section(
+    open val id: String,
+    open val acceptedEnergy: Double?,
+    open val deliveryEnergy: Double?
+) {
+    abstract fun getConsumption(): Double?
+}
