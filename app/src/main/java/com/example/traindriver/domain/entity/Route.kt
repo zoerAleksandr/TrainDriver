@@ -1,6 +1,8 @@
 package com.example.traindriver.domain.entity
 
+import com.example.traindriver.ui.screen.viewing_route_screen.element.rounding
 import com.example.traindriver.ui.util.currentTimeInLong
+import java.math.BigDecimal
 import java.util.*
 
 fun generateUid() = UUID.randomUUID().toString()
@@ -81,6 +83,38 @@ operator fun Double?.times(other: Double?): Double? =
         null
     }
 
+fun Double.countCharsAfterDecimalPoint(): Int {
+    return BigDecimal.valueOf(this).scale()
+}
+
+fun differenceBetweenDouble(value1: Double?, value2: Double?): Double? {
+    val countAfterPoint1: Int = value1?.countCharsAfterDecimalPoint() ?: 0
+    val countAfterPoint2: Int = value2?.countCharsAfterDecimalPoint() ?: 0
+    val maxCount = if (countAfterPoint1 > countAfterPoint2) {
+        countAfterPoint1
+    } else {
+        countAfterPoint2
+    }
+    val result = value2 - value1
+    return result?.let {
+        rounding(it, maxCount)
+    }
+}
+
+fun reverseDifferenceBetweenDouble(value1: Double?, value2: Double?): Double? {
+    val countAfterPoint1: Int = value1?.countCharsAfterDecimalPoint() ?: 0
+    val countAfterPoint2: Int = value2?.countCharsAfterDecimalPoint() ?: 0
+    val maxCount = if (countAfterPoint1 > countAfterPoint2) {
+        countAfterPoint1
+    } else {
+        countAfterPoint2
+    }
+    val result = value1 - value2
+    return result?.let {
+        rounding(it, maxCount)
+    }
+}
+
 data class SectionElectric(
     override val id: String = generateUid(),
     override var acceptedEnergy: Double? = null,
@@ -88,8 +122,9 @@ data class SectionElectric(
     var acceptedRecovery: Double? = null,
     var deliveryRecovery: Double? = null
 ) : Section(id, acceptedEnergy, deliveryEnergy) {
-    override fun getConsumption() = deliveryEnergy - acceptedEnergy
-    fun getRecoveryResult() = deliveryRecovery - acceptedRecovery
+
+    override fun getConsumption() = differenceBetweenDouble(acceptedEnergy, deliveryEnergy)
+    fun getRecoveryResult() = differenceBetweenDouble(acceptedRecovery, deliveryRecovery)
 }
 
 data class SectionDiesel(
@@ -100,8 +135,8 @@ data class SectionDiesel(
     var acceptedInKilo: Double? = acceptedEnergy * coefficient,
     var deliveryInKilo: Double? = deliveryEnergy * coefficient
 ) : Section(id, acceptedEnergy, deliveryEnergy) {
-    override fun getConsumption(): Double? = acceptedEnergy - deliveryEnergy
-    fun getConsumptionInKilo() = acceptedInKilo - deliveryInKilo
+    override fun getConsumption() = reverseDifferenceBetweenDouble(acceptedEnergy, deliveryEnergy)
+    fun getConsumptionInKilo() = reverseDifferenceBetweenDouble(acceptedInKilo, deliveryInKilo)
 }
 
 abstract class Section(

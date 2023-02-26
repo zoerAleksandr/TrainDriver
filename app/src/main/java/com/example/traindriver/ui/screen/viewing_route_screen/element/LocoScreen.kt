@@ -26,6 +26,8 @@ import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.DateAndTimeFormat.DEFAULT_TIME_TEXT
 import com.example.traindriver.ui.util.DateAndTimeFormat.TIME_FORMAT
+import com.example.traindriver.ui.util.EmptyDataText.DEFAULT_ENERGY
+import com.example.traindriver.ui.util.EmptyDataText.RESULT_ENERGY
 import java.text.SimpleDateFormat
 import kotlin.math.pow
 import kotlin.math.roundToInt
@@ -89,9 +91,11 @@ fun ItemLocomotive(loco: Locomotive) {
                 start.linkTo(parent.start)
             }) {
                 Row(horizontalArrangement = Arrangement.SpaceAround) {
-                    Text(text = loco.series.toString(), color = setTextColor(loco.series))
+                    val seriesText = loco.series ?: "xxxx"
+                    val numberText = loco.number ?: "000"
+                    Text(text = seriesText, color = setTextColor(loco.series))
                     Text(text = " - ", color = setTextColor(loco.number))
-                    Text(text = loco.number.toString(), color = setTextColor(loco.number))
+                    Text(text = numberText, color = setTextColor(loco.number))
                 }
             }
             Row(
@@ -193,6 +197,14 @@ operator fun Double.plus(other: Double?): Double =
         this
     }
 
+fun Double.str(): String {
+    return if (this % 1.0 == 0.0) {
+        this.toString().dropLast(2)
+    } else {
+        this.toString()
+    }
+}
+
 @Composable
 fun GeneralResult(modifier: Modifier, loco: Locomotive) {
     when (loco.type) {
@@ -213,7 +225,7 @@ fun GeneralResult(modifier: Modifier, loco: Locomotive) {
                 contentAlignment = Alignment.CenterEnd
             ) {
                 if (totalConsumption != 0.0) {
-                    Text(text = "$totalConsumption / $totalRecovery")
+                    Text(text = "${totalConsumption.str()} / ${totalRecovery.str()}")
                 }
             }
         }
@@ -250,11 +262,14 @@ fun ItemSection(section: Section) {
                         Row(
                             modifier = Modifier.wrapContentWidth(),
                         ) {
-                            Text(text = section.acceptedEnergy.toString())
-                            Text(text = " - ")
-                            Text(text = section.deliveryEnergy.toString())
+                            val acceptedText = section.acceptedEnergy?.str() ?: DEFAULT_ENERGY
+                            val deliveryText = section.deliveryEnergy?.str() ?: DEFAULT_ENERGY
+                            Text(text = acceptedText, color = setTextColor(section.acceptedEnergy))
+                            Text(text = " - ", color = setTextColor(section.deliveryEnergy))
+                            Text(text = deliveryText, color = setTextColor(section.deliveryEnergy))
                         }
-                        Text(text = section.getConsumption().toString())
+                        val resultText = section.getConsumption()?.str() ?: RESULT_ENERGY
+                        Text(text = resultText, color = setTextColor(section.getConsumption()))
                     }
 
                     Row(
@@ -264,11 +279,17 @@ fun ItemSection(section: Section) {
                         Row(
                             modifier = Modifier.wrapContentWidth(),
                         ) {
-                            Text(text = section.acceptedRecovery.toString())
-                            Text(text = " - ")
-                            Text(text = section.deliveryRecovery.toString())
+                            section.acceptedRecovery?.let { value ->
+                                Text(text = value.str(), color = setTextColor(value))
+                            }
+                            section.deliveryRecovery?.let { value ->
+                                Text(text = " - ", color = setTextColor(value))
+                                Text(text = value.str(), color = setTextColor(value))
+                            }
                         }
-                        Text(text = section.getRecoveryResult().toString())
+                        section.getRecoveryResult()?.let { value ->
+                            Text(text = value.str(), color = setTextColor(value))
+                        }
                     }
                 }
             }

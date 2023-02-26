@@ -29,9 +29,9 @@ class MockDataRepository : DataRepository {
                 sectionList = listOf(
                     SectionElectric(
                         acceptedEnergy = 122009.0,
-                        deliveryEnergy = 122034.0,
-//                        acceptedRecovery = 9043.0,
-//                        deliveryRecovery = 9049.0
+                        deliveryEnergy = 122033.0,
+                        acceptedRecovery = 9043.0,
+                        deliveryRecovery = 9049.0
                     ),
                     SectionElectric(
                         acceptedEnergy = 122009.0,
