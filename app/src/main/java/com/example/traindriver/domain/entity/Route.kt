@@ -115,6 +115,22 @@ fun reverseDifferenceBetweenDouble(value1: Double?, value2: Double?): Double? {
     }
 }
 
+operator fun Double.plus(other: Double?): Double {
+    return if (other == null) {
+        this
+    } else {
+        this + other
+    }
+}
+
+fun Double?.plusNullableValue(other: Double?): Double? {
+    return if (this == null) {
+        null
+    } else {
+        this + other
+    }
+}
+
 data class SectionElectric(
     override val id: String = generateUid(),
     override var acceptedEnergy: Double? = null,
@@ -133,10 +149,16 @@ data class SectionDiesel(
     override val deliveryEnergy: Double? = null,
     var coefficient: Double? = null,
     var acceptedInKilo: Double? = acceptedEnergy * coefficient,
-    var deliveryInKilo: Double? = deliveryEnergy * coefficient
+    var deliveryInKilo: Double? = deliveryEnergy * coefficient,
+    var fuelSupply: Double? = null,
+    var coefficientSupply: Double? = null,
+    var fuelSupplyInKilo: Double? = fuelSupply * coefficientSupply
 ) : Section(id, acceptedEnergy, deliveryEnergy) {
-    override fun getConsumption() = reverseDifferenceBetweenDouble(acceptedEnergy, deliveryEnergy)
-    fun getConsumptionInKilo() = reverseDifferenceBetweenDouble(acceptedInKilo, deliveryInKilo)
+    override fun getConsumption() =
+        reverseDifferenceBetweenDouble(acceptedEnergy, deliveryEnergy).plusNullableValue(fuelSupply)
+
+    fun getConsumptionInKilo() = getConsumption() * coefficient
+//        reverseDifferenceBetweenDouble(acceptedInKilo, deliveryInKilo)
 }
 
 abstract class Section(

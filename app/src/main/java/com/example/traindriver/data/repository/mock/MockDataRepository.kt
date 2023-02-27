@@ -1,8 +1,8 @@
 package com.example.traindriver.data.repository.mock
 
-import com.example.traindriver.domain.repository.DataRepository
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.*
+import com.example.traindriver.domain.repository.DataRepository
 import com.example.traindriver.ui.screen.main_screen.RouteListByMonthResponse
 import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
 import kotlinx.coroutines.channels.awaitClose
@@ -24,8 +24,30 @@ class MockDataRepository : DataRepository {
         ),
         locoList = mutableListOf(
             Locomotive(
+                series = "2тэ116у",
+                number = "338",
+                type = false,
+                sectionList = listOf(
+                    SectionDiesel(
+                        acceptedEnergy = 2000.0,
+                        deliveryEnergy = 3100.0,
+                        coefficient = 0.83,
+                        fuelSupply = 2000.0,
+                        coefficientSupply = 0.85
+                    ),
+                    SectionDiesel(
+                        acceptedEnergy = 3000.0,
+                        deliveryEnergy = 4000.0,
+                        coefficient = 0.83,
+                        fuelSupply = 2000.0,
+                        coefficientSupply = 0.85
+                    ),
+                )
+            ),
+            Locomotive(
                 series = "2эс4к",
                 number = "104",
+                type = true,
                 sectionList = listOf(
                     SectionElectric(
                         acceptedEnergy = 122009.0,
@@ -39,15 +61,28 @@ class MockDataRepository : DataRepository {
 //                        acceptedRecovery = 9043.0,
 //                        deliveryRecovery = 9049.0
                     ),
+                )
+            ),
+            Locomotive(
+                series = "2эс4к",
+                number = "104",
+                type = true,
+                sectionList = listOf(
+                    SectionElectric(
+                        acceptedEnergy = 122009.0,
+                        deliveryEnergy = 122033.0,
+                        acceptedRecovery = 9043.0,
+                        deliveryRecovery = 9049.0
+                    ),
                     SectionElectric(
                         acceptedEnergy = 122009.0,
                         deliveryEnergy = 122034.0,
 //                        acceptedRecovery = 9043.0,
 //                        deliveryRecovery = 9049.0
                     ),
-//                    SectionDiesel(acceptedEnergy = 122009.0, deliveryEnergy = 121893.0, coefficient = 0.83)
                 )
-            )
+            ),
+
         )
     )
     private val two = Route(
@@ -65,7 +100,9 @@ class MockDataRepository : DataRepository {
             Locomotive(series = "ВЛ10", number = "598")
         )
     )
-    private val three = Route(
+
+    private
+    val three = Route(
         number = 4490,
         timeStartWork = 1_675_857_000_000,
         timeEndWork = 1_675_876_200_000,

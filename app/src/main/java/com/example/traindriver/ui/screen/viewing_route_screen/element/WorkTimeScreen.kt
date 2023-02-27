@@ -27,7 +27,7 @@ import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.ui.element_screen.LoadingElement
 import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
-import com.example.traindriver.ui.theme.ColorClicableText
+import com.example.traindriver.ui.theme.ColorClickableText
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
@@ -40,7 +40,7 @@ import com.example.traindriver.ui.util.getHour
 import com.example.traindriver.ui.util.getRemainingMinuteFromHour
 import java.text.SimpleDateFormat
 
-private const val LINK_TO_SETTING = "LINK_TO_SETTING"
+const val LINK_TO_SETTING = "LINK_TO_SETTING"
 
 operator fun Long?.plus(other: Long?): Long? =
     if (this != null && other != null) {
@@ -103,7 +103,7 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
             append(text)
             addStyle(
                 style = SpanStyle(
-                    color = ColorClicableText,
+                    color = ColorClickableText,
                     textDecoration = TextDecoration.Underline
                 ), start = startIndex, end = endIndex
             )

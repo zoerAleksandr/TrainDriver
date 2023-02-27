@@ -3,7 +3,7 @@ package com.example.traindriver.ui.screen.viewing_route_screen.element
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavController
 import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.*
@@ -33,13 +34,13 @@ import kotlin.math.pow
 import kotlin.math.roundToInt
 
 @Composable
-fun LocoScreen(viewModel: ViewingRouteViewModel) {
+fun LocoScreen(viewModel: ViewingRouteViewModel, navController: NavController) {
     when (val routeState = viewModel.routeState) {
         is ResultState.Loading -> {
             LoadingScreen()
         }
         is ResultState.Success -> routeState.data?.let { route ->
-            DataScreen(route)
+            DataScreen(route, navController)
         }
         is ResultState.Failure -> {
             FailureScreen()
@@ -53,10 +54,13 @@ private fun LoadingScreen() {
 }
 
 @Composable
-private fun DataScreen(route: Route) {
+private fun DataScreen(route: Route, navController: NavController) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(route.locoList) { item: Locomotive ->
-            ItemLocomotive(item)
+        itemsIndexed(route.locoList) { index, item ->
+            ItemLocomotive(item, navController)
+            if (index == route.locoList.size - 1) {
+                Spacer(modifier = Modifier.height(60.dp))
+            }
         }
     }
 }
@@ -69,13 +73,12 @@ private fun FailureScreen() {
 }
 
 @Composable
-fun ItemLocomotive(loco: Locomotive) {
+fun ItemLocomotive(loco: Locomotive, navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp, top = 8.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
         backgroundColor = MaterialTheme.colors.background,
-//        border = BorderStroke(0.5.dp, MaterialTheme.colors.secondary),
         shape = ShapeBackground.medium,
         elevation = 6.dp
     ) {
@@ -93,9 +96,21 @@ fun ItemLocomotive(loco: Locomotive) {
                 Row(horizontalArrangement = Arrangement.SpaceAround) {
                     val seriesText = loco.series ?: "xxxx"
                     val numberText = loco.number ?: "000"
-                    Text(text = seriesText, color = setTextColor(loco.series))
-                    Text(text = " - ", color = setTextColor(loco.number))
-                    Text(text = numberText, color = setTextColor(loco.number))
+                    Text(
+                        text = seriesText,
+                        color = setTextColor(loco.series),
+                        style = Typography.subtitle1
+                    )
+                    Text(
+                        text = " - ",
+                        color = setTextColor(loco.number),
+                        style = Typography.subtitle1
+                    )
+                    Text(
+                        text = numberText,
+                        color = setTextColor(loco.number),
+                        style = Typography.subtitle1
+                    )
                 }
             }
             Row(
@@ -184,7 +199,10 @@ fun ItemLocomotive(loco: Locomotive) {
                 loco.sectionList.forEach { item: Section ->
                     ItemSection(section = item)
                 }
-                GeneralResult(modifier = Modifier.padding(top = 8.dp, end = 16.dp), loco = loco)
+                GeneralResult(
+                    modifier = Modifier.padding(top = 8.dp, end = 16.dp, start = 16.dp),
+                    loco = loco
+                )
             }
         }
     }
@@ -225,12 +243,36 @@ fun GeneralResult(modifier: Modifier, loco: Locomotive) {
                 contentAlignment = Alignment.CenterEnd
             ) {
                 if (totalConsumption != 0.0) {
-                    Text(text = "${totalConsumption.str()} / ${totalRecovery.str()}")
+                    Text(
+                        text = "${totalConsumption.str()} / ${totalRecovery.str()}",
+                        style = Typography.body2
+                    )
                 }
             }
         }
         false -> {
+            Box(
+                modifier = modifier.fillMaxWidth(),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                var totalConsumption = 0.0
+                loco.sectionList.forEach { section: Section ->
+                    totalConsumption += section.getConsumption()
+                }
 
+                var totalConsumptionInKilo = 0.0
+                loco.sectionList.forEach { section ->
+                    if (section is SectionDiesel) {
+                        totalConsumptionInKilo += section.getConsumptionInKilo()
+                    }
+                }
+                if (totalConsumption != 0.0) {
+                    Text(
+                        text = "${totalConsumption.str()}л / ${totalConsumptionInKilo.str()}кг",
+                        style = Typography.body2
+                    )
+                }
+            }
         }
     }
 }
@@ -318,34 +360,87 @@ fun ItemSection(section: Section) {
                         Row(
                             modifier = Modifier.wrapContentWidth(),
                         ) {
-                            Text(text = section.acceptedEnergy.toString())
-                            Text(text = " - ")
-                            Text(text = section.deliveryEnergy.toString())
+                            val acceptedText = section.acceptedEnergy?.str() ?: DEFAULT_ENERGY
+                            val deliveryText = section.deliveryEnergy?.str() ?: DEFAULT_ENERGY
+                            Text(
+                                text = acceptedText,
+                                color = setTextColor(section.acceptedEnergy),
+                                style = Typography.body1
+                            )
+                            Text(
+                                text = " - ",
+                                color = setTextColor(section.deliveryEnergy),
+                                style = Typography.body1
+                            )
+                            Text(
+                                text = deliveryText,
+                                color = setTextColor(section.deliveryEnergy),
+                                style = Typography.body1
+                            )
                         }
-                        Text(text = section.getConsumption().toString())
+                        val resultText = "${section.getConsumption()?.str() ?: RESULT_ENERGY} л"
+                        Text(
+                            text = resultText,
+                            color = setTextColor(section.getConsumption()),
+                            style = Typography.body1
+                        )
                     }
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Row(
-                            modifier = Modifier.wrapContentWidth(),
-                        ) {
-                            Text(text = section.acceptedInKilo.toString())
-                            Text(text = " - ")
-                            Text(text = section.deliveryInKilo.toString())
-                        }
-                        val r = section.getConsumptionInKilo()?.let { rounding(it, 2) }
-                        Text(text = r.toString())
-                    }
+                    if (section.acceptedEnergy != null || section.deliveryEnergy != null) {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Row(
+                                    modifier = Modifier.wrapContentWidth(),
+                                ) {
+                                    val acceptedText =
+                                        section.acceptedInKilo?.str() ?: DEFAULT_ENERGY
+                                    val deliveryText =
+                                        section.deliveryInKilo?.str() ?: DEFAULT_ENERGY
+                                    Text(
+                                        text = acceptedText,
+                                        color = setTextColor(section.acceptedInKilo),
+                                        style = Typography.body1
+                                    )
+                                    Text(
+                                        text = " - ",
+                                        color = setTextColor(section.deliveryInKilo),
+                                        style = Typography.body1
+                                    )
+                                    Text(
+                                        text = deliveryText,
+                                        color = setTextColor(section.deliveryInKilo),
+                                        style = Typography.body1
+                                    )
+                                }
+                                val r = section.getConsumptionInKilo()?.let { rounding(it, 2) }
+                                val resultText = "${r?.str() ?: RESULT_ENERGY} кг"
 
-                    section.coefficient?.let { k ->
-                        Box(
+                                Text(
+                                    text = resultText,
+                                    color = setTextColor(section.getConsumptionInKilo()),
+                                    style = Typography.body1
+                                )
+                            }
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                section.coefficient?.let { coefficient ->
+                                    Text(text = "k = $coefficient", style = Typography.body2)
+                                }
+                            }
+                        }
+                    }
+                    section.fuelSupply?.let { fuel ->
+                        Column(
                             modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.CenterStart
+                            horizontalAlignment = Alignment.End
                         ) {
-                            Text(text = "k = $k", color = MaterialTheme.colors.primaryVariant)
+                            Text(text = "Снабжение", style = Typography.body2)
+                            Text(text = "${fuel.str()}л", style = Typography.body2)
                         }
                     }
                 }
