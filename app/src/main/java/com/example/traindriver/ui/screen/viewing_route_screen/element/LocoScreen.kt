@@ -243,7 +243,7 @@ fun GeneralResult(modifier: Modifier, loco: Locomotive) {
                     Text(
                         text = "${totalConsumption.str()} / ${totalRecovery.str()}",
                         style = Typography.body2,
-                        color = MaterialTheme.colors.primaryVariant
+                        color = MaterialTheme.colors.primary
                     )
                 }
             }
@@ -268,7 +268,7 @@ fun GeneralResult(modifier: Modifier, loco: Locomotive) {
                     Text(
                         text = "${totalConsumption.str()}л / ${totalConsumptionInKilo.str()}кг",
                         style = Typography.body2,
-                        color = MaterialTheme.colors.primaryVariant
+                        color = MaterialTheme.colors.primary
                     )
                 }
             }
@@ -479,7 +479,7 @@ fun ItemSection(section: Section, navController: NavController) {
                             Text(
                                 text = "${fuel.str()}л",
                                 style = Typography.body2,
-                                color = MaterialTheme.colors.primaryVariant
+                                color = MaterialTheme.colors.primary
                             )
                         }
                     }
