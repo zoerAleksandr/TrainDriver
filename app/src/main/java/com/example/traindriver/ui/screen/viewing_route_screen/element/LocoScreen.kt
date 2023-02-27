@@ -1,9 +1,11 @@
 package com.example.traindriver.ui.screen.viewing_route_screen.element
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -12,15 +14,24 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.*
 import com.example.traindriver.ui.element_screen.LoadingElement
+import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.viewing_route_screen.ViewingRouteViewModel
+import com.example.traindriver.ui.theme.ColorClickableText
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
@@ -78,7 +89,7 @@ fun ItemLocomotive(loco: Locomotive, navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-        backgroundColor = MaterialTheme.colors.background,
+        backgroundColor = MaterialTheme.colors.surface,
         shape = ShapeBackground.medium,
         elevation = 6.dp
     ) {
@@ -197,7 +208,7 @@ fun ItemLocomotive(loco: Locomotive, navController: NavController) {
                 }
                 .padding(top = 8.dp)) {
                 loco.sectionList.forEach { item: Section ->
-                    ItemSection(section = item)
+                    ItemSection(section = item, navController = navController)
                 }
                 GeneralResult(
                     modifier = Modifier.padding(top = 8.dp, end = 16.dp, start = 16.dp),
@@ -245,7 +256,8 @@ fun GeneralResult(modifier: Modifier, loco: Locomotive) {
                 if (totalConsumption != 0.0) {
                     Text(
                         text = "${totalConsumption.str()} / ${totalRecovery.str()}",
-                        style = Typography.body2
+                        style = Typography.body2,
+                        color = MaterialTheme.colors.primaryVariant
                     )
                 }
             }
@@ -269,7 +281,8 @@ fun GeneralResult(modifier: Modifier, loco: Locomotive) {
                 if (totalConsumption != 0.0) {
                     Text(
                         text = "${totalConsumption.str()}л / ${totalConsumptionInKilo.str()}кг",
-                        style = Typography.body2
+                        style = Typography.body2,
+                        color = MaterialTheme.colors.primaryVariant
                     )
                 }
             }
@@ -278,7 +291,7 @@ fun GeneralResult(modifier: Modifier, loco: Locomotive) {
 }
 
 @Composable
-fun ItemSection(section: Section) {
+fun ItemSection(section: Section, navController: NavController) {
     when (section) {
         is SectionElectric -> {
             Box(
@@ -428,19 +441,60 @@ fun ItemSection(section: Section) {
                                 modifier = Modifier.fillMaxWidth(),
                                 contentAlignment = Alignment.CenterStart
                             ) {
-                                section.coefficient?.let { coefficient ->
-                                    Text(text = "k = $coefficient", style = Typography.body2)
+                                val linkText = buildAnnotatedString {
+                                    val value = section.coefficient?.toString() ?: "0.00"
+                                    val text = "k = $value"
+
+                                    val startIndex = startIndexLastWord(text)
+                                    val endIndex = text.length
+
+                                    append(text)
+                                    addStyle(
+                                        SpanStyle(
+                                            color = ColorClickableText,
+                                            textDecoration = TextDecoration.Underline
+                                        ), start = startIndex, end = endIndex
+                                    )
+
+                                    addStringAnnotation(
+                                        tag = LINK_TO_SETTING,
+                                        annotation = Screen.Setting.route,
+                                        start = startIndex,
+                                        end = endIndex
+                                    )
+                                }
+                                ClickableText(
+                                    text = linkText,
+                                    style = Typography.body2
+                                        .copy(color = setTextColor(section.coefficient))
+                                ) {
+                                    linkText.getStringAnnotations(LINK_TO_SETTING, it, it)
+                                        .firstOrNull()?.let { annotation ->
+                                            navController.navigate(annotation.item)
+                                        }
                                 }
                             }
                         }
                     }
                     section.fuelSupply?.let { fuel ->
-                        Column(
+                        Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.End
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "Снабжение", style = Typography.body2)
-                            Text(text = "${fuel.str()}л", style = Typography.body2)
+                            Image(
+                                modifier = Modifier
+                                    .size(dimensionResource(id = R.dimen.icon_size))
+                                    .padding(end = 8.dp),
+                                painter = painterResource(id = R.drawable.refuel_icon),
+                                contentDescription = null,
+                                colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary)
+                            )
+                            Text(
+                                text = "${fuel.str()}л",
+                                style = Typography.body2,
+                                color = MaterialTheme.colors.primaryVariant
+                            )
                         }
                     }
                 }
@@ -472,7 +526,8 @@ fun setTextColor(any: Any?): Color = if (any == null) {
 private fun ItemSectionPrev() {
     TrainDriverTheme {
         ItemSection(
-            SectionElectric(acceptedEnergy = 133032.0, deliveryEnergy = 113064.3)
+            SectionElectric(acceptedEnergy = 133032.0, deliveryEnergy = 113064.3),
+            rememberNavController()
         )
     }
 }
