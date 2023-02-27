@@ -40,9 +40,10 @@ import com.example.traindriver.ui.util.DateAndTimeFormat.DEFAULT_TIME_TEXT
 import com.example.traindriver.ui.util.DateAndTimeFormat.TIME_FORMAT
 import com.example.traindriver.ui.util.EmptyDataText.DEFAULT_ENERGY
 import com.example.traindriver.ui.util.EmptyDataText.RESULT_ENERGY
+import com.example.traindriver.ui.util.double_util.plus
+import com.example.traindriver.ui.util.double_util.rounding
+import com.example.traindriver.ui.util.double_util.str
 import java.text.SimpleDateFormat
-import kotlin.math.pow
-import kotlin.math.roundToInt
 
 @Composable
 fun LocoScreen(viewModel: ViewingRouteViewModel, navController: NavController) {
@@ -216,21 +217,6 @@ fun ItemLocomotive(loco: Locomotive, navController: NavController) {
                 )
             }
         }
-    }
-}
-
-operator fun Double.plus(other: Double?): Double =
-    if (other != null) {
-        this + other
-    } else {
-        this
-    }
-
-fun Double.str(): String {
-    return if (this % 1.0 == 0.0) {
-        this.toString().dropLast(2)
-    } else {
-        this.toString()
     }
 }
 
@@ -503,8 +489,6 @@ fun ItemSection(section: Section, navController: NavController) {
     }
 }
 
-fun rounding(value: Double, count: Int) = (value * 10.0.pow(count)).roundToInt() / 10.0.pow(count)
-
 @Composable
 @ReadOnlyComposable
 fun setTextColor(any: Any?): Color = if (any == null) {
@@ -512,14 +496,6 @@ fun setTextColor(any: Any?): Color = if (any == null) {
 } else {
     MaterialTheme.colors.primary
 }
-
-//@Composable
-//@DarkLightPreviews
-//private fun LocoScreenPrev() {
-//    TrainDriverTheme {
-//        LocoScreen(viewModel())
-//    }
-//}
 
 @Composable
 @DarkLightPreviews

@@ -1,8 +1,10 @@
 package com.example.traindriver.domain.entity
 
-import com.example.traindriver.ui.screen.viewing_route_screen.element.rounding
 import com.example.traindriver.ui.util.currentTimeInLong
-import java.math.BigDecimal
+import com.example.traindriver.ui.util.double_util.times
+import com.example.traindriver.ui.util.double_util.differenceBetweenDouble
+import com.example.traindriver.ui.util.double_util.plusNullableValue
+import com.example.traindriver.ui.util.double_util.reverseDifferenceBetweenDouble
 import java.util.*
 
 fun generateUid() = UUID.randomUUID().toString()
@@ -52,7 +54,6 @@ data class Station(
     var timeDeparture: Long? = null
 )
 
-
 /**
  * type locomotive when true = electric locomotive, when false = diesel locomotive
  * */
@@ -68,68 +69,6 @@ data class Locomotive(
     var timeStartOfDelivery: Long? = null,
     var timeEndOfDelivery: Long? = null
 )
-
-operator fun Double?.minus(other: Double?): Double? =
-    if (this != null && other != null) {
-        this - other
-    } else {
-        null
-    }
-
-operator fun Double?.times(other: Double?): Double? =
-    if (this != null && other != null) {
-        this * other
-    } else {
-        null
-    }
-
-fun Double.countCharsAfterDecimalPoint(): Int {
-    return BigDecimal.valueOf(this).scale()
-}
-
-fun differenceBetweenDouble(value1: Double?, value2: Double?): Double? {
-    val countAfterPoint1: Int = value1?.countCharsAfterDecimalPoint() ?: 0
-    val countAfterPoint2: Int = value2?.countCharsAfterDecimalPoint() ?: 0
-    val maxCount = if (countAfterPoint1 > countAfterPoint2) {
-        countAfterPoint1
-    } else {
-        countAfterPoint2
-    }
-    val result = value2 - value1
-    return result?.let {
-        rounding(it, maxCount)
-    }
-}
-
-fun reverseDifferenceBetweenDouble(value1: Double?, value2: Double?): Double? {
-    val countAfterPoint1: Int = value1?.countCharsAfterDecimalPoint() ?: 0
-    val countAfterPoint2: Int = value2?.countCharsAfterDecimalPoint() ?: 0
-    val maxCount = if (countAfterPoint1 > countAfterPoint2) {
-        countAfterPoint1
-    } else {
-        countAfterPoint2
-    }
-    val result = value1 - value2
-    return result?.let {
-        rounding(it, maxCount)
-    }
-}
-
-operator fun Double.plus(other: Double?): Double {
-    return if (other == null) {
-        this
-    } else {
-        this + other
-    }
-}
-
-fun Double?.plusNullableValue(other: Double?): Double? {
-    return if (this == null) {
-        null
-    } else {
-        this + other
-    }
-}
 
 data class SectionElectric(
     override val id: String = generateUid(),
@@ -158,7 +97,6 @@ data class SectionDiesel(
         reverseDifferenceBetweenDouble(acceptedEnergy, deliveryEnergy).plusNullableValue(fuelSupply)
 
     fun getConsumptionInKilo() = getConsumption() * coefficient
-//        reverseDifferenceBetweenDouble(acceptedInKilo, deliveryInKilo)
 }
 
 abstract class Section(
