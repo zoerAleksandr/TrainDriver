@@ -156,7 +156,7 @@ private fun TabContent(
             0 -> WorkTimeScreen(navController, viewModel.routeState, viewModel.minTimeRest)
             1 -> LocoScreen(viewModel, navController)
             2 -> TrainScreen(viewModel)
-            3 -> PassengerScreen()
+            3 -> PassengerScreen(viewModel)
         }
     }
 }

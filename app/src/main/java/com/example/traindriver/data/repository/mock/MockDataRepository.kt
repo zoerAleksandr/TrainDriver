@@ -25,13 +25,15 @@ class MockDataRepository : DataRepository {
                 locomotive = Locomotive(number = "141", series = "2эс4к"),
                 stations = mutableListOf(
                     Station(stationName = "Лужская", timeDeparture = 1_675_789_900_000),
-                    Station( timeArrival = 1_675_789_800_000, timeDeparture = 1_675_789_900_000),
-                    Station( timeArrival = 1_675_789_800_000, timeDeparture = 1_675_789_900_000),
-                    Station( timeArrival = 1_675_789_800_000, timeDeparture = 1_675_789_900_000),
-                    Station(stationName = "Екатеринбург-Сортировочный", timeArrival = 1_675_789_800_000)
+                    Station(timeArrival = 1_675_789_800_000, timeDeparture = 1_675_789_900_000),
+                    Station(timeArrival = 1_675_789_800_000, timeDeparture = 1_675_789_900_000),
+                    Station(timeArrival = 1_675_789_800_000, timeDeparture = 1_675_789_900_000),
+                    Station(
+                        stationName = "Екатеринбург-Сортировочный",
+                        timeArrival = 1_675_789_800_000
+                    )
                 )
             ),
-//            Train()
         ),
         locoList = mutableListOf(
             Locomotive(
@@ -88,12 +90,22 @@ class MockDataRepository : DataRepository {
                     SectionElectric(
                         acceptedEnergy = 122009.0,
                         deliveryEnergy = 122034.0,
-//                        acceptedRecovery = 9043.0,
-//                        deliveryRecovery = 9049.0
+                        acceptedRecovery = 9043.0,
+                        deliveryRecovery = 9049.0
                     ),
                 )
             ),
 
+            ),
+        passengerList = mutableListOf(
+            Passenger(
+                trainNumber = "8902",
+                stationArrival = "Веймарн",
+                stationDeparture = "Лужская",
+                timeArrival = 1_675_789_800_000,
+                timeDeparture = 1_675_790_000_000,
+                notes = "Приказ №91 ДЦУП Александров"
+            )
         )
     )
     private val two = Route(
