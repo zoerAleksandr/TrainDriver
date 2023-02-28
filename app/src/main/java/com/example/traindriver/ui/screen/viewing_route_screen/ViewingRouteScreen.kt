@@ -155,7 +155,7 @@ private fun TabContent(
         when (page) {
             0 -> WorkTimeScreen(navController, viewModel.routeState, viewModel.minTimeRest)
             1 -> LocoScreen(viewModel, navController)
-            2 -> TrainScreen()
+            2 -> TrainScreen(viewModel)
             3 -> PassengerScreen()
         }
     }

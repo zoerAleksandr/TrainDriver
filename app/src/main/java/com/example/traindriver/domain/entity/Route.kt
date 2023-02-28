@@ -36,7 +36,9 @@ data class Train(
     var number: String? = null,
     var weight: Int? = null,
     var axle: Int? = null,
-    var conditionalLength: Int? = null
+    var conditionalLength: Int? = null,
+    var locomotive: Locomotive? = null,
+    var stations: MutableList<Station> = mutableListOf()
 )
 
 data class Passenger(

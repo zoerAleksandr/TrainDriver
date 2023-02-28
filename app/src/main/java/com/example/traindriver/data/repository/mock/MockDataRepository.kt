@@ -20,7 +20,18 @@ class MockDataRepository : DataRepository {
             Station(stationName = "СПБСМ")
         ),
         trainList = mutableListOf(
-            Train(number = "2220")
+            Train(
+                number = "2289", weight = 1709, axle = 228, conditionalLength = 57,
+                locomotive = Locomotive(number = "141", series = "2эс4к"),
+                stations = mutableListOf(
+                    Station(stationName = "Лужская", timeDeparture = 1_675_789_900_000),
+                    Station( timeArrival = 1_675_789_800_000, timeDeparture = 1_675_789_900_000),
+                    Station( timeArrival = 1_675_789_800_000, timeDeparture = 1_675_789_900_000),
+                    Station( timeArrival = 1_675_789_800_000, timeDeparture = 1_675_789_900_000),
+                    Station(stationName = "Екатеринбург-Сортировочный", timeArrival = 1_675_789_800_000)
+                )
+            ),
+//            Train()
         ),
         locoList = mutableListOf(
             Locomotive(

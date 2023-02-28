@@ -70,7 +70,7 @@ private fun DataScreen(route: Route, navController: NavController) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         itemsIndexed(route.locoList) { index, item ->
             ItemLocomotive(item, navController)
-            if (index == route.locoList.size - 1) {
+            if (index == route.locoList.lastIndex) {
                 Spacer(modifier = Modifier.height(60.dp))
             }
         }
@@ -321,15 +321,19 @@ fun ItemSection(section: Section, navController: NavController) {
                             modifier = Modifier.wrapContentWidth(),
                         ) {
                             section.acceptedRecovery?.let { value ->
-                                Text(text = value.str(), color = setTextColor(value))
+                                Text(text = value.str(),
+                                    style = Typography.body1.copy(color = setTextColor(value)))
                             }
                             section.deliveryRecovery?.let { value ->
-                                Text(text = " - ", color = setTextColor(value))
-                                Text(text = value.str(), color = setTextColor(value))
+                                Text(text = " - ",
+                                    style = Typography.body1.copy(color = setTextColor(value)))
+                                Text(text = value.str(),
+                                    style = Typography.body1.copy(color = setTextColor(value)))
                             }
                         }
                         section.getRecoveryResult()?.let { value ->
-                            Text(text = value.str(), color = setTextColor(value))
+                            Text(text = value.str(),
+                                style = Typography.body1.copy(color = setTextColor(value)))
                         }
                     }
                 }
