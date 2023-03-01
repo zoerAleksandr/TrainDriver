@@ -32,7 +32,7 @@ import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.domain.entity.Station
 import com.example.traindriver.domain.entity.Train
 import com.example.traindriver.ui.element_screen.LoadingElement
-import com.example.traindriver.ui.screen.viewing_route_screen.ViewingRouteViewModel
+import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.Constants.DURATION_CROSSFADE
@@ -41,9 +41,9 @@ import com.example.traindriver.ui.util.EmptyDataText.DEFAULT_STATION_NAME
 import java.text.SimpleDateFormat
 
 @Composable
-fun TrainScreen(viewModel: ViewingRouteViewModel) {
+fun TrainScreen(response: RouteResponse) {
     Crossfade(
-        targetState = viewModel.routeState,
+        targetState = response,
         animationSpec = tween(durationMillis = DURATION_CROSSFADE)
     ) { state ->
         when (state) {

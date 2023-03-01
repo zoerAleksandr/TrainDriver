@@ -37,7 +37,7 @@ import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.*
 import com.example.traindriver.ui.element_screen.LoadingElement
 import com.example.traindriver.ui.screen.Screen
-import com.example.traindriver.ui.screen.viewing_route_screen.ViewingRouteViewModel
+import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
 import com.example.traindriver.ui.theme.ColorClickableText
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
@@ -54,9 +54,9 @@ import com.example.traindriver.ui.util.double_util.str
 import java.text.SimpleDateFormat
 
 @Composable
-fun LocoScreen(viewModel: ViewingRouteViewModel, navController: NavController) {
+fun LocoScreen(response: RouteResponse, navController: NavController) {
     Crossfade(
-        targetState = viewModel.routeState,
+        targetState = response,
         animationSpec = tween(durationMillis = DURATION_CROSSFADE)
     ) { state ->
         when (state) {

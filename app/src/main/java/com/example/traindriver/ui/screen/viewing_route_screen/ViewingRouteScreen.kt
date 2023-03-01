@@ -1,10 +1,11 @@
 package com.example.traindriver.ui.screen.viewing_route_screen
 
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -14,12 +15,12 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
+import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.ui.element_screen.CustomScrollableTabRow
 import com.example.traindriver.ui.element_screen.TopSnackbar
 import com.example.traindriver.ui.screen.viewing_route_screen.element.*
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
-import com.example.traindriver.ui.util.Constants.DURATION_CROSSFADE
 import com.example.traindriver.ui.util.Constants.ROUTE
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.DateAndTimeFormat.DATE_FORMAT
@@ -49,8 +50,6 @@ fun ViewingRouteScreen(
         }
     }
 
-    val routeState = viewModel.routeState
-
     Scaffold(scaffoldState = scaffoldState, snackbarHost = {
         SnackbarHost(
             hostState = it
@@ -58,19 +57,13 @@ fun ViewingRouteScreen(
             TopSnackbar(snackBarData)
         }
     }) {
-        Crossfade(
-            targetState = routeState,
-            animationSpec = tween(durationMillis = DURATION_CROSSFADE)
-        ) { state ->
-            TabScreen(state, navController, scaffoldState.snackbarHostState, viewModel)
-        }
+        TabScreen(navController, scaffoldState.snackbarHostState, viewModel)
     }
 }
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun TabScreen(
-    routeState: RouteResponse,
     navController: NavController,
     snackbarHostState: SnackbarHostState,
     viewModel: ViewingRouteViewModel
@@ -85,42 +78,40 @@ fun TabScreen(
             .fillMaxSize()
             .padding(top = 38.dp)
     ) {
-        Header(routeState = routeState, snackbarHostState = snackbarHostState)
+        Header(response = viewModel.routeState, snackbarHostState = snackbarHostState)
         Tabs(pagerState)
         TabContent(pagerState, navController, viewModel)
     }
 }
 
 @Composable
-private fun Header(routeState: RouteResponse, snackbarHostState: SnackbarHostState) {
+private fun Header(response: RouteResponse, snackbarHostState: SnackbarHostState) {
+    val currentRoute = remember {
+        mutableStateOf(Route())
+    }
+    DataHeader(route = currentRoute.value)
     val scope = rememberCoroutineScope()
-
-    var dateStartWork by remember {
-        mutableStateOf<Long?>(null)
-    }
-
-    val dateStartWorkText = dateStartWork?.let { millis ->
-        SimpleDateFormat(DATE_FORMAT).format(millis)
-    } ?: ""
-
-    var routeNumber by remember {
-        mutableStateOf<Int?>(null)
-    }
-    val routeNumberText = routeNumber ?: "0000"
-
-    when (routeState) {
-        is ResultState.Loading -> {}
-        is ResultState.Success -> routeState.data?.let { route ->
-            dateStartWork = route.timeStartWork
-            routeNumber = route.number
+    when (response) {
+        is ResultState.Loading -> {
+        }
+        is ResultState.Success -> response.data?.let { route ->
+            currentRoute.value = route
         }
         is ResultState.Failure -> {
             scope.launch {
-                snackbarHostState.showSnackbar(routeState.msg.message.toString())
+                snackbarHostState.showSnackbar(response.msg.message.toString())
             }
         }
     }
+}
 
+@Composable
+private fun DataHeader(route: Route) {
+    val dateStartWorkText = route.timeStartWork?.let { millis ->
+        SimpleDateFormat(DATE_FORMAT).format(millis)
+    } ?: ""
+
+    val routeNumberText = route.number ?: "0000"
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -129,11 +120,11 @@ private fun Header(routeState: RouteResponse, snackbarHostState: SnackbarHostSta
     ) {
         Text(
             text = dateStartWorkText,
-            style = Typography.subtitle1.copy(color = setTextColor(dateStartWork))
+            style = Typography.subtitle1.copy(color = setTextColor(route.timeStartWork))
         )
         Text(
             text = "№ $routeNumberText",
-            style = Typography.subtitle1.copy(color = setTextColor(routeNumber))
+            style = Typography.subtitle1.copy(color = setTextColor(route.number))
         )
     }
 }
@@ -164,9 +155,9 @@ private fun TabContent(
     HorizontalPager(state = pagerState) { page ->
         when (page) {
             0 -> WorkTimeScreen(navController, viewModel.routeState, viewModel.minTimeRest)
-            1 -> LocoScreen(viewModel, navController)
-            2 -> TrainScreen(viewModel)
-            3 -> PassengerScreen(viewModel)
+            1 -> LocoScreen(viewModel.routeState, navController)
+            2 -> TrainScreen(viewModel.routeState)
+            3 -> PassengerScreen(viewModel.routeState)
         }
     }
 }
