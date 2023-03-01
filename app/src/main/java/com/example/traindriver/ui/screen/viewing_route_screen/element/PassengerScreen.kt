@@ -1,6 +1,7 @@
 package com.example.traindriver.ui.screen.viewing_route_screen.element
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -28,21 +29,27 @@ import com.example.traindriver.ui.element_screen.LoadingElement
 import com.example.traindriver.ui.screen.viewing_route_screen.ViewingRouteViewModel
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.Typography
+import com.example.traindriver.ui.util.Constants.DURATION_CROSSFADE
 import com.example.traindriver.ui.util.DateAndTimeFormat
 import com.example.traindriver.ui.util.EmptyDataText.DEFAULT_STATION_NAME
 import java.text.SimpleDateFormat
 
 @Composable
 fun PassengerScreen(viewModel: ViewingRouteViewModel) {
-    when (val routeState = viewModel.routeState) {
-        is ResultState.Loading -> {
-            LoadingScreen()
-        }
-        is ResultState.Success -> routeState.data?.let { route ->
-            DataScreen(route)
-        }
-        is ResultState.Failure -> {
-            FailureScreen()
+    Crossfade(
+        targetState = viewModel.routeState,
+        animationSpec = tween(durationMillis = DURATION_CROSSFADE)
+    ) { state ->
+        when (state) {
+            is ResultState.Loading -> {
+                LoadingScreen()
+            }
+            is ResultState.Success -> state.data?.let { route ->
+                DataScreen(route)
+            }
+            is ResultState.Failure -> {
+                FailureScreen()
+            }
         }
     }
 }
@@ -64,9 +71,7 @@ private fun DataScreen(route: Route) {
             enter = fadeIn(animationSpec = tween(durationMillis = 300)),
             exit = fadeOut(animationSpec = tween(durationMillis = 300))
         ) {
-            BottomShadow(
-                modifier = Modifier.constrainAs(shadow) { top.linkTo(parent.top) }
-            )
+            BottomShadow(modifier = Modifier.constrainAs(shadow) { top.linkTo(parent.top) })
         }
 
         LazyColumn(
@@ -74,8 +79,7 @@ private fun DataScreen(route: Route) {
                 .fillMaxSize()
                 .constrainAs(data) {
                     top.linkTo(parent.top)
-                },
-            state = scrollState
+                }, state = scrollState
         ) {
             itemsIndexed(route.passengerList) { index, item ->
                 PassengerItem(item)
@@ -126,66 +130,48 @@ fun PassengerItem(passenger: Passenger) {
                 style = Typography.subtitle1.copy(color = setTextColor(passenger.trainNumber))
             )
 
-            Text(
-                modifier = Modifier
-                    .constrainAs(stArrival) {
-                        top.linkTo(trainNumber.bottom)
-                    }
-                    .padding(top = 8.dp),
-                text = stArrivalText,
-                style = Typography.body1.copy(
-                    color = setTextColor(passenger.stationArrival)
-                )
-            )
+            Text(modifier = Modifier
+                .constrainAs(stArrival) {
+                    top.linkTo(trainNumber.bottom)
+                }
+                .padding(top = 8.dp), text = stArrivalText, style = Typography.body1.copy(
+                color = setTextColor(passenger.stationArrival)
+            ))
 
-            Text(
-                modifier = Modifier
-                    .constrainAs(stDeparture) {
-                        top.linkTo(trainNumber.bottom)
-                    }
-                    .padding(top = 8.dp),
-                text = stDepartureText,
-                style = Typography.body1.copy(
-                    color = setTextColor(passenger.stationDeparture)
-                )
-            )
+            Text(modifier = Modifier
+                .constrainAs(stDeparture) {
+                    top.linkTo(trainNumber.bottom)
+                }
+                .padding(top = 8.dp), text = stDepartureText, style = Typography.body1.copy(
+                color = setTextColor(passenger.stationDeparture)
+            ))
 
-            Text(
-                modifier = Modifier
-                    .constrainAs(timeArrival) {
-                        top.linkTo(stArrival.bottom)
-                    }
-                    .padding(top = 8.dp),
-                text = timeArrivalText,
-                style = Typography.body1.copy(
-                    color = setTextColor(passenger.timeArrival)
-                )
-            )
+            Text(modifier = Modifier
+                .constrainAs(timeArrival) {
+                    top.linkTo(stArrival.bottom)
+                }
+                .padding(top = 8.dp), text = timeArrivalText, style = Typography.body1.copy(
+                color = setTextColor(passenger.timeArrival)
+            ))
 
-            Text(
-                modifier = Modifier
-                    .constrainAs(timeDeparture) {
-                        top.linkTo(stDeparture.bottom)
-                    }
-                    .padding(top = 8.dp),
-                text = timeDepartureText,
-                style = Typography.body1.copy(
-                    color = setTextColor(passenger.timeDeparture)
-                )
-            )
+            Text(modifier = Modifier
+                .constrainAs(timeDeparture) {
+                    top.linkTo(stDeparture.bottom)
+                }
+                .padding(top = 8.dp), text = timeDepartureText, style = Typography.body1.copy(
+                color = setTextColor(passenger.timeDeparture)
+            ))
 
             passenger.notes?.let { text ->
-                Text(
-                    modifier = Modifier
-                        .constrainAs(notes) {
-                            start.linkTo(parent.start)
-                            top.linkTo(timeArrival.bottom)
-                        }
-                        .padding(top = 8.dp),
+                Text(modifier = Modifier
+                    .constrainAs(notes) {
+                        start.linkTo(parent.start)
+                        top.linkTo(timeArrival.bottom)
+                    }
+                    .padding(top = 8.dp),
                     text = text,
                     textAlign = TextAlign.Start,
-                    style = Typography.body2.copy(color = MaterialTheme.colors.primary)
-                )
+                    style = Typography.body2.copy(color = MaterialTheme.colors.primary))
             }
         }
     }

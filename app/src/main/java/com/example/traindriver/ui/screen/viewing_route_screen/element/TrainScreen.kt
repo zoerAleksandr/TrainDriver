@@ -1,6 +1,7 @@
 package com.example.traindriver.ui.screen.viewing_route_screen.element
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -34,21 +35,27 @@ import com.example.traindriver.ui.element_screen.LoadingElement
 import com.example.traindriver.ui.screen.viewing_route_screen.ViewingRouteViewModel
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.Typography
+import com.example.traindriver.ui.util.Constants.DURATION_CROSSFADE
 import com.example.traindriver.ui.util.DateAndTimeFormat
 import com.example.traindriver.ui.util.EmptyDataText.DEFAULT_STATION_NAME
 import java.text.SimpleDateFormat
 
 @Composable
 fun TrainScreen(viewModel: ViewingRouteViewModel) {
-    when (val routeState = viewModel.routeState) {
-        is ResultState.Loading -> {
-            LoadingScreen()
-        }
-        is ResultState.Success -> routeState.data?.let { route ->
-            DataScreen(route)
-        }
-        is ResultState.Failure -> {
-            FailureScreen()
+    Crossfade(
+        targetState = viewModel.routeState,
+        animationSpec = tween(durationMillis = DURATION_CROSSFADE)
+    ) { state ->
+        when (state) {
+            is ResultState.Loading -> {
+                LoadingScreen()
+            }
+            is ResultState.Success -> state.data?.let { route ->
+                DataScreen(route)
+            }
+            is ResultState.Failure -> {
+                FailureScreen()
+            }
         }
     }
 }

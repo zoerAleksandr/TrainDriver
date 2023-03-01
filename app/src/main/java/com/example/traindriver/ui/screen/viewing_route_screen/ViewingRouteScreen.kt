@@ -1,5 +1,7 @@
 package com.example.traindriver.ui.screen.viewing_route_screen
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -17,6 +19,7 @@ import com.example.traindriver.ui.element_screen.TopSnackbar
 import com.example.traindriver.ui.screen.viewing_route_screen.element.*
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
+import com.example.traindriver.ui.util.Constants.DURATION_CROSSFADE
 import com.example.traindriver.ui.util.Constants.ROUTE
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.DateAndTimeFormat.DATE_FORMAT
@@ -55,7 +58,12 @@ fun ViewingRouteScreen(
             TopSnackbar(snackBarData)
         }
     }) {
-        TabScreen(routeState, navController, scaffoldState.snackbarHostState, viewModel)
+        Crossfade(
+            targetState = routeState,
+            animationSpec = tween(durationMillis = DURATION_CROSSFADE)
+        ) { state ->
+            TabScreen(state, navController, scaffoldState.snackbarHostState, viewModel)
+        }
     }
 }
 

@@ -1,7 +1,10 @@
 package com.example.traindriver.ui.screen.viewing_route_screen.element
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -39,6 +42,7 @@ import com.example.traindriver.ui.theme.ColorClickableText
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
+import com.example.traindriver.ui.util.Constants.DURATION_CROSSFADE
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.DateAndTimeFormat.DEFAULT_TIME_TEXT
 import com.example.traindriver.ui.util.DateAndTimeFormat.TIME_FORMAT
@@ -51,15 +55,20 @@ import java.text.SimpleDateFormat
 
 @Composable
 fun LocoScreen(viewModel: ViewingRouteViewModel, navController: NavController) {
-    when (val routeState = viewModel.routeState) {
-        is ResultState.Loading -> {
-            LoadingScreen()
-        }
-        is ResultState.Success -> routeState.data?.let { route ->
-            DataScreen(route, navController)
-        }
-        is ResultState.Failure -> {
-            FailureScreen()
+    Crossfade(
+        targetState = viewModel.routeState,
+        animationSpec = tween(durationMillis = DURATION_CROSSFADE)
+    ) { state ->
+        when (state) {
+            is ResultState.Loading -> {
+                LoadingScreen()
+            }
+            is ResultState.Success -> state.data?.let { route ->
+                DataScreen(route, navController)
+            }
+            is ResultState.Failure -> {
+                FailureScreen()
+            }
         }
     }
 }

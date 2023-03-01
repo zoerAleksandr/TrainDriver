@@ -1,5 +1,7 @@
 package com.example.traindriver.ui.screen.viewing_route_screen.element
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +33,7 @@ import com.example.traindriver.ui.theme.ColorClickableText
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
+import com.example.traindriver.ui.util.Constants.DURATION_CROSSFADE
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.DateAndTimeFormat.DATE_FORMAT
 import com.example.traindriver.ui.util.DateAndTimeFormat.DEFAULT_DATE_TEXT
@@ -51,15 +54,20 @@ operator fun Long?.plus(other: Long?): Long? =
 
 @Composable
 fun WorkTimeScreen(navController: NavController, routeResponse: RouteResponse, minTimeRest: Long) {
-    when (routeResponse) {
-        is ResultState.Loading -> {
-            LoadingScreen()
-        }
-        is ResultState.Success -> routeResponse.data?.let { route ->
-            DataScreen(route, navController, minTimeRest)
-        }
-        is ResultState.Failure -> {
-            FailureScreen()
+    Crossfade(
+        targetState = routeResponse,
+        animationSpec = tween(durationMillis = DURATION_CROSSFADE)
+    ) { state ->
+        when (state) {
+            is ResultState.Loading -> {
+                LoadingScreen()
+            }
+            is ResultState.Success -> state.data?.let { route ->
+                DataScreen(route, navController, minTimeRest)
+            }
+            is ResultState.Failure -> {
+                FailureScreen()
+            }
         }
     }
 }
