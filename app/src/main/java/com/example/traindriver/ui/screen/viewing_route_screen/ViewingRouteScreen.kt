@@ -14,10 +14,7 @@ import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.ui.element_screen.CustomScrollableTabRow
 import com.example.traindriver.ui.element_screen.TopSnackbar
-import com.example.traindriver.ui.screen.viewing_route_screen.element.LocoScreen
-import com.example.traindriver.ui.screen.viewing_route_screen.element.PassengerScreen
-import com.example.traindriver.ui.screen.viewing_route_screen.element.TrainScreen
-import com.example.traindriver.ui.screen.viewing_route_screen.element.WorkTimeScreen
+import com.example.traindriver.ui.screen.viewing_route_screen.element.*
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.Constants.ROUTE
@@ -122,11 +119,16 @@ private fun Header(routeState: RouteResponse, snackbarHostState: SnackbarHostSta
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = dateStartWorkText, style = Typography.body1)
-        Text(text = "№ $routeNumberText", style = Typography.body1)
+        Text(
+            text = dateStartWorkText,
+            style = Typography.subtitle1.copy(color = setTextColor(dateStartWork))
+        )
+        Text(
+            text = "№ $routeNumberText",
+            style = Typography.subtitle1.copy(color = setTextColor(routeNumber))
+        )
     }
 }
-
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable

@@ -1,10 +1,13 @@
 package com.example.traindriver.ui.screen.viewing_route_screen.element
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -22,6 +25,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -67,11 +71,37 @@ private fun LoadingScreen() {
 
 @Composable
 private fun DataScreen(route: Route, navController: NavController) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        itemsIndexed(route.locoList) { index, item ->
-            ItemLocomotive(item, navController)
-            if (index == route.locoList.lastIndex) {
-                Spacer(modifier = Modifier.height(60.dp))
+    val scrollState = rememberLazyListState()
+    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+        val (shadow, data) = createRefs()
+
+        AnimatedVisibility(
+            modifier = Modifier.zIndex(1f),
+            visible = !scrollState.isScrollInInitialState(),
+            enter = fadeIn(animationSpec = tween(durationMillis = 300)),
+            exit = fadeOut(animationSpec = tween(durationMillis = 300))
+        ) {
+            BottomShadow(
+                modifier = Modifier
+                    .constrainAs(shadow) {
+                        top.linkTo(parent.top)
+                    },
+            )
+        }
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .constrainAs(data) {
+                    top.linkTo(parent.top)
+                },
+            state = scrollState
+        ) {
+            itemsIndexed(route.locoList) { index, item ->
+                ItemLocomotive(item, navController)
+                if (index == route.locoList.lastIndex) {
+                    Spacer(modifier = Modifier.height(60.dp))
+                }
             }
         }
     }
@@ -321,19 +351,27 @@ fun ItemSection(section: Section, navController: NavController) {
                             modifier = Modifier.wrapContentWidth(),
                         ) {
                             section.acceptedRecovery?.let { value ->
-                                Text(text = value.str(),
-                                    style = Typography.body1.copy(color = setTextColor(value)))
+                                Text(
+                                    text = value.str(),
+                                    style = Typography.body1.copy(color = setTextColor(value))
+                                )
                             }
                             section.deliveryRecovery?.let { value ->
-                                Text(text = " - ",
-                                    style = Typography.body1.copy(color = setTextColor(value)))
-                                Text(text = value.str(),
-                                    style = Typography.body1.copy(color = setTextColor(value)))
+                                Text(
+                                    text = " - ",
+                                    style = Typography.body1.copy(color = setTextColor(value))
+                                )
+                                Text(
+                                    text = value.str(),
+                                    style = Typography.body1.copy(color = setTextColor(value))
+                                )
                             }
                         }
                         section.getRecoveryResult()?.let { value ->
-                            Text(text = value.str(),
-                                style = Typography.body1.copy(color = setTextColor(value)))
+                            Text(
+                                text = value.str(),
+                                style = Typography.body1.copy(color = setTextColor(value))
+                            )
                         }
                     }
                 }

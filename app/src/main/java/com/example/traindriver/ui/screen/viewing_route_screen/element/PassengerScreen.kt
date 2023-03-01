@@ -1,8 +1,13 @@
 package com.example.traindriver.ui.screen.viewing_route_screen.element
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -12,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.traindriver.R
@@ -48,11 +54,34 @@ private fun LoadingScreen() {
 
 @Composable
 private fun DataScreen(route: Route) {
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        itemsIndexed(route.passengerList) { index, item ->
-            PassengerItem(item)
-            if (index == route.passengerList.lastIndex) {
-                Spacer(modifier = Modifier.height(60.dp))
+    val scrollState = rememberLazyListState()
+    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+        val (shadow, data) = createRefs()
+
+        AnimatedVisibility(
+            modifier = Modifier.zIndex(1f),
+            visible = !scrollState.isScrollInInitialState(),
+            enter = fadeIn(animationSpec = tween(durationMillis = 300)),
+            exit = fadeOut(animationSpec = tween(durationMillis = 300))
+        ) {
+            BottomShadow(
+                modifier = Modifier.constrainAs(shadow) { top.linkTo(parent.top) }
+            )
+        }
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .constrainAs(data) {
+                    top.linkTo(parent.top)
+                },
+            state = scrollState
+        ) {
+            itemsIndexed(route.passengerList) { index, item ->
+                PassengerItem(item)
+                if (index == route.passengerList.lastIndex) {
+                    Spacer(modifier = Modifier.height(60.dp))
+                }
             }
         }
     }
