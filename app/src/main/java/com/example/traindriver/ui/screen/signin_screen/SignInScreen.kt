@@ -27,7 +27,7 @@ import com.example.traindriver.ui.element_screen.HandleBottomSheet
 import com.example.traindriver.ui.element_screen.NumberPhoneTextField
 import com.example.traindriver.ui.element_screen.TopSnackbar
 import com.example.traindriver.ui.element_screen.getAllLocaleExcept
-import com.example.traindriver.ui.screen.ScreenEnum
+import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.signin_screen.components.CreateUserWithPhone
 import com.example.traindriver.ui.screen.signin_screen.components.OneTapSignIn
 import com.example.traindriver.ui.screen.signin_screen.components.SignInWithGoogle
@@ -258,8 +258,8 @@ fun SignInScreen(
 
 private fun navigateToMainScreen(navController: NavController) {
     navController.apply {
-        this.popBackStack(ScreenEnum.SIGN_IN.name, true)
-        this.navigate(ScreenEnum.MAIN.name)
+        this.popBackStack(Screen.SignIn.route, true)
+        this.navigate(Screen.Home.route)
     }
 }
 

@@ -1,6 +1,11 @@
 package com.example.traindriver.ui.util
 
-object Constants {
+import android.content.res.Resources
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+
+object Constants: KoinComponent {
+    private val res: Resources by inject()
     const val USERS = "users"
 
     const val DISPLAY_NAME = "displayName"
@@ -14,4 +19,8 @@ object Constants {
     const val ANONYMOUS_SIGN_IN_WORKER = "anonymousSignIn"
 
     const val NETWORK_CONNECTED = "networkConnected"
+
+    const val ROUTE = "route"
+
+    const val DURATION_CROSSFADE = 500
 }

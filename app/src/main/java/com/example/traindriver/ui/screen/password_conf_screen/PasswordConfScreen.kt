@@ -40,7 +40,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.ui.element_screen.TopSnackbar
-import com.example.traindriver.ui.screen.ScreenEnum
+import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.signin_screen.ResendSmsCodeResponse
 import com.example.traindriver.ui.screen.signin_screen.SignInViewModel
 import com.example.traindriver.ui.screen.signin_screen.WithPhoneResponse
@@ -102,8 +102,8 @@ fun PasswordConfScreen(
                                 }
                                 is ResultState.Success -> {
                                     navController.apply {
-                                        this.popBackStack(ScreenEnum.SIGN_IN.name, true)
-                                        this.navigate(ScreenEnum.MAIN.name)
+                                        this.popBackStack(Screen.SignIn.route, true)
+                                        this.navigate(Screen.Home.route)
                                     }
                                 }
                                 is ResultState.Failure -> {
@@ -139,8 +139,8 @@ fun PasswordConfScreen(
                     ),
                     onClick = {
                         navController.apply {
-                            popBackStack(ScreenEnum.PASSWORD_CONFIRMATION.name, true)
-                            navigate(ScreenEnum.SIGN_IN.name)
+                            popBackStack(Screen.PasswordConfirmation.route, true)
+                            navigate(Screen.SignIn.route)
                         }
                     }
                 ) {
@@ -158,7 +158,7 @@ fun PasswordConfScreen(
                         top.linkTo(topGuideLine)
                     },
                     style = Typography.h3,
-                    color = MaterialTheme.colors.onBackground,
+                    color = MaterialTheme.colors.primary,
                     text = stringResource(id = R.string.title_passwordConfScreen)
                 )
                 Row(
@@ -218,7 +218,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -267,7 +267,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -316,7 +316,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -365,7 +365,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -414,7 +414,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -446,7 +446,7 @@ fun PasswordConfScreen(
                                         v6.value = it
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.onBackground),
+                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -492,11 +492,15 @@ fun PasswordConfScreen(
                         } else {
                             stringResource(id = R.string.resent_text_passwordConfScreen, countdown)
                         },
-                        style = Typography.body1,
+                        style = if (resentTextEnable) {
+                            Typography.body1
+                        } else {
+                            Typography.body2
+                        },
                         color = if (resentTextEnable) {
                             ClicableTextColor
                         } else {
-                            MaterialTheme.colors.onBackground
+                            MaterialTheme.colors.primary
                         },
                         textAlign = TextAlign.Center
                     )

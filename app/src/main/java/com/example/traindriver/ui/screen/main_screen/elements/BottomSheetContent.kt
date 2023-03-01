@@ -1,6 +1,5 @@
 package com.example.traindriver.ui.screen.main_screen.elements
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,17 +13,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
-import com.example.traindriver.domain.entity.Itinerary
+import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.ui.element_screen.HandleBottomSheet
+import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.util.SnackbarMessage.DATA_LOADING_ERROR
 import kotlinx.coroutines.launch
-import com.example.traindriver.R
 
 @Composable
 fun BottomSheetContent(
-    listRoute: ResultState<List<Itinerary>>,
-    snackbarHostState: SnackbarHostState
+    listRoute: ResultState<List<Route>>,
+    snackbarHostState: SnackbarHostState,
+    navController: NavController
 ) {
     val scope = rememberCoroutineScope()
     Column(
@@ -55,9 +57,9 @@ fun BottomSheetContent(
                         }
                     } else {
                         items(list) { route ->
-                            ItemMainScreen(itinerary = route) {
-                                // TODO
-                                Log.d("ZZZ", "uid = ${route.id}")
+                            ItemMainScreen(route = route) {
+                                navController
+                                    .navigate(Screen.ViewingRoute.passId(route.id))
                             }
                         }
                     }

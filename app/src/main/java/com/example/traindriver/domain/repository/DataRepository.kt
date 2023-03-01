@@ -1,7 +1,7 @@
-package com.example.traindriver.data.repository
+package com.example.traindriver.domain.repository
 
 import com.example.traindriver.ui.screen.main_screen.RouteListByMonthResponse
-import com.example.traindriver.ui.screen.main_screen.RouteResponse
+import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
 import kotlinx.coroutines.flow.Flow
 
 interface DataRepository {

@@ -41,7 +41,11 @@ fun MainScreen(
         sheetPeekHeight = 260.dp,
         sheetShape = ShapeSurface.medium,
         sheetContent = {
-            BottomSheetContent(mainViewModel.listRoute, scaffoldState.snackbarHostState)
+            BottomSheetContent(
+                mainViewModel.listRoute,
+                scaffoldState.snackbarHostState,
+                navController
+            )
         }) {
         Scaffold(backgroundColor = MaterialTheme.colors.background,
             scaffoldState = scaffoldState,

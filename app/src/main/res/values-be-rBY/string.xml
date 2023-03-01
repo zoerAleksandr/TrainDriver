@@ -33,6 +33,20 @@
     <string name="december">СНЕ</string>
     <string name="empty_route_list">Няма маршрутаў</string>
 
+    // Viewing Route Screen
+    <string name="work_time">Час</string>
+    <string name="locomotive">Лакаматыў</string>
+    <string name="train">Цягнік</string>
+    <string name="passenger">Пасажыр</string>
+    <string name="route_opening_error">Памылка адкрыцця маршруту</string>
+    <string name="info_text_min_time_rest">
+        Час мінімальнага адпачынку складае %1$s гадзіны.
+        Змяніць гэта ў наладах.</string>
+    <string name="min_time_rest_text">Мінімальны адпачынак да %1$s</string>
+    <string name="complete_time_rest_text">Поўны адпачынак да %1$s</string>
+    <string name="abbreviated_hour">г</string>
+    <string name="abbreviated_minute">мін</string>
+
     // Сообщения ошибок
     <string name="invalid_code">Няправільны код</string>
     <string name="empty_number">"Увядзіце нумар тэлефона"</string>

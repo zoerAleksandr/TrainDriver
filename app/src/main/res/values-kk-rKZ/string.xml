@@ -33,6 +33,20 @@
     <string name="december">ЖЕЛ</string>
     <string name="empty_route_list">Маршруттар жоқ</string>
 
+    // Viewing Route Screen
+    <string name="work_time">Уақыт</string>
+    <string name="locomotive">Локомотив</string>
+    <string name="train">Пойыз</string>
+    <string name="passenger">Жолаушы</string>
+    <string name="route_opening_error">Маршрутты ашу қатесі</string>
+    <string name="info_text_min_time_rest">
+        Ең аз демалу уақыты-%1$s сағат.
+        Бұл уақытты параметрлерде өзгертуге болады.</string>
+    <string name="min_time_rest_text">%1$s-ге дейін ең аз демалыс</string>
+    <string name="complete_time_rest_text">%1$s-ге дейін толық демалыс</string>
+    <string name="abbreviated_hour">с</string>
+    <string name="abbreviated_minute">мин</string>
+
     // Сообщения ошибок
     <string name="invalid_code">Қате код</string>
     <string name="empty_number">"Телефон нөмірін енгізіңіз"</string>

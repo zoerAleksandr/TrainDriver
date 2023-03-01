@@ -7,7 +7,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
 import com.example.traindriver.data.util.ResultState
-import com.example.traindriver.ui.screen.ScreenEnum
+import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.signin_screen.CreateUserWithPhoneResponse
 import com.example.traindriver.ui.screen.signin_screen.WithPhoneResponse
 import com.example.traindriver.ui.util.SnackbarMessage
@@ -34,10 +34,10 @@ fun CreateUserWithPhone(
             LaunchedEffect(result) {
                 when (result) {
                     is WithPhoneResponse.SmsSend -> {
-                        navController.navigate(ScreenEnum.PASSWORD_CONFIRMATION.name)
+                        navController.navigate(Screen.PasswordConfirmation.route)
                     }
                     is WithPhoneResponse.AutoSignIn -> {
-                        navController.navigate(ScreenEnum.MAIN.name)
+                        navController.navigate(Screen.Home.route)
                     }
                 }
             }

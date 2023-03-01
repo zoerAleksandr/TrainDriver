@@ -99,12 +99,7 @@ fun NumberPhoneTextField(
                 isFilledCallback?.isFilled(it.length >= localeUser.value.maxLength())
             },
             visualTransformation = localeUser.value.transformedNumber,
-            textStyle = TextStyle(
-                color = MaterialTheme.colors.primary,
-                fontSize = 18.sp,
-                fontFamily = overpassFontFamily,
-                fontWeight = FontWeight.Light
-            ),
+            textStyle = Typography.body2.copy(color = MaterialTheme.colors.primary),
             cursorBrush = SolidColor(MaterialTheme.colors.onSurface),
             decorationBox = { innerTextField ->
                 Box(

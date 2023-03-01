@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traindriver.PreferencesApp
 import com.example.traindriver.data.repository.DataStoreRepository
-import com.example.traindriver.ui.screen.ScreenEnum
+import com.example.traindriver.ui.screen.Screen
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -20,7 +20,7 @@ class SplashViewModel : ViewModel(), KoinComponent {
     private val _isLoading: MutableState<Boolean> = mutableStateOf(true)
     val isLoading: State<Boolean> = _isLoading
 
-    private val _startDestination: MutableState<String> = mutableStateOf(ScreenEnum.SIGN_IN.name)
+    private val _startDestination: MutableState<String> = mutableStateOf(Screen.SignIn.route)
     val startDestination: State<String> = _startDestination
 
     init {
@@ -43,10 +43,10 @@ class SplashViewModel : ViewModel(), KoinComponent {
     private suspend fun getRegisteredState(): Boolean {
         val isRegistered = repository.readIsRegisteredState()
         return if (isRegistered) {
-            _startDestination.value = ScreenEnum.MAIN.name
+            _startDestination.value = Screen.Home.route
             true
         } else {
-            _startDestination.value = ScreenEnum.SIGN_IN.name
+            _startDestination.value = Screen.SignIn.route
             false
         }
     }
