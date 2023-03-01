@@ -120,11 +120,11 @@ private fun DataHeader(route: Route) {
     ) {
         Text(
             text = dateStartWorkText,
-            style = Typography.subtitle1.copy(color = setTextColor(route.timeStartWork))
+            style = Typography.subtitle2.copy(color = setTextColor(route.timeStartWork))
         )
         Text(
             text = "№ $routeNumberText",
-            style = Typography.subtitle1.copy(color = setTextColor(route.number))
+            style = Typography.subtitle2.copy(color = setTextColor(route.number))
         )
     }
 }

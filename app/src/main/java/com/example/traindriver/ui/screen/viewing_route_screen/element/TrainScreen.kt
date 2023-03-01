@@ -131,7 +131,7 @@ fun TrainItem(train: Train) {
                     top.linkTo(parent.top)
                 },
                 text = "№" + " ${train.number ?: "0000"}",
-                style = Typography.subtitle1.copy(color = setTextColor(any = train.number))
+                style = Typography.subtitle2.copy(color = setTextColor(any = train.number))
             )
             Text(
                 modifier = Modifier.constrainAs(loco) {
@@ -139,7 +139,7 @@ fun TrainItem(train: Train) {
                     top.linkTo(parent.top)
                 },
                 text = "${train.locomotive?.series ?: ""} - ${train.locomotive?.number ?: ""}",
-                style = Typography.subtitle1.copy(color = setTextColor(any = train.number))
+                style = Typography.subtitle2.copy(color = setTextColor(any = train.number))
             )
             Column(modifier = Modifier
                 .constrainAs(weight) {

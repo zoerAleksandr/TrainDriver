@@ -127,7 +127,7 @@ fun PassengerItem(passenger: Passenger) {
                     start.linkTo(parent.start)
                 },
                 text = trainNumberText,
-                style = Typography.subtitle1.copy(color = setTextColor(passenger.trainNumber))
+                style = Typography.subtitle2.copy(color = setTextColor(passenger.trainNumber))
             )
 
             Text(modifier = Modifier

@@ -150,17 +150,17 @@ fun ItemLocomotive(loco: Locomotive, navController: NavController) {
                     Text(
                         text = seriesText,
                         color = setTextColor(loco.series),
-                        style = Typography.subtitle1
+                        style = Typography.subtitle2
                     )
                     Text(
                         text = " - ",
                         color = setTextColor(loco.number),
-                        style = Typography.subtitle1
+                        style = Typography.subtitle2
                     )
                     Text(
                         text = numberText,
                         color = setTextColor(loco.number),
-                        style = Typography.subtitle1
+                        style = Typography.subtitle2
                     )
                 }
             }
