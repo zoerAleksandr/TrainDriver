@@ -30,15 +30,15 @@ val Typography = Typography(
     ),
     subtitle1 = TextStyle(
         fontWeight = FontWeight.Medium,
-        fontSize = 20.sp,
+        fontSize = 22.sp,
     ),
     subtitle2 = TextStyle(
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.SemiBold,
         fontSize = 20.sp,
     ),
     body1 = TextStyle(
-        fontWeight = FontWeight.Bold,
-        fontSize = 16.sp
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp
     ),
     body2 = TextStyle(
         fontSize = 16.sp,

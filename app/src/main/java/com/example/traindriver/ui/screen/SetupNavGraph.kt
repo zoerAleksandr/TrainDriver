@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.traindriver.ui.screen.adding_screen.AddingScreen
 import com.example.traindriver.ui.screen.main_screen.MainScreen
 import com.example.traindriver.ui.screen.password_conf_screen.PasswordConfScreen
 import com.example.traindriver.ui.screen.setting_screen.SettingScreen
@@ -49,6 +50,9 @@ fun SetupNavGraph(
         }
         composable(Screen.Setting.route) {
             SettingScreen()
+        }
+        composable(Screen.Adding.route){
+            AddingScreen(navController)
         }
     }
 }
