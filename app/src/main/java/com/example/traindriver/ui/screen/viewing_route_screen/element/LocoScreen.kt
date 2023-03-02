@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -125,136 +124,139 @@ private fun FailureScreen() {
 
 @Composable
 fun ItemLocomotive(loco: Locomotive, navController: NavController) {
-    Card(
+    ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-        backgroundColor = MaterialTheme.colors.surface,
-        shape = ShapeBackground.medium,
-        elevation = 6.dp
+            .padding(16.dp)
     ) {
-        ConstraintLayout(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            val (seriesAndNumber, time, sections) = createRefs()
+        val (seriesAndNumber, time, sections) = createRefs()
 
-            Box(modifier = Modifier.constrainAs(seriesAndNumber) {
+        Box(modifier = Modifier
+            .padding(start = 16.dp)
+            .constrainAs(seriesAndNumber) {
                 top.linkTo(parent.top)
                 start.linkTo(parent.start)
             }) {
-                Row(horizontalArrangement = Arrangement.SpaceAround) {
-                    val seriesText = loco.series ?: "xxxx"
-                    val numberText = loco.number ?: "000"
-                    Text(
-                        text = seriesText,
-                        color = setTextColor(loco.series),
-                        style = Typography.subtitle2
-                    )
-                    Text(
-                        text = " - ",
-                        color = setTextColor(loco.number),
-                        style = Typography.subtitle2
-                    )
-                    Text(
-                        text = numberText,
-                        color = setTextColor(loco.number),
-                        style = Typography.subtitle2
-                    )
-                }
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-                    .constrainAs(time) {
-                        top.linkTo(seriesAndNumber.bottom)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    },
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier.border(
-                        width = 0.5.dp,
-                        color = MaterialTheme.colors.secondary,
-                        shape = ShapeBackground.medium
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ) {
-                        val timeStartAcceptance = loco.timeStartOfAcceptance?.let { millis ->
-                            SimpleDateFormat(TIME_FORMAT).format(millis)
-                        } ?: DEFAULT_TIME_TEXT
-
-                        val timeEndAcceptance = loco.timeEndOfAcceptance?.let { millis ->
-                            SimpleDateFormat(TIME_FORMAT).format(millis)
-                        } ?: DEFAULT_TIME_TEXT
-
-                        Text(
-                            text = timeStartAcceptance,
-                            color = setTextColor(loco.timeStartOfAcceptance)
-                        )
-                        Text(
-                            text = " - ", color = setTextColor(loco.timeEndOfAcceptance)
-                        )
-                        Text(
-                            text = timeEndAcceptance, color = setTextColor(loco.timeEndOfAcceptance)
-                        )
-                    }
-                }
-
-                Box(
-                    modifier = Modifier.border(
-                        width = 0.5.dp,
-                        color = MaterialTheme.colors.secondary,
-                        shape = ShapeBackground.medium
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ) {
-                        val timeStartDelivery = loco.timeStartOfDelivery?.let { millis ->
-                            SimpleDateFormat(TIME_FORMAT).format(millis)
-                        } ?: DEFAULT_TIME_TEXT
-
-                        val timeEndDelivery = loco.timeEndOfDelivery?.let { millis ->
-                            SimpleDateFormat(TIME_FORMAT).format(millis)
-                        } ?: DEFAULT_TIME_TEXT
-
-                        Text(
-                            text = timeStartDelivery,
-                            color = setTextColor(loco.timeStartOfAcceptance)
-                        )
-                        Text(
-                            text = " - ", color = setTextColor(loco.timeEndOfAcceptance)
-                        )
-                        Text(
-                            text = timeEndDelivery, color = setTextColor(loco.timeEndOfAcceptance)
-                        )
-                    }
-                }
-            }
-            Column(modifier = Modifier
-                .constrainAs(sections) {
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    top.linkTo(time.bottom)
-                }
-                .padding(top = 8.dp)) {
-                loco.sectionList.forEach { item: Section ->
-                    ItemSection(section = item, navController = navController)
-                }
-                GeneralResult(
-                    modifier = Modifier.padding(top = 8.dp, end = 16.dp, start = 16.dp),
-                    loco = loco
+            Row(horizontalArrangement = Arrangement.SpaceAround) {
+                val seriesText = loco.series ?: "XXXX"
+                val numberText = loco.number ?: "000"
+                Text(
+                    text = seriesText,
+                    color = setTextColor(loco.series),
+                    style = Typography.subtitle2
+                )
+                Text(
+                    text = " - ",
+                    color = setTextColor(loco.number),
+                    style = Typography.subtitle2
+                )
+                Text(
+                    text = numberText,
+                    color = setTextColor(loco.number),
+                    style = Typography.subtitle2
                 )
             }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+                .constrainAs(time) {
+                    top.linkTo(seriesAndNumber.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                },
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier.border(
+                    width = 0.5.dp,
+                    color = MaterialTheme.colors.secondary,
+                    shape = ShapeBackground.small
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    val timeStartAcceptance = loco.timeStartOfAcceptance?.let { millis ->
+                        SimpleDateFormat(TIME_FORMAT).format(millis)
+                    } ?: DEFAULT_TIME_TEXT
+
+                    val timeEndAcceptance = loco.timeEndOfAcceptance?.let { millis ->
+                        SimpleDateFormat(TIME_FORMAT).format(millis)
+                    } ?: DEFAULT_TIME_TEXT
+
+                    Text(
+                        text = timeStartAcceptance,
+                        color = setTextColor(loco.timeStartOfAcceptance)
+                    )
+                    Text(
+                        text = " - ", color = setTextColor(loco.timeEndOfAcceptance)
+                    )
+                    Text(
+                        text = timeEndAcceptance, color = setTextColor(loco.timeEndOfAcceptance)
+                    )
+                }
+            }
+
+            Box(
+                modifier = Modifier.border(
+                    width = 0.5.dp,
+                    color = MaterialTheme.colors.secondary,
+                    shape = ShapeBackground.small
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    val timeStartDelivery = loco.timeStartOfDelivery?.let { millis ->
+                        SimpleDateFormat(TIME_FORMAT).format(millis)
+                    } ?: DEFAULT_TIME_TEXT
+
+                    val timeEndDelivery = loco.timeEndOfDelivery?.let { millis ->
+                        SimpleDateFormat(TIME_FORMAT).format(millis)
+                    } ?: DEFAULT_TIME_TEXT
+
+                    Text(
+                        text = timeStartDelivery,
+                        color = setTextColor(loco.timeStartOfAcceptance)
+                    )
+                    Text(
+                        text = " - ", color = setTextColor(loco.timeEndOfAcceptance)
+                    )
+                    Text(
+                        text = timeEndDelivery, color = setTextColor(loco.timeEndOfAcceptance)
+                    )
+                }
+            }
+        }
+        Column(modifier = Modifier
+            .constrainAs(sections) {
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                top.linkTo(time.bottom)
+            }
+            .padding(top = 16.dp)) {
+            loco.sectionList.forEachIndexed { index, item ->
+                if (index.rem(2) != 0) {
+                    ItemSection(
+                        section = item,
+                        navController = navController,
+                    )
+                } else {
+                    ItemSection(
+                        section = item,
+                        navController = navController,
+                    )
+                }
+            }
+            GeneralResult(
+                modifier = Modifier.padding(top = 8.dp, end = 16.dp, start = 16.dp),
+                loco = loco
+            )
         }
     }
 }
@@ -322,11 +324,11 @@ fun ItemSection(section: Section, navController: NavController) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 4.dp)
+                    .padding(top = 8.dp)
                     .border(
                         width = 0.5.dp,
                         color = MaterialTheme.colors.secondary,
-                        shape = ShapeBackground.medium
+                        shape = ShapeBackground.small
                     )
             ) {
                 Column(
@@ -390,11 +392,11 @@ fun ItemSection(section: Section, navController: NavController) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 4.dp)
+                    .padding(top = 8.dp)
                     .border(
                         width = 0.5.dp,
                         color = MaterialTheme.colors.secondary,
-                        shape = ShapeBackground.medium
+                        shape = ShapeBackground.small
                     )
             ) {
                 Column(
@@ -552,9 +554,29 @@ fun setTextColor(any: Any?): Color = if (any == null) {
 @DarkLightPreviews
 private fun ItemSectionPrev() {
     TrainDriverTheme {
-        ItemSection(
-            SectionElectric(acceptedEnergy = 133032.0, deliveryEnergy = 113064.3),
-            rememberNavController()
+        ItemLocomotive(
+            loco = Locomotive(
+                series = "2тэ116у",
+                number = "338",
+                type = false,
+                sectionList = listOf(
+                    SectionDiesel(
+                        acceptedEnergy = 2000.0,
+                        deliveryEnergy = 3100.0,
+                        coefficient = 0.83,
+                        fuelSupply = 2000.0,
+                        coefficientSupply = 0.85
+                    ),
+                    SectionDiesel(
+                        acceptedEnergy = 3000.0,
+                        deliveryEnergy = 4000.0,
+                        coefficient = 0.83,
+                        fuelSupply = 2000.0,
+                        coefficientSupply = 0.85
+                    ),
+                )
+            ),
+            navController = rememberNavController(),
         )
     }
 }

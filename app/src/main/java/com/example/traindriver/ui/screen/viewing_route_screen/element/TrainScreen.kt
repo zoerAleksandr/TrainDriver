@@ -5,12 +5,11 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Card
-import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +32,6 @@ import com.example.traindriver.domain.entity.Station
 import com.example.traindriver.domain.entity.Train
 import com.example.traindriver.ui.element_screen.LoadingElement
 import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
-import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.Constants.DURATION_CROSSFADE
 import com.example.traindriver.ui.util.DateAndTimeFormat
@@ -109,92 +107,92 @@ private fun FailureScreen() {
 
 @Composable
 fun TrainItem(train: Train) {
-    Card(
+    ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-        backgroundColor = MaterialTheme.colors.surface,
-        shape = ShapeBackground.medium,
-        elevation = 6.dp
+            .padding(bottom = 24.dp)
     ) {
-        ConstraintLayout(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            val (number, weight, axle, conditionalLength, loco, stations) = createRefs()
+        val (number, weight, axle, conditionalLength, loco, stations) = createRefs()
 
-            createHorizontalChain(weight, axle, conditionalLength, chainStyle = ChainStyle.Packed)
-            Text(
-                modifier = Modifier.constrainAs(number) {
+        createHorizontalChain(weight, axle, conditionalLength, chainStyle = ChainStyle.Packed)
+        Text(
+            modifier = Modifier
+                .padding(start = 32.dp, top = 16.dp)
+                .constrainAs(number) {
                     start.linkTo(parent.start)
                     top.linkTo(parent.top)
                 },
-                text = "№" + " ${train.number ?: "0000"}",
-                style = Typography.subtitle2.copy(color = setTextColor(any = train.number))
-            )
-            Text(
-                modifier = Modifier.constrainAs(loco) {
+            text = "№" + " ${train.number ?: "0000"}",
+            style = Typography.subtitle2.copy(color = setTextColor(any = train.number))
+        )
+        Text(
+            modifier = Modifier
+                .padding(end = 32.dp, top = 16.dp)
+                .constrainAs(loco) {
                     end.linkTo(parent.end)
                     top.linkTo(parent.top)
                 },
-                text = "${train.locomotive?.series ?: ""} - ${train.locomotive?.number ?: ""}",
-                style = Typography.subtitle2.copy(color = setTextColor(any = train.number))
+            text = "${train.locomotive?.series ?: ""} - ${train.locomotive?.number ?: ""}",
+            style = Typography.subtitle2.copy(color = setTextColor(any = train.number))
+        )
+        Column(modifier = Modifier
+            .constrainAs(weight) {
+                top.linkTo(number.bottom)
+                start.linkTo(parent.start)
+            }
+            .padding(end = 12.dp, top = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "вес",
+                style = Typography.caption.copy(color = MaterialTheme.colors.primaryVariant)
             )
-            Column(modifier = Modifier
-                .constrainAs(weight) {
-                    top.linkTo(number.bottom)
-                    start.linkTo(parent.start)
-                }
-                .padding(end = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "вес",
-                    style = Typography.caption.copy(color = MaterialTheme.colors.primaryVariant)
-                )
-                Text(
-                    text = "${train.weight ?: " - "}",
-                    style = Typography.body1.copy(color = setTextColor(any = train.weight))
-                )
+            Text(
+                text = "${train.weight ?: " - "}",
+                style = Typography.body1.copy(color = setTextColor(any = train.weight))
+            )
+        }
+        Column(modifier = Modifier
+            .constrainAs(axle) {
+                top.linkTo(number.bottom)
             }
-            Column(modifier = Modifier
-                .constrainAs(axle) {
-                    top.linkTo(number.bottom)
-                }
-                .padding(end = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "оси",
-                    style = Typography.caption.copy(color = MaterialTheme.colors.primaryVariant)
-                )
-                Text(
-                    text = "${train.axle ?: " - "}",
-                    style = Typography.body1.copy(color = setTextColor(any = train.weight))
-                )
+            .padding(end = 12.dp, top = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "оси",
+                style = Typography.caption.copy(color = MaterialTheme.colors.primaryVariant)
+            )
+            Text(
+                text = "${train.axle ?: " - "}",
+                style = Typography.body1.copy(color = setTextColor(any = train.weight))
+            )
+        }
+        Column(modifier = Modifier
+            .constrainAs(conditionalLength) {
+                top.linkTo(number.bottom)
             }
-            Column(modifier = Modifier
-                .constrainAs(conditionalLength) {
-                    top.linkTo(number.bottom)
-                }
-                .padding(end = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "у.д.",
-                    style = Typography.caption.copy(color = MaterialTheme.colors.primaryVariant)
-                )
-                Text(
-                    text = "${train.conditionalLength ?: " - "}",
-                    style = Typography.body1.copy(color = setTextColor(any = train.weight))
-                )
+            .padding(end = 12.dp, top = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "у.д.",
+                style = Typography.caption.copy(color = MaterialTheme.colors.primaryVariant)
+            )
+            Text(
+                text = "${train.conditionalLength ?: " - "}",
+                style = Typography.body1.copy(color = setTextColor(any = train.weight))
+            )
+        }
+        Column(modifier = Modifier
+            .padding(vertical = 12.dp)
+            .constrainAs(stations) {
+                top.linkTo(weight.bottom)
             }
-            Column(modifier = Modifier
-                .constrainAs(stations) {
-                    top.linkTo(weight.bottom)
-                }
-                .fillMaxWidth()
-                .padding(top = 8.dp)) {
-                train.stations.forEachIndexed { index, item ->
-                    ItemStation(item)
-                    if (index != train.stations.lastIndex) {
-                        Divider(color = MaterialTheme.colors.primaryVariant.copy(alpha = 0.2f))
-                    }
+            .fillMaxWidth()
+            .padding(top = 16.dp)) {
+            train.stations.forEachIndexed { index, item ->
+                if (index.rem(2) != 0) {
+                    ItemStation(item, Color.Transparent)
+                } else {
+                    ItemStation(item, MaterialTheme.colors.secondary.copy(alpha = 0.2f))
                 }
             }
         }
@@ -210,11 +208,12 @@ fun textColorOrTransparent(any: Any?): Color = if (any == null) {
 }
 
 @Composable
-fun ItemStation(station: Station) {
+fun ItemStation(station: Station, backgroundColor: Color) {
     ConstraintLayout(
         modifier = Modifier
+            .background(backgroundColor)
             .fillMaxWidth()
-            .padding(bottom = 6.dp, top = 6.dp)
+            .padding(vertical = 6.dp, horizontal = 32.dp)
     ) {
         val (name, time) = createRefs()
 

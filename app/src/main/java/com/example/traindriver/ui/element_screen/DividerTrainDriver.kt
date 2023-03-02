@@ -25,7 +25,7 @@ fun VerticalDividerTrainDriver(
 @Composable
 fun HorizontalDividerTrainDriver(
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colors.secondary,
+    color: Color = MaterialTheme.colors.primaryVariant.copy(alpha = 0.5f),
     thickness: Dp = 1.dp
 ){
     Box(modifier = modifier

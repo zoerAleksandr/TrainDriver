@@ -87,7 +87,7 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 54.dp)
+//            .padding(top = 54.dp)
     ) {
         val (startTimeBlock, endTimeBlock, overTimeBlock, typeOfRest) = createRefs()
 
@@ -128,13 +128,14 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
 
         Column(
             modifier = Modifier
+                .padding(top = 32.dp)
                 .constrainAs(startTimeBlock) {
-                    top.linkTo(parent.top)
+                    top.linkTo(overTimeBlock.bottom)
                     start.linkTo(parent.start)
                 }
                 .border(
                     width = 0.5.dp,
-                    shape = ShapeBackground.medium,
+                    shape = ShapeBackground.small,
                     color = MaterialTheme.colors.secondary
                 )
                 .padding(18.dp),
@@ -169,13 +170,14 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
 
         Column(
             modifier = Modifier
+                .padding(top = 32.dp)
                 .constrainAs(endTimeBlock) {
-                    top.linkTo(parent.top)
+                    top.linkTo(overTimeBlock.bottom)
                     end.linkTo(parent.end)
                 }
                 .border(
                     width = 0.5.dp,
-                    shape = ShapeBackground.medium,
+                    shape = ShapeBackground.small,
                     color = MaterialTheme.colors.secondary
                 )
                 .padding(18.dp),
@@ -250,7 +252,7 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
         Box(
             modifier = Modifier
                 .constrainAs(overTimeBlock) {
-                    top.linkTo(startTimeBlock.bottom)
+                    top.linkTo(parent.top)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
@@ -263,20 +265,20 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
                     "0$hour"
                 } else {
                     hour.toString()
-                } + stringResource(id = R.string.abbreviated_hour)
+                }
 
                 val minute = millis.getRemainingMinuteFromHour()
                 val minuteText = if (minute < 10) {
                     "0$minute"
                 } else {
                     minute.toString()
-                } + stringResource(id = R.string.abbreviated_minute)
+                }
 
-                "$hourText $minuteText"
+                "$hourText : $minuteText"
             } else {
                 ""
             }
-            Text(text = textOverTime, style = Typography.body2)
+            Text(text = textOverTime, style = Typography.h1)
         }
     }
 }

@@ -14,6 +14,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.traindriver.R
 import com.example.traindriver.ui.element_screen.TopSnackbar
+import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.main_screen.elements.BottomSheetContent
 import com.example.traindriver.ui.screen.main_screen.elements.CircularIndicator
 import com.example.traindriver.ui.screen.main_screen.elements.TopBarMainScreen
@@ -79,7 +80,9 @@ fun MainScreen(
                         contentColor = MaterialTheme.colors.onSecondary
                     ),
                     shape = ShapeButton.medium,
-                    onClick = { /*TODO*/ }
+                    onClick = {
+                        navController.navigate(Screen.Adding.route)
+                    }
                 ) {
                     Text(
                         text = stringResource(id = R.string.add_itinerary),
