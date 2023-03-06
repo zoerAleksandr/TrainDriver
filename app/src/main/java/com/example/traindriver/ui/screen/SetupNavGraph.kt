@@ -52,7 +52,7 @@ fun SetupNavGraph(
             SettingScreen()
         }
         composable(Screen.Adding.route){
-            AddingScreen(navController)
+            AddingScreen(navController = navController)
         }
     }
 }

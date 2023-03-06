@@ -17,7 +17,11 @@ import com.example.traindriver.ui.element_screen.VerticalDividerTrainDriver
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
-import com.example.traindriver.ui.util.*
+import com.example.traindriver.ui.util.DarkLightPreviews
+import com.example.traindriver.ui.util.FontScalePreviews
+import com.example.traindriver.ui.util.getDay
+import com.example.traindriver.ui.util.getMonth
+import com.example.traindriver.ui.util.long_util.getTimeInStringFormat
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -87,24 +91,7 @@ fun WorkTimeElementItem(
 ) {
     val workTime = route.getWorkTime()
 
-    val textTime = if (workTime != null) {
-        val hour = workTime.getHour()
-        val hourText = if (hour < 10) {
-            "0$hour"
-        } else {
-            hour.toString()
-        }
-
-        val minute = workTime.getRemainingMinuteFromHour()
-        val minuteText = if (minute < 10) {
-            "0$minute"
-        } else {
-            minute.toString()
-        }
-        "$hourText:$minuteText"
-    } else {
-        "--:--"
-    }
+    val textTime = workTime.getTimeInStringFormat()
     Text(modifier = modifier, text = textTime, style = Typography.body2)
 }
 

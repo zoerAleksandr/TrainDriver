@@ -39,8 +39,7 @@ import com.example.traindriver.ui.util.DateAndTimeFormat.DATE_FORMAT
 import com.example.traindriver.ui.util.DateAndTimeFormat.DEFAULT_DATE_TEXT
 import com.example.traindriver.ui.util.DateAndTimeFormat.DEFAULT_TIME_TEXT
 import com.example.traindriver.ui.util.DateAndTimeFormat.TIME_FORMAT
-import com.example.traindriver.ui.util.getHour
-import com.example.traindriver.ui.util.getRemainingMinuteFromHour
+import com.example.traindriver.ui.util.long_util.getTimeInStringFormat
 import java.text.SimpleDateFormat
 
 const val LINK_TO_SETTING = "LINK_TO_SETTING"
@@ -259,26 +258,7 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
                 .padding(top = 32.dp)
         ) {
             val millis = route.getWorkTime()
-            val textOverTime = if (millis != null) {
-                val hour = millis.getHour()
-                val hourText = if (hour < 10) {
-                    "0$hour"
-                } else {
-                    hour.toString()
-                }
-
-                val minute = millis.getRemainingMinuteFromHour()
-                val minuteText = if (minute < 10) {
-                    "0$minute"
-                } else {
-                    minute.toString()
-                }
-
-                "$hourText : $minuteText"
-            } else {
-                ""
-            }
-            Text(text = textOverTime, style = Typography.h1)
+            Text(text = millis.getTimeInStringFormat(), style = Typography.h1)
         }
     }
 }

@@ -21,8 +21,8 @@ import com.example.traindriver.ui.screen.main_screen.elements.TopBarMainScreen
 import com.example.traindriver.ui.theme.*
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.changeAlphaWithScroll
-import com.example.traindriver.ui.util.getHour
-import com.example.traindriver.ui.util.getRemainingMinuteFromHour
+import com.example.traindriver.ui.util.long_util.getHour
+import com.example.traindriver.ui.util.long_util.getRemainingMinuteFromHour
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

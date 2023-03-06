@@ -1,46 +1,109 @@
 package com.example.traindriver.ui.screen.adding_screen
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.traindriver.R
 import com.example.traindriver.ui.element_screen.HorizontalDividerTrainDriver
 import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.viewing_route_screen.element.setTextColor
-import com.example.traindriver.ui.theme.ColorClickableText
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.Typography
+import com.example.traindriver.ui.util.ClickableTextTrainDriver
 import com.example.traindriver.ui.util.DateAndTimeFormat
 import com.example.traindriver.ui.util.DateAndTimeFormat.DEFAULT_DATE_TEXT
 import com.example.traindriver.ui.util.Tags.LINK_TO_HOME
+import com.example.traindriver.ui.util.long_util.getTimeInStringFormat
+import com.example.traindriver.ui.util.long_util.minus
 import java.text.SimpleDateFormat
+import java.util.Calendar.*
 
 @Composable
-fun AddingScreen(navController: NavController) {
-    val dateStart by remember { mutableStateOf<Long?>(null) }
-    val dateEnd by remember { mutableStateOf<Long?>(null) }
+fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavController) {
     var number by remember { mutableStateOf(TextFieldValue("")) }
+
+    val timeValue = viewModel.state.value
+
+    val dateStart = timeValue.startTime.time
+    val dateEnd = timeValue.endTime.time
+
+    val timeResult = dateEnd - dateStart
+
+    val startCalendar = getInstance()
+
+    dateStart?.let {
+        startCalendar.timeInMillis = it
+    }
+
+    val startTimePicker = TimePickerDialog(
+        LocalContext.current, { _, h: Int, m: Int ->
+            startCalendar[HOUR_OF_DAY] = h
+            startCalendar[MINUTE] = m
+            startCalendar[SECOND] = 0
+            startCalendar[MILLISECOND] = 0
+            viewModel.createEvent(WorkTimeEvent.EnteredStartTime(startCalendar.timeInMillis))
+            viewModel.createEvent(WorkTimeEvent.FocusChange(WorkTimeType.START))
+        }, startCalendar[HOUR_OF_DAY], startCalendar[MINUTE], true
+    )
+
+    val startDatePicker = DatePickerDialog(
+        LocalContext.current,
+        { _, y: Int, m: Int, d: Int ->
+            startCalendar[YEAR] = y
+            startCalendar[MONTH] = m
+            startCalendar[DAY_OF_MONTH] = d
+            startTimePicker.show()
+        }, startCalendar[YEAR], startCalendar[MONTH], startCalendar[DAY_OF_MONTH]
+    )
+
+    val endCalendar = getInstance()
+    dateEnd?.let {
+        endCalendar.timeInMillis = it
+    }
+
+    val endTimePicker = TimePickerDialog(
+        LocalContext.current, { _, h: Int, m: Int ->
+            endCalendar[HOUR_OF_DAY] = h
+            endCalendar[MINUTE] = m
+            endCalendar[SECOND] = 0
+            endCalendar[MILLISECOND] = 0
+            viewModel.createEvent(WorkTimeEvent.EnteredEndTime(endCalendar.timeInMillis))
+            viewModel.createEvent(WorkTimeEvent.FocusChange(WorkTimeType.END))
+        }, endCalendar[HOUR_OF_DAY], endCalendar[MINUTE], true
+    )
+
+    val endDatePicker = DatePickerDialog(
+        LocalContext.current,
+        { _, y: Int, m: Int, d: Int ->
+            endCalendar[YEAR] = y
+            endCalendar[MONTH] = m
+            endCalendar[DAY_OF_MONTH] = d
+            endTimePicker.show()
+        }, endCalendar[YEAR], endCalendar[MONTH], endCalendar[DAY_OF_MONTH]
+    )
 
     Scaffold(
         backgroundColor = MaterialTheme.colors.background,
-        topBar = { AddingAppBar(navController = navController) }
+        topBar = { AddingAppBar(navController = navController, enabled = timeValue.formValid) }
     ) {
         ConstraintLayout(
             modifier = Modifier
@@ -48,7 +111,8 @@ fun AddingScreen(navController: NavController) {
                 .verticalScroll(rememberScrollState())
         ) {
             val (times, list, resultTime) = createRefs()
-            Text(
+
+            Row(
                 modifier = Modifier
                     .padding(24.dp)
                     .constrainAs(resultTime) {
@@ -57,9 +121,27 @@ fun AddingScreen(navController: NavController) {
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                     },
-                text = "11:30",
-                style = Typography.h1.copy(color = MaterialTheme.colors.primary)
-            )
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (!timeValue.formValid) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_error_24),
+                        tint = Color.Red,
+                        contentDescription = null
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 8.dp),
+                        text = timeValue.errorMessage,
+                        style = Typography.caption.copy(color = Color.Red),
+                        color = Color.Red
+                    )
+                } else {
+                    Text(
+                        text = timeResult.getTimeInStringFormat(),
+                        style = Typography.h1.copy(color = MaterialTheme.colors.primary)
+                    )
+                }
+            }
 
             Row(
                 modifier = Modifier
@@ -75,9 +157,12 @@ fun AddingScreen(navController: NavController) {
             ) {
                 Column(
                     modifier = Modifier
+                        .clickable {
+                            startDatePicker.show()
+                        }
                         .border(
                             width = 0.5.dp,
-                            shape = ShapeBackground.medium,
+                            shape = ShapeBackground.small,
                             color = MaterialTheme.colors.secondary
                         )
                         .padding(18.dp),
@@ -93,7 +178,8 @@ fun AddingScreen(navController: NavController) {
                         color = setTextColor(dateStart)
                     )
                     dateStart?.let { millis ->
-                        val time = SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT).format(millis)
+                        val time =
+                            SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT).format(millis)
                         Text(
                             text = time,
                             style = Typography.body1,
@@ -101,14 +187,18 @@ fun AddingScreen(navController: NavController) {
                         )
                     }
                 }
+
                 Column(
                     modifier = Modifier
                         .border(
                             width = 0.5.dp,
-                            shape = ShapeBackground.medium,
+                            shape = ShapeBackground.small,
                             color = MaterialTheme.colors.secondary
                         )
-                        .padding(18.dp),
+                        .padding(18.dp)
+                        .clickable {
+                            endDatePicker.show()
+                        },
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     val dateStartText = dateEnd?.let { millis ->
@@ -121,7 +211,8 @@ fun AddingScreen(navController: NavController) {
                         color = setTextColor(dateEnd)
                     )
                     dateEnd?.let { millis ->
-                        val time = SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT).format(millis)
+                        val time =
+                            SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT).format(millis)
                         Text(
                             text = time,
                             style = Typography.body1,
@@ -130,6 +221,7 @@ fun AddingScreen(navController: NavController) {
                     }
                 }
             }
+
             Column(modifier = Modifier
                 .constrainAs(list) {
                     start.linkTo(parent.start)
@@ -234,7 +326,7 @@ fun ItemAddLoco() {
 }
 
 @Composable
-private fun AddingAppBar(navController: NavController) {
+private fun AddingAppBar(navController: NavController, enabled: Boolean) {
     TopAppBar(
         modifier = Modifier
             .fillMaxHeight(0.12f),
@@ -271,12 +363,6 @@ private fun AddingAppBar(navController: NavController) {
                 val end = text.length
                 append(text)
 
-                addStyle(
-                    style = SpanStyle(
-                        color = ColorClickableText,
-                    ), start, end
-                )
-
                 addStringAnnotation(
                     tag = LINK_TO_HOME,
                     annotation = Screen.Home.route,
@@ -285,14 +371,15 @@ private fun AddingAppBar(navController: NavController) {
                 )
             }
 
-            ClickableText(
+            ClickableTextTrainDriver(
                 modifier = Modifier.constrainAs(button) {
                     end.linkTo(parent.end)
                     top.linkTo(icon.top)
                     bottom.linkTo(icon.bottom)
                 },
+                enabled = enabled,
                 text = linkText,
-                style = Typography.button.copy(color = ColorClickableText)
+                style = Typography.button
             ) {
                 // TODO SAVE TO REPOSITORY
                 linkText.getStringAnnotations(LINK_TO_HOME, it, it)
