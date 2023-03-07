@@ -1,5 +1,6 @@
 package com.example.traindriver.ui.screen.adding_screen
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import androidx.compose.foundation.*
@@ -46,9 +47,11 @@ import com.example.traindriver.ui.util.long_util.getTimeInStringFormat
 import com.example.traindriver.ui.util.long_util.minus
 import com.example.traindriver.ui.util.long_util.plus
 import java.text.SimpleDateFormat
+import java.util.*
 import java.util.Calendar.*
 
 @Composable
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavController) {
 
     OnLifecycleEvent { _, event ->
@@ -188,7 +191,9 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     val dateStartText = dateStart?.let { millis ->
-                        SimpleDateFormat(DateAndTimeFormat.DATE_FORMAT).format(millis)
+                        SimpleDateFormat(DateAndTimeFormat.DATE_FORMAT, Locale.getDefault()).format(
+                            millis
+                        )
                     } ?: DEFAULT_DATE_TEXT
 
                     Text(
@@ -198,7 +203,10 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                     )
                     dateStart?.let { millis ->
                         val time =
-                            SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT).format(millis)
+                            SimpleDateFormat(
+                                DateAndTimeFormat.TIME_FORMAT,
+                                Locale.getDefault()
+                            ).format(millis)
                         Text(
                             text = time,
                             style = Typography.body1,
@@ -221,7 +229,9 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     val dateStartText = dateEnd?.let { millis ->
-                        SimpleDateFormat(DateAndTimeFormat.DATE_FORMAT).format(millis)
+                        SimpleDateFormat(DateAndTimeFormat.DATE_FORMAT, Locale.getDefault()).format(
+                            millis
+                        )
                     } ?: DEFAULT_DATE_TEXT
 
                     Text(
@@ -231,7 +241,10 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                     )
                     dateEnd?.let { millis ->
                         val time =
-                            SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT).format(millis)
+                            SimpleDateFormat(
+                                DateAndTimeFormat.TIME_FORMAT,
+                                Locale.getDefault()
+                            ).format(millis)
                         Text(
                             text = time,
                             style = Typography.body1,
@@ -322,7 +335,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                     .padding(start = 16.dp),
                 horizontalAlignment = Alignment.Start) {
                 if (checkedState.value) {
-                    minRest?.let {
+/*                    minRest?.let {
                         SimpleDateFormat("${DateAndTimeFormat.DATE_FORMAT} ${DateAndTimeFormat.TIME_FORMAT}").format(
                             it
                         )
@@ -359,7 +372,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                             .firstOrNull()?.let { stringAnnotation ->
                                 navController.navigate(stringAnnotation.item)
                             }
-                    }
+                    }*/
                 }
             }
 

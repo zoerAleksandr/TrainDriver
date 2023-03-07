@@ -1,5 +1,6 @@
 package com.example.traindriver.ui.screen.password_conf_screen
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.view.KeyEvent
 import androidx.compose.foundation.Image
@@ -55,14 +56,15 @@ import com.example.traindriver.ui.util.SnackbarMessage.SMS_SEND_MSG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalComposeUiApi::class)
+
 @Composable
+@OptIn(ExperimentalComposeUiApi::class)
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 fun PasswordConfScreen(
     navController: NavController,
     signInViewModel: SignInViewModel,
     activity: Activity
 ) {
-    val scope = rememberCoroutineScope()
     val number by signInViewModel.number
     val countdown by signInViewModel.timer
     val resentTextEnable by signInViewModel.resetButtonEnable
@@ -93,7 +95,7 @@ fun PasswordConfScreen(
             }
         ) {
             if (code.length == 6) {
-                scope.launch(Dispatchers.Main) {
+                LaunchedEffect(number, Dispatchers.Main) {
                     signInViewModel.phoneAuth.checkCode(code)
                         .collect { state ->
                             when (state) {
@@ -524,8 +526,10 @@ fun ResendCode(
 
     when (resendCode) {
         is ResultState.Loading -> {
-            scope.launch {
-                snackbarHostState.showSnackbar(CONNECTING_TO_SERVER_MSG)
+            LaunchedEffect(key1 = resendCode) {
+                scope.launch {
+                    snackbarHostState.showSnackbar(CONNECTING_TO_SERVER_MSG)
+                }
             }
         }
         is ResultState.Success -> resendCode.data?.let { result ->
@@ -541,8 +545,10 @@ fun ResendCode(
             }
         }
         is ResultState.Failure -> {
-            scope.launch {
-                snackbarHostState.showSnackbar(ERROR_TRY_AGAIN_MSG)
+            LaunchedEffect(key1 = resendCode) {
+                scope.launch {
+                    snackbarHostState.showSnackbar(ERROR_TRY_AGAIN_MSG)
+                }
             }
         }
     }

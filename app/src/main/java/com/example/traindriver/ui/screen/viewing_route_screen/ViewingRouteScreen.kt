@@ -1,11 +1,9 @@
 package com.example.traindriver.ui.screen.viewing_route_screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -29,10 +27,11 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 fun ViewingRouteScreen(
     navController: NavController,
     viewModel: ViewingRouteViewModel = viewModel()
@@ -61,8 +60,8 @@ fun ViewingRouteScreen(
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
 @Composable
+@OptIn(ExperimentalPagerApi::class)
 fun TabScreen(
     navController: NavController,
     snackbarHostState: SnackbarHostState,
@@ -90,7 +89,6 @@ private fun Header(response: RouteResponse, snackbarHostState: SnackbarHostState
         mutableStateOf(Route())
     }
     DataHeader(route = currentRoute.value)
-    val scope = rememberCoroutineScope()
     when (response) {
         is ResultState.Loading -> {
         }
@@ -98,7 +96,7 @@ private fun Header(response: RouteResponse, snackbarHostState: SnackbarHostState
             currentRoute.value = route
         }
         is ResultState.Failure -> {
-            scope.launch {
+            LaunchedEffect(currentRoute) {
                 snackbarHostState.showSnackbar(response.msg.message.toString())
             }
         }
@@ -108,7 +106,7 @@ private fun Header(response: RouteResponse, snackbarHostState: SnackbarHostState
 @Composable
 private fun DataHeader(route: Route) {
     val dateStartWorkText = route.timeStartWork?.let { millis ->
-        SimpleDateFormat(DATE_FORMAT).format(millis)
+        SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(millis)
     } ?: ""
 
     val routeNumberText = route.number ?: "0000"

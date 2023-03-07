@@ -1,5 +1,6 @@
 package com.example.traindriver.ui.screen.signin_screen
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
@@ -9,10 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -45,8 +43,9 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
+@OptIn(ExperimentalMaterialApi::class)
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 fun SignInScreen(
     navController: NavController,
     activity: Activity,
@@ -66,13 +65,15 @@ fun SignInScreen(
     val allowEntry = viewModel.allowEntry
     val localeState = viewModel.locale
 
-    if (localeState.value == LocaleUser.OTHER) {
-        scope.launch {
-            sheetState.show()
-        }
-    } else {
-        scope.launch {
-            sheetState.hide()
+    LaunchedEffect(key1 = localeState.value) {
+        if (localeState.value == LocaleUser.OTHER) {
+            scope.launch {
+                sheetState.show()
+            }
+        } else {
+            scope.launch {
+                sheetState.hide()
+            }
         }
     }
 

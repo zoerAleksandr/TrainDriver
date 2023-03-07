@@ -1,5 +1,6 @@
 package com.example.traindriver.ui.screen.main_screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,8 +25,10 @@ import com.example.traindriver.ui.util.changeAlphaWithScroll
 import com.example.traindriver.ui.util.long_util.getHour
 import com.example.traindriver.ui.util.long_util.getRemainingMinuteFromHour
 
-@OptIn(ExperimentalMaterialApi::class)
+
 @Composable
+@OptIn(ExperimentalMaterialApi::class)
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 fun MainScreen(
     navController: NavController, mainViewModel: MainViewModel = viewModel()
 ) {
