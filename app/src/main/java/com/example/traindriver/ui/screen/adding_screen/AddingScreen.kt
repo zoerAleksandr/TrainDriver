@@ -110,7 +110,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            val (times, list, resultTime) = createRefs()
+            val (times, list, resultTime, restSwitch) = createRefs()
 
             Row(
                 modifier = Modifier
@@ -146,10 +146,8 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 32.dp)
                     .constrainAs(times) {
                         top.linkTo(resultTime.bottom)
-                        bottom.linkTo(list.top)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                     },
@@ -222,11 +220,44 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                 }
             }
 
+            val checkedState = remember { mutableStateOf(false) }
+
+            Row(
+                modifier = Modifier
+                    .padding(end = 16.dp, top = 24.dp)
+                    .constrainAs(restSwitch) {
+                        top.linkTo(times.bottom)
+                        end.linkTo(parent.end)
+                    },
+                verticalAlignment = Alignment.CenterVertically
+            )
+            {
+                Text(
+                    modifier = Modifier
+                        .padding(end = 8.dp),
+                    text = "Отдых в ПО",
+                    style = Typography.body2.copy(
+                        color = if (checkedState.value) {
+                            MaterialTheme.colors.primary
+                        } else {
+                            MaterialTheme.colors.primaryVariant
+                        }
+                    )
+                )
+
+                Switch(
+                    checked = checkedState.value,
+                    onCheckedChange = {
+                        checkedState.value = it
+                    },
+                )
+            }
+
             Column(modifier = Modifier
                 .constrainAs(list) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                    bottom.linkTo(parent.bottom)
+                    top.linkTo(restSwitch.bottom)
                     width = Dimension.fillToConstraints
                 }
                 .padding(vertical = 32.dp)) {

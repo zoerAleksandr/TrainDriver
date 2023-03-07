@@ -12,7 +12,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
-import com.example.traindriver.ui.theme.ColorClickableText
 
 @Composable
 fun ClickableTextTrainDriver(
@@ -38,7 +37,7 @@ fun ClickableTextTrainDriver(
     }
     val currentStyle = style.copy(
         color = if (enabled) {
-            ColorClickableText
+            MaterialTheme.colors.secondaryVariant
         } else {
             MaterialTheme.colors.primaryVariant
         }
