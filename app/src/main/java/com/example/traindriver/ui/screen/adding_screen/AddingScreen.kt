@@ -5,6 +5,7 @@ import android.app.TimePickerDialog
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,31 +15,51 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.traindriver.R
 import com.example.traindriver.ui.element_screen.HorizontalDividerTrainDriver
 import com.example.traindriver.ui.screen.Screen
+import com.example.traindriver.ui.screen.viewing_route_screen.element.LINK_TO_SETTING
 import com.example.traindriver.ui.screen.viewing_route_screen.element.setTextColor
+import com.example.traindriver.ui.screen.viewing_route_screen.element.startIndexLastWord
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.ClickableTextTrainDriver
 import com.example.traindriver.ui.util.DateAndTimeFormat
 import com.example.traindriver.ui.util.DateAndTimeFormat.DEFAULT_DATE_TEXT
+import com.example.traindriver.ui.util.OnLifecycleEvent
 import com.example.traindriver.ui.util.Tags.LINK_TO_HOME
+import com.example.traindriver.ui.util.long_util.div
 import com.example.traindriver.ui.util.long_util.getTimeInStringFormat
 import com.example.traindriver.ui.util.long_util.minus
+import com.example.traindriver.ui.util.long_util.plus
 import java.text.SimpleDateFormat
 import java.util.Calendar.*
 
 @Composable
 fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavController) {
+
+    OnLifecycleEvent { _, event ->
+        when (event) {
+            Lifecycle.Event.ON_RESUME -> {
+                viewModel.getMinTimeRest()
+            }
+            else -> {}
+        }
+    }
+
     var number by remember { mutableStateOf(TextFieldValue("")) }
 
     val timeValue = viewModel.state.value
@@ -110,7 +131,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-            val (times, list, resultTime, restSwitch) = createRefs()
+            val (times, list, resultTime, restSwitch, info) = createRefs()
 
             Row(
                 modifier = Modifier
@@ -253,11 +274,100 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                 )
             }
 
+            val halfRest = timeResult / 2
+            val minRest: Long? = halfRest?.let { half ->
+                if (half > viewModel.minTimeRest) {
+                    dateEnd + half
+                } else {
+                    dateEnd + viewModel.minTimeRest
+                }
+            }
+            val completeRest: Long? = dateEnd + timeResult
+            val minTimeRestText = (viewModel.minTimeRest / 3_600_000f).let { time ->
+                if (time % 1 == 0f) {
+                    time.toInt()
+                } else {
+                    time
+                }
+            }
+
+            val link = buildAnnotatedString {
+                val text = stringResource(id = R.string.info_text_min_time_rest, minTimeRestText)
+
+                val endIndex = text.length - 1
+                val startIndex = startIndexLastWord(text)
+
+                append(text)
+                addStyle(
+                    style = SpanStyle(
+                        color = MaterialTheme.colors.secondaryVariant,
+                        textDecoration = TextDecoration.Underline
+                    ), start = startIndex, end = endIndex
+                )
+
+                addStringAnnotation(
+                    tag = LINK_TO_SETTING,
+                    annotation = Screen.Setting.route,
+                    start = startIndex,
+                    end = endIndex
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .constrainAs(info) {
+                        start.linkTo(parent.start)
+                        top.linkTo(restSwitch.bottom)
+                    }
+                    .padding(start = 16.dp),
+                horizontalAlignment = Alignment.Start) {
+                if (checkedState.value) {
+                    minRest?.let {
+                        SimpleDateFormat("${DateAndTimeFormat.DATE_FORMAT} ${DateAndTimeFormat.TIME_FORMAT}").format(
+                            it
+                        )
+                    }
+                        ?.also {
+                            Text(
+                                text = stringResource(id = R.string.min_time_rest_text, it),
+                                style = Typography.body2
+                            )
+                        }
+
+                    completeRest?.let {
+                        SimpleDateFormat("${DateAndTimeFormat.DATE_FORMAT} ${DateAndTimeFormat.TIME_FORMAT}").format(
+                            it
+                        )
+                    }
+                        ?.also {
+                            Text(
+                                text = stringResource(id = R.string.complete_time_rest_text, it),
+                                style = Typography.body2
+                            )
+                        }
+
+                    ClickableText(
+                        modifier = Modifier.padding(top = 12.dp),
+                        text = link,
+                        style = Typography.caption
+                            .copy(
+                                fontStyle = FontStyle.Italic,
+                                color = MaterialTheme.colors.onBackground
+                            )
+                    ) {
+                        link.getStringAnnotations(LINK_TO_SETTING, it, it)
+                            .firstOrNull()?.let { stringAnnotation ->
+                                navController.navigate(stringAnnotation.item)
+                            }
+                    }
+                }
+            }
+
             Column(modifier = Modifier
                 .constrainAs(list) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
-                    top.linkTo(restSwitch.bottom)
+                    top.linkTo(info.bottom)
                     width = Dimension.fillToConstraints
                 }
                 .padding(vertical = 32.dp)) {

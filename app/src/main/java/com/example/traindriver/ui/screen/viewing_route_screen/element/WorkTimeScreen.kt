@@ -39,7 +39,9 @@ import com.example.traindriver.ui.util.DateAndTimeFormat.DATE_FORMAT
 import com.example.traindriver.ui.util.DateAndTimeFormat.DEFAULT_DATE_TEXT
 import com.example.traindriver.ui.util.DateAndTimeFormat.DEFAULT_TIME_TEXT
 import com.example.traindriver.ui.util.DateAndTimeFormat.TIME_FORMAT
+import com.example.traindriver.ui.util.long_util.div
 import com.example.traindriver.ui.util.long_util.getTimeInStringFormat
+import com.example.traindriver.ui.util.long_util.plus
 import java.text.SimpleDateFormat
 
 const val LINK_TO_SETTING = "LINK_TO_SETTING"
@@ -86,7 +88,6 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-//            .padding(top = 54.dp)
     ) {
         val (startTimeBlock, endTimeBlock, overTimeBlock, typeOfRest) = createRefs()
 
@@ -110,7 +111,7 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
             append(text)
             addStyle(
                 style = SpanStyle(
-                    color = ColorClickableText,
+                    color = MaterialTheme.colors.secondaryVariant,
                     textDecoration = TextDecoration.Underline
                 ), start = startIndex, end = endIndex
             )
@@ -122,7 +123,14 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
                 end = endIndex
             )
         }
-        val minRest: Long? = route.timeEndWork + minTimeRest
+        val halfRest = route.getWorkTime() / 2
+        val minRest: Long? = halfRest?.let { half ->
+            if (half > minTimeRest) {
+                route.timeEndWork + half
+            } else {
+                route.timeEndWork + minTimeRest
+            }
+        }
         val completeRest: Long? = route.timeEndWork + route.getWorkTime()
 
         Column(

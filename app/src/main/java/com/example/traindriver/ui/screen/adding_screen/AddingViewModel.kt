@@ -1,13 +1,25 @@
 package com.example.traindriver.ui.screen.adding_screen
 
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.traindriver.data.repository.DataStoreRepository
 import com.example.traindriver.ui.util.long_util.minus
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class AddingViewModel : ViewModel() {
+class AddingViewModel : ViewModel(), KoinComponent {
+    private val dataStoreRepository: DataStoreRepository by inject()
     private var _state = mutableStateOf(WorkTimeEditState(formValid = true))
     val state: State<WorkTimeEditState> = _state
+
+    var minTimeRest by mutableStateOf(0L)
+        private set
 
     fun createEvent(event: WorkTimeEvent) {
         onEvent(event)
@@ -65,6 +77,12 @@ class AddingViewModel : ViewModel() {
                     return it >= 0
                 } ?: return true
             }
+        }
+    }
+
+    fun getMinTimeRest() {
+        viewModelScope.launch {
+            minTimeRest = dataStoreRepository.getMinTimeRest().first()
         }
     }
 }
