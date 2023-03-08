@@ -3,6 +3,8 @@ package com.example.traindriver.ui.screen.adding_screen
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
@@ -21,6 +23,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ChainStyle
@@ -326,53 +329,85 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                 )
             }
 
-            Column(
+            Box(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .constrainAs(info) {
                         start.linkTo(parent.start)
                         top.linkTo(restSwitch.bottom)
-                    }
-                    .padding(start = 16.dp),
-                horizontalAlignment = Alignment.Start) {
-                if (checkedState.value) {
-/*                    minRest?.let {
-                        SimpleDateFormat("${DateAndTimeFormat.DATE_FORMAT} ${DateAndTimeFormat.TIME_FORMAT}").format(
-                            it
-                        )
-                    }
-                        ?.also {
-                            Text(
-                                text = stringResource(id = R.string.min_time_rest_text, it),
-                                style = Typography.body2
-                            )
-                        }
-
-                    completeRest?.let {
-                        SimpleDateFormat("${DateAndTimeFormat.DATE_FORMAT} ${DateAndTimeFormat.TIME_FORMAT}").format(
-                            it
-                        )
-                    }
-                        ?.also {
-                            Text(
-                                text = stringResource(id = R.string.complete_time_rest_text, it),
-                                style = Typography.body2
-                            )
-                        }
-
-                    ClickableText(
-                        modifier = Modifier.padding(top = 12.dp),
-                        text = link,
-                        style = Typography.caption
-                            .copy(
-                                fontStyle = FontStyle.Italic,
-                                color = MaterialTheme.colors.onBackground
-                            )
+                    },
+            ) {
+                AnimatedVisibility(
+                    visible = checkedState.value,
+                    enter = slideInHorizontally(animationSpec = tween(durationMillis = 300))
+                            + fadeIn(animationSpec = tween(durationMillis = 300)),
+                    exit = slideOutHorizontally(animationSpec = tween(durationMillis = 300))
+                            + fadeOut(animationSpec = tween(durationMillis = 150))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colors.secondaryVariant.copy(alpha = 0.1f)),
+                        horizontalAlignment = Alignment.Start
                     ) {
-                        link.getStringAnnotations(LINK_TO_SETTING, it, it)
-                            .firstOrNull()?.let { stringAnnotation ->
-                                navController.navigate(stringAnnotation.item)
+                        Icon(
+                            modifier = Modifier.padding(top = 16.dp, start = 16.dp, bottom = 8.dp),
+                            painter = painterResource(id = R.drawable.ic_info_24),
+                            tint = MaterialTheme.colors.secondaryVariant,
+                            contentDescription = null
+                        )
+                        minRest?.let {
+                            SimpleDateFormat(
+                                "${DateAndTimeFormat.DATE_FORMAT} ${DateAndTimeFormat.TIME_FORMAT}",
+                                Locale.getDefault()
+                            ).format(
+                                it
+                            )
+                        }
+                            ?.also {
+                                Text(
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    text = stringResource(id = R.string.min_time_rest_text, it),
+                                    style = Typography.body2,
+                                    textAlign = TextAlign.End
+                                )
                             }
-                    }*/
+
+                        completeRest?.let {
+                            SimpleDateFormat(
+                                "${DateAndTimeFormat.DATE_FORMAT} ${DateAndTimeFormat.TIME_FORMAT}",
+                                Locale.getDefault()
+                            ).format(
+                                it
+                            )
+                        }
+                            ?.also {
+                                Text(
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    text = stringResource(
+                                        id = R.string.complete_time_rest_text,
+                                        it
+                                    ),
+                                    style = Typography.body2,
+                                    textAlign = TextAlign.End
+                                )
+                            }
+
+                        ClickableText(
+                            modifier = Modifier.padding(start = 16.dp, bottom = 16.dp, end = 16.dp, top = 12.dp),
+                            text = link,
+                            style = Typography.caption
+                                .copy(
+                                    fontStyle = FontStyle.Italic,
+                                    color = MaterialTheme.colors.onBackground
+                                )
+                        ) {
+                            link.getStringAnnotations(LINK_TO_SETTING, it, it)
+                                .firstOrNull()?.let { stringAnnotation ->
+                                    navController.navigate(stringAnnotation.item)
+                                }
+                        }
+                    }
                 }
             }
 
