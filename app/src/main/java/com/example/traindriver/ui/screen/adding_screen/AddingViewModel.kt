@@ -2,6 +2,7 @@ package com.example.traindriver.ui.screen.adding_screen
 
 import android.util.Log
 import androidx.compose.runtime.*
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traindriver.data.repository.DataStoreRepository
@@ -14,16 +15,29 @@ import org.koin.core.component.inject
 
 class AddingViewModel : ViewModel(), KoinComponent {
     private val dataStoreRepository: DataStoreRepository by inject()
-    private var _state = mutableStateOf(WorkTimeEditState(formValid = true))
-    val state: State<WorkTimeEditState> = _state
+    private var _timeEditState = mutableStateOf(WorkTimeEditState(formValid = true))
+    val timeEditState: State<WorkTimeEditState> = _timeEditState
 
-    private val _stateLocoList = mutableStateOf(listOf<Locomotive>(
-        Locomotive(series = "2эс4к", number = "103"),
-        Locomotive(series = "3эс4к", number = "078"),
-        Locomotive(series = "ВЛ10", number = "1010"),
-        Locomotive(series = "3эс4к", number = "078"),
-        Locomotive(series = "ВЛ10", number = "1010")
-    ))
+    var restState by mutableStateOf(false)
+        private set
+
+    fun setRest(rest: Boolean) {
+        restState = rest
+    }
+
+    var numberRouteState by mutableStateOf(TextFieldValue(""))
+        private set
+
+    fun setNumber(newValue: TextFieldValue){
+        numberRouteState = newValue
+    }
+
+    private val _stateLocoList = mutableStateOf(
+        listOf<Locomotive>(
+            Locomotive(series = "2эс4к", number = "103"),
+            Locomotive(series = "3эс4к", number = "078")
+        )
+    )
     val stateLocoList: State<List<Locomotive>> = _stateLocoList
 
     var minTimeRest by mutableStateOf(0L)
@@ -36,15 +50,15 @@ class AddingViewModel : ViewModel(), KoinComponent {
     private fun onEvent(event: WorkTimeEvent) {
         when (event) {
             is WorkTimeEvent.EnteredStartTime -> {
-                _state.value = state.value.copy(
-                    startTime = state.value.startTime.copy(
+                _timeEditState.value = timeEditState.value.copy(
+                    startTime = timeEditState.value.startTime.copy(
                         time = event.value
                     )
                 )
             }
             is WorkTimeEvent.EnteredEndTime -> {
-                _state.value = state.value.copy(
-                    endTime = state.value.endTime.copy(
+                _timeEditState.value = timeEditState.value.copy(
+                    endTime = timeEditState.value.endTime.copy(
                         time = event.value
                     )
                 )
@@ -53,14 +67,15 @@ class AddingViewModel : ViewModel(), KoinComponent {
                 when (event.fieldName) {
                     WorkTimeType.START -> {
                         val timeValid =
-                            validateInput(state.value.startTime.time, WorkTimeType.START)
-                        _state.value = state.value.copy(
+                            validateInput(timeEditState.value.startTime.time, WorkTimeType.START)
+                        _timeEditState.value = timeEditState.value.copy(
                             formValid = timeValid
                         )
                     }
                     WorkTimeType.END -> {
-                        val timeValid = validateInput(state.value.endTime.time, WorkTimeType.END)
-                        _state.value = state.value.copy(
+                        val timeValid =
+                            validateInput(timeEditState.value.endTime.time, WorkTimeType.END)
+                        _timeEditState.value = timeEditState.value.copy(
                             formValid = timeValid
                         )
                     }
@@ -72,14 +87,14 @@ class AddingViewModel : ViewModel(), KoinComponent {
     private fun validateInput(inputValue: Long?, type: WorkTimeType): Boolean {
         when (type) {
             WorkTimeType.START -> {
-                val end = state.value.endTime.time
+                val end = timeEditState.value.endTime.time
                 val result = end - inputValue
                 result?.let {
                     return it >= 0
                 } ?: return true
             }
             WorkTimeType.END -> {
-                val start = state.value.startTime.time
+                val start = timeEditState.value.startTime.time
                 val result = inputValue - start
                 result?.let {
                     return it >= 0
@@ -98,7 +113,6 @@ class AddingViewModel : ViewModel(), KoinComponent {
         val list = _stateLocoList.value.toMutableList()
         list.add(0, it)
         _stateLocoList.value = list
-        Log.d("ZZZ", "${_stateLocoList.value.javaClass}")
     }
 }
 

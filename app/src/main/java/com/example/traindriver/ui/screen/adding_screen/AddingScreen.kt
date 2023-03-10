@@ -12,8 +12,6 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -80,9 +78,9 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
         }
     }
 
-    var number by remember { mutableStateOf(TextFieldValue("")) }
+    val number = viewModel.numberRouteState
 
-    val timeValue = viewModel.state.value
+    val timeValue = viewModel.timeEditState.value
 
     val dateStart = timeValue.startTime.time
     val dateEnd = timeValue.endTime.time
@@ -306,7 +304,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                     }
                 }
 
-                val checkedState = remember { mutableStateOf(false) }
+//                val checkedState = remember { mutableStateOf(false) }
 
                 Row(
                     modifier = Modifier
@@ -323,7 +321,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                             .padding(end = 8.dp),
                         text = "Отдых в ПО",
                         style = Typography.body2.copy(
-                            color = if (checkedState.value) {
+                            color = if (viewModel.restState) {
                                 MaterialTheme.colors.primary
                             } else {
                                 MaterialTheme.colors.primaryVariant
@@ -332,9 +330,9 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                     )
 
                     Switch(
-                        checked = checkedState.value,
+                        checked = viewModel.restState,
                         onCheckedChange = {
-                            checkedState.value = it
+                            viewModel.setRest(it)
                         },
                     )
                 }
@@ -388,7 +386,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                         },
                 ) {
                     AnimatedVisibility(
-                        visible = checkedState.value,
+                        visible = viewModel.restState,
                         enter = slideInHorizontally(animationSpec = tween(durationMillis = 300))
                                 + fadeIn(animationSpec = tween(durationMillis = 300)),
                         exit = slideOutHorizontally(animationSpec = tween(durationMillis = 300))
@@ -484,7 +482,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                             .padding(vertical = 12.dp, horizontal = 24.dp),
                         hint = "№ маршрута",
                         value = number,
-                        onValueChange = { number = it }
+                        onValueChange = { viewModel.setNumber(it) }
                     )
                     HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
                     Spacer(modifier = Modifier.height(24.dp))

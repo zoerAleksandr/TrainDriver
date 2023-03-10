@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -94,7 +95,7 @@ fun CustomTab(
             .clip(ShapeBackground.small)
             .border(
                 width = 1.dp,
-                color = MaterialTheme.colors.primaryVariant,
+                color = MaterialTheme.colors.onSurface.copy(alpha = ContentAlpha.disabled),
                 shape = ShapeBackground.small
             )
             .background(MaterialTheme.colors.background)
