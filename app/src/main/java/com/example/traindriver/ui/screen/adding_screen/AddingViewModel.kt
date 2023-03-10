@@ -1,12 +1,11 @@
 package com.example.traindriver.ui.screen.adding_screen
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import android.util.Log
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traindriver.data.repository.DataStoreRepository
+import com.example.traindriver.domain.entity.Locomotive
 import com.example.traindriver.ui.util.long_util.minus
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -17,6 +16,15 @@ class AddingViewModel : ViewModel(), KoinComponent {
     private val dataStoreRepository: DataStoreRepository by inject()
     private var _state = mutableStateOf(WorkTimeEditState(formValid = true))
     val state: State<WorkTimeEditState> = _state
+
+    private val _stateLocoList = mutableStateOf(listOf<Locomotive>(
+        Locomotive(series = "2эс4к", number = "103"),
+        Locomotive(series = "3эс4к", number = "078"),
+        Locomotive(series = "ВЛ10", number = "1010"),
+        Locomotive(series = "3эс4к", number = "078"),
+        Locomotive(series = "ВЛ10", number = "1010")
+    ))
+    val stateLocoList: State<List<Locomotive>> = _stateLocoList
 
     var minTimeRest by mutableStateOf(0L)
         private set
@@ -84,6 +92,13 @@ class AddingViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
             minTimeRest = dataStoreRepository.getMinTimeRest().first()
         }
+    }
+
+    val addLocomotive: (Locomotive) -> Unit = {
+        val list = _stateLocoList.value.toMutableList()
+        list.add(0, it)
+        _stateLocoList.value = list
+        Log.d("ZZZ", "${_stateLocoList.value.javaClass}")
     }
 }
 
