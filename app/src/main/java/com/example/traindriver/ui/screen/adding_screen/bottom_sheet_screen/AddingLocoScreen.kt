@@ -207,7 +207,7 @@ fun AddingLocoScreen(
             if (!stateAccepted.formValid) {
                 Row(
                     modifier = Modifier
-                        .padding(top =12.dp, start = 16.dp, end = 16.dp),
+                        .padding(top = 12.dp, start = 16.dp, end = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -284,6 +284,186 @@ fun AddingLocoScreen(
                             text = timeStartText,
                             style = Typography.body1,
                             color = setTextColor(endAcceptedTime)
+                        )
+                    }
+                }
+            }
+        }
+
+        val stateDelivery = viewModel.deliveryTimeState.value
+        val startDeliveryTime = stateDelivery.startDelivered.time
+        val endDeliveryTime = stateDelivery.endDelivered.time
+
+        val startDeliveryCalendar = Calendar.getInstance()
+        startDeliveryTime?.let {
+            startAcceptedCalendar.timeInMillis = it
+        }
+
+        val endDeliveryCalendar = Calendar.getInstance()
+        endDeliveryTime?.let {
+            endDeliveryCalendar.timeInMillis = it
+        }
+
+        val startDeliveryTimePicker = TimePickerDialog(
+            LocalContext.current,
+            { _, h: Int, m: Int ->
+                startDeliveryCalendar[Calendar.HOUR_OF_DAY] = h
+                startDeliveryCalendar[Calendar.MINUTE] = m
+                startDeliveryCalendar[Calendar.SECOND] = 0
+                startDeliveryCalendar[Calendar.MILLISECOND] = 0
+                viewModel.createEventDelivery(
+                    DeliveryEvent.EnteredStartDelivery(
+                        startDeliveryCalendar.timeInMillis
+                    )
+                )
+                viewModel.createEventDelivery(DeliveryEvent.FocusChange(DeliveredType.START))
+            },
+            startDeliveryCalendar[Calendar.HOUR_OF_DAY],
+            startDeliveryCalendar[Calendar.MINUTE],
+            true
+        )
+
+        val startDeliveryDatePicker = DatePickerDialog(
+            LocalContext.current,
+            { _, y: Int, m: Int, d: Int ->
+                startDeliveryCalendar[Calendar.YEAR] = y
+                startDeliveryCalendar[Calendar.MONTH] = m
+                startDeliveryCalendar[Calendar.DAY_OF_MONTH] = d
+                startDeliveryTimePicker.show()
+            },
+            startDeliveryCalendar[Calendar.YEAR],
+            startDeliveryCalendar[Calendar.MONTH],
+            startDeliveryCalendar[Calendar.DAY_OF_MONTH]
+        )
+
+        val endDeliveryTimePicker = TimePickerDialog(
+            LocalContext.current,
+            { _, h: Int, m: Int ->
+                endDeliveryCalendar[Calendar.HOUR_OF_DAY] = h
+                endDeliveryCalendar[Calendar.MINUTE] = m
+                endDeliveryCalendar[Calendar.SECOND] = 0
+                endDeliveryCalendar[Calendar.MILLISECOND] = 0
+                viewModel.createEventDelivery(
+                    DeliveryEvent.EnteredEndDelivery(
+                        endDeliveryCalendar.timeInMillis
+                    )
+                )
+                viewModel.createEventDelivery(DeliveryEvent.FocusChange(DeliveredType.END))
+            },
+            endDeliveryCalendar[Calendar.HOUR_OF_DAY],
+            endDeliveryCalendar[Calendar.MINUTE],
+            true
+        )
+
+        val endDeliveryDatePicker = DatePickerDialog(
+            LocalContext.current,
+            { _, y: Int, m: Int, d: Int ->
+                endDeliveryCalendar[Calendar.YEAR] = y
+                endDeliveryCalendar[Calendar.MONTH] = m
+                endDeliveryCalendar[Calendar.DAY_OF_MONTH] = d
+                endDeliveryTimePicker.show()
+            },
+            endDeliveryCalendar[Calendar.YEAR],
+            endDeliveryCalendar[Calendar.MONTH],
+            endDeliveryCalendar[Calendar.DAY_OF_MONTH]
+        )
+
+        Column(
+            modifier = Modifier
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                .constrainAs(deliveryBlock) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(acceptanceBlock.bottom)
+                    width = Dimension.fillToConstraints
+                }
+                .border(
+                    width = 1.dp,
+                    shape = ShapeBackground.small,
+                    color = MaterialTheme.colors.secondary
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (!stateDelivery.formValid) {
+                Row(
+                    modifier = Modifier
+                        .padding(top = 12.dp, start = 16.dp, end = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_error_24),
+                        tint = Color.Red,
+                        contentDescription = null
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 8.dp),
+                        text = stateDelivery.errorMessage,
+                        style = Typography.caption.copy(color = Color.Red),
+                        color = Color.Red
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier.padding(start = 16.dp),
+                    text = "Сдача",
+                    style = Typography.body1
+                )
+
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clickable {
+                                startDeliveryDatePicker.show()
+                            }
+                            .padding(horizontal = 18.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val timeStartText = startDeliveryTime?.let { millis ->
+                            SimpleDateFormat(
+                                DateAndTimeFormat.TIME_FORMAT,
+                                Locale.getDefault()
+                            ).format(
+                                millis
+                            )
+                        } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
+
+                        Text(
+                            text = timeStartText,
+                            style = Typography.body1,
+                            color = setTextColor(startDeliveryTime)
+                        )
+                    }
+                    Text(" - ")
+                    Box(
+                        modifier = Modifier
+                            .padding(18.dp)
+                            .clickable {
+                                endDeliveryDatePicker.show()
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val timeEndText = endDeliveryTime?.let { millis ->
+                            SimpleDateFormat(
+                                DateAndTimeFormat.TIME_FORMAT,
+                                Locale.getDefault()
+                            ).format(
+                                millis
+                            )
+                        } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
+
+                        Text(
+                            text = timeEndText,
+                            style = Typography.body1,
+                            color = setTextColor(endDeliveryTime)
                         )
                     }
                 }

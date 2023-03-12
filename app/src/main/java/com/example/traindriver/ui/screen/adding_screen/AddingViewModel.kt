@@ -369,7 +369,6 @@ class AddingViewModel : ViewModel(), KoinComponent {
 
 }
 
-
 sealed class WorkTimeEvent {
     data class EnteredStartTime(val value: Long?) : WorkTimeEvent()
     data class EnteredEndTime(val value: Long?) : WorkTimeEvent()
