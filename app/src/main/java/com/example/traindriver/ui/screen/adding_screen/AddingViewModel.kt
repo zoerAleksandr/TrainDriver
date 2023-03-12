@@ -166,6 +166,15 @@ class AddingViewModel : ViewModel(), KoinComponent {
     }
 
     private fun validateAccepted(inputValue: Long?, type: AcceptedType): Boolean {
+        acceptedTimeState.value.endAccepted.time?.let { endAccepted ->
+            deliveryTimeState.value.startDelivered.time?.let { startDelivery ->
+                if (startDelivery > endAccepted) {
+                    acceptedTimeState.value.errorMessage =
+                        "Начало приемки позже окончания"
+                    return false
+                }
+            }
+        }
         return when (type) {
             AcceptedType.START -> {
                 inputValue?.let { input ->
@@ -291,6 +300,15 @@ class AddingViewModel : ViewModel(), KoinComponent {
     }
 
     private fun validateDelivery(inputValue: Long?, type: DeliveredType): Boolean {
+        acceptedTimeState.value.endAccepted.time?.let { endAccepted ->
+            deliveryTimeState.value.startDelivered.time?.let { startDelivery ->
+                if (startDelivery < endAccepted) {
+                    deliveryTimeState.value.errorMessage =
+                        "Начало сдачи раньше окончания приемки"
+                    return false
+                }
+            }
+        }
         return when (type) {
             DeliveredType.START -> {
                 inputValue?.let { input ->
@@ -321,7 +339,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
                     deliveryTimeState.value.endDelivered.time?.let { endDelivery ->
                         if (input > endDelivery) {
                             deliveryTimeState.value.errorMessage =
-                                "Начало сдачи позже окончания "
+                                "Начало сдачи позже окончания"
                             return false
                         }
                     }
