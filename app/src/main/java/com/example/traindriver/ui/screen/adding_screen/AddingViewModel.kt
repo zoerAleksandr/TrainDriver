@@ -6,11 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traindriver.data.repository.DataStoreRepository
 import com.example.traindriver.domain.entity.Locomotive
+import com.example.traindriver.ui.util.DateAndTimeFormat
 import com.example.traindriver.ui.util.long_util.minus
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.text.SimpleDateFormat
+import java.util.*
 
 class AddingViewModel : ViewModel(), KoinComponent {
     private val dataStoreRepository: DataStoreRepository by inject()
@@ -117,12 +120,12 @@ class AddingViewModel : ViewModel(), KoinComponent {
     var acceptedTimeState = mutableStateOf(AcceptedBlockState(formValid = true))
         private set
 
-    fun createEventAccepted(event: AcceptedEvent){
+    fun createEventAccepted(event: AcceptedEvent) {
         onAcceptedEvent(event)
     }
 
     private fun onAcceptedEvent(event: AcceptedEvent) {
-        when(event){
+        when (event) {
             is AcceptedEvent.EnteredStartAccepted -> {
                 acceptedTimeState.value = acceptedTimeState.value.copy(
                     startAccepted = acceptedTimeState.value.startAccepted.copy(
@@ -138,9 +141,103 @@ class AddingViewModel : ViewModel(), KoinComponent {
                 )
             }
             is AcceptedEvent.FocusChange -> {
-                acceptedTimeState.value = acceptedTimeState.value.copy(
-                    formValid = true
-                )
+                when (event.fieldName) {
+                    AcceptedType.START -> {
+                        val valid = validateAccepted(
+                            acceptedTimeState.value.startAccepted.time,
+                            AcceptedType.START
+                        )
+                        acceptedTimeState.value = acceptedTimeState.value.copy(
+                            formValid = valid
+                        )
+                    }
+                    AcceptedType.END -> {
+                        val valid = validateAccepted(
+                            acceptedTimeState.value.endAccepted.time,
+                            AcceptedType.END
+                        )
+                        acceptedTimeState.value = acceptedTimeState.value.copy(
+                            formValid = valid
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun validateAccepted(inputValue: Long?, type: AcceptedType): Boolean {
+        return when (type) {
+            AcceptedType.START -> {
+                inputValue?.let { input ->
+                    timeEditState.value.startTime.time?.let { timeStart ->
+                        if (input < timeStart) {
+                            val timeStartText =
+                                SimpleDateFormat(
+                                    DateAndTimeFormat.TIME_FORMAT,
+                                    Locale.getDefault()
+                                ).format(timeStart)
+                            acceptedTimeState.value.errorMessage =
+                                "Время приемки раньше явки $timeStartText"
+                            return false
+                        }
+                    }
+                    timeEditState.value.endTime.time?.let { endTime ->
+                        if (input > endTime) {
+                            val timeEndText =
+                                SimpleDateFormat(
+                                    DateAndTimeFormat.TIME_FORMAT,
+                                    Locale.getDefault()
+                                ).format(endTime)
+                            acceptedTimeState.value.errorMessage =
+                                "Время приемки позже окончания работы $timeEndText"
+                            return false
+                        }
+                    }
+                    acceptedTimeState.value.endAccepted.time?.let { endAccepted ->
+                        if (input > endAccepted) {
+                            acceptedTimeState.value.errorMessage =
+                                "Начало приемки позже окончания"
+                            return false
+                        }
+                    }
+                }
+                true
+            }
+            AcceptedType.END -> {
+                inputValue?.let { input ->
+                    timeEditState.value.startTime.time?.let { timeStart ->
+                        if (input < timeStart) {
+                            val timeStartText =
+                                SimpleDateFormat(
+                                    DateAndTimeFormat.TIME_FORMAT,
+                                    Locale.getDefault()
+                                ).format(timeStart)
+                            acceptedTimeState.value.errorMessage =
+                                "Время приемки раньше явки $timeStartText"
+                            return false
+                        }
+                    }
+                    timeEditState.value.endTime.time?.let { endTime ->
+                        if (input > endTime) {
+                            val timeEndText =
+                                SimpleDateFormat(
+                                    DateAndTimeFormat.TIME_FORMAT,
+                                    Locale.getDefault()
+                                ).format(endTime)
+                            acceptedTimeState.value.errorMessage =
+                                "Время приемки позже окончания работы $timeEndText"
+                            return false
+                        }
+                    }
+                    acceptedTimeState.value.startAccepted.time?.let { startAccepted ->
+                        if (input < startAccepted) {
+                            acceptedTimeState.value.errorMessage =
+                                "Окончание приемки раньше начала"
+                            return false
+                        }
+                    }
+                }
+                true
             }
         }
     }
@@ -182,11 +279,11 @@ data class AcceptedBlockState(
     val startAccepted: AcceptedTimeState = AcceptedTimeState(type = AcceptedType.START),
     val endAccepted: AcceptedTimeState = AcceptedTimeState(type = AcceptedType.END),
     val formValid: Boolean,
-    val errorMessage: String? = null
+    var errorMessage: String = ""
 )
 
 sealed class AcceptedEvent {
-    data class EnteredStartAccepted(val value: Long?): AcceptedEvent()
-    data class EnteredEndAccepted(val value: Long?): AcceptedEvent()
+    data class EnteredStartAccepted(val value: Long?) : AcceptedEvent()
+    data class EnteredEndAccepted(val value: Long?) : AcceptedEvent()
     data class FocusChange(val fieldName: AcceptedType) : AcceptedEvent()
 }

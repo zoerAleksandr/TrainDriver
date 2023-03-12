@@ -9,13 +9,16 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.traindriver.R
 import com.example.traindriver.domain.entity.Locomotive
 import com.example.traindriver.ui.screen.adding_screen.*
 import com.example.traindriver.ui.screen.adding_screen.custom_tab.CustomTab
@@ -185,79 +188,104 @@ fun AddingLocoScreen(
         )
 
 
-        Row(modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .constrainAs(acceptanceBlock) {
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                top.linkTo(typeLoco.bottom)
-                width = Dimension.fillToConstraints
-            }
-            .border(
-                width = 1.dp,
-                shape = ShapeBackground.small,
-                color = MaterialTheme.colors.secondary
-            ),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .constrainAs(acceptanceBlock) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(typeLoco.bottom)
+                    width = Dimension.fillToConstraints
+                }
+                .border(
+                    width = 1.dp,
+                    shape = ShapeBackground.small,
+                    color = MaterialTheme.colors.secondary
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                modifier = Modifier.padding(start = 16.dp),
-                text = "Приемка",
-                style = Typography.body1
-            )
-
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
+            if (!stateAccepted.formValid) {
+                Row(
                     modifier = Modifier
-                        .clickable {
-                            startAcceptedDatePicker.show()
-                        }
-                        .padding(horizontal = 18.dp),
-                    contentAlignment = Alignment.Center
+                        .padding(top =12.dp, start = 16.dp, end = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val timeStartText = startAcceptedTime?.let { millis ->
-                        SimpleDateFormat(
-                            DateAndTimeFormat.TIME_FORMAT,
-                            Locale.getDefault()
-                        ).format(
-                            millis
-                        )
-                    } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
-
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_error_24),
+                        tint = Color.Red,
+                        contentDescription = null
+                    )
                     Text(
-                        text = timeStartText,
-                        style = Typography.body1,
-                        color = setTextColor(startAcceptedTime)
+                        modifier = Modifier.padding(start = 8.dp),
+                        text = stateAccepted.errorMessage,
+                        style = Typography.caption.copy(color = Color.Red),
+                        color = Color.Red
                     )
                 }
-                Text(" - ")
-                Box(
-                    modifier = Modifier
-                        .padding(18.dp)
-                        .clickable {
-                            endAcceptedDatePicker.show()
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    val timeStartText = endAcceptedTime?.let { millis ->
-                        SimpleDateFormat(
-                            DateAndTimeFormat.TIME_FORMAT,
-                            Locale.getDefault()
-                        ).format(
-                            millis
-                        )
-                    } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier.padding(start = 16.dp),
+                    text = "Приемка",
+                    style = Typography.body1
+                )
 
-                    Text(
-                        text = timeStartText,
-                        style = Typography.body1,
-                        color = setTextColor(endAcceptedTime)
-                    )
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clickable {
+                                startAcceptedDatePicker.show()
+                            }
+                            .padding(horizontal = 18.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val timeStartText = startAcceptedTime?.let { millis ->
+                            SimpleDateFormat(
+                                DateAndTimeFormat.TIME_FORMAT,
+                                Locale.getDefault()
+                            ).format(
+                                millis
+                            )
+                        } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
+
+                        Text(
+                            text = timeStartText,
+                            style = Typography.body1,
+                            color = setTextColor(startAcceptedTime)
+                        )
+                    }
+                    Text(" - ")
+                    Box(
+                        modifier = Modifier
+                            .padding(18.dp)
+                            .clickable {
+                                endAcceptedDatePicker.show()
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val timeStartText = endAcceptedTime?.let { millis ->
+                            SimpleDateFormat(
+                                DateAndTimeFormat.TIME_FORMAT,
+                                Locale.getDefault()
+                            ).format(
+                                millis
+                            )
+                        } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
+
+                        Text(
+                            text = timeStartText,
+                            style = Typography.body1,
+                            color = setTextColor(endAcceptedTime)
+                        )
+                    }
                 }
             }
         }
