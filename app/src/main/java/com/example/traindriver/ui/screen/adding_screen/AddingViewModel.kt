@@ -241,6 +241,132 @@ class AddingViewModel : ViewModel(), KoinComponent {
             }
         }
     }
+
+    var deliveryTimeState = mutableStateOf(DeliveryBlockState(formValid = true))
+        private set
+
+    fun createEventDelivery(event: DeliveryEvent) {
+        onDeliveryEvent(event)
+    }
+
+    private fun onDeliveryEvent(event: DeliveryEvent) {
+        when (event) {
+            is DeliveryEvent.EnteredStartDelivery -> {
+                deliveryTimeState.value = deliveryTimeState.value.copy(
+                    startDelivered = deliveryTimeState.value.startDelivered.copy(
+                        time = event.value
+                    )
+                )
+            }
+            is DeliveryEvent.EnteredEndDelivery -> {
+                deliveryTimeState.value = deliveryTimeState.value.copy(
+                    endDelivered = deliveryTimeState.value.endDelivered.copy(
+                        time = event.value
+                    )
+                )
+            }
+            is DeliveryEvent.FocusChange -> {
+                when (event.fieldName) {
+                    DeliveredType.START -> {
+                        val valid = validateDelivery(
+                            deliveryTimeState.value.startDelivered.time,
+                            DeliveredType.START
+                        )
+                        deliveryTimeState.value = deliveryTimeState.value.copy(
+                            formValid = valid
+                        )
+                    }
+                    DeliveredType.END -> {
+                        val valid = validateDelivery(
+                            deliveryTimeState.value.endDelivered.time,
+                            DeliveredType.END
+                        )
+                        deliveryTimeState.value = deliveryTimeState.value.copy(
+                            formValid = valid
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun validateDelivery(inputValue: Long?, type: DeliveredType): Boolean {
+        return when (type) {
+            DeliveredType.START -> {
+                inputValue?.let { input ->
+                    timeEditState.value.startTime.time?.let { timeStart ->
+                        if (input < timeStart) {
+                            val timeStartText =
+                                SimpleDateFormat(
+                                    DateAndTimeFormat.TIME_FORMAT,
+                                    Locale.getDefault()
+                                ).format(timeStart)
+                            deliveryTimeState.value.errorMessage =
+                                "Время сдачи раньше явки $timeStartText"
+                            return false
+                        }
+                    }
+                    timeEditState.value.endTime.time?.let { timeEnd ->
+                        if (input > timeEnd) {
+                            val timeStartText =
+                                SimpleDateFormat(
+                                    DateAndTimeFormat.TIME_FORMAT,
+                                    Locale.getDefault()
+                                ).format(timeEnd)
+                            deliveryTimeState.value.errorMessage =
+                                "Время сдачи позже окончания работы $timeStartText"
+                            return false
+                        }
+                    }
+                    deliveryTimeState.value.endDelivered.time?.let { endDelivery ->
+                        if (input > endDelivery) {
+                            deliveryTimeState.value.errorMessage =
+                                "Начало сдачи позже окончания "
+                            return false
+                        }
+                    }
+                }
+                true
+            }
+            DeliveredType.END -> {
+                inputValue?.let { input ->
+                    timeEditState.value.startTime.time?.let { timeStart ->
+                        if (input < timeStart) {
+                            val timeStartText =
+                                SimpleDateFormat(
+                                    DateAndTimeFormat.TIME_FORMAT,
+                                    Locale.getDefault()
+                                ).format(timeStart)
+                            deliveryTimeState.value.errorMessage =
+                                "Время сдачи раньше явки $timeStartText"
+                            return false
+                        }
+                    }
+                    timeEditState.value.endTime.time?.let { timeEnd ->
+                        if (input > timeEnd) {
+                            val timeStartText =
+                                SimpleDateFormat(
+                                    DateAndTimeFormat.TIME_FORMAT,
+                                    Locale.getDefault()
+                                ).format(timeEnd)
+                            deliveryTimeState.value.errorMessage =
+                                "Время сдачи позже окончания работы $timeStartText"
+                            return false
+                        }
+                    }
+                    deliveryTimeState.value.startDelivered.time?.let { startDelivery ->
+                        if (input < startDelivery) {
+                            deliveryTimeState.value.errorMessage =
+                                "Окончание сдачи раньше начала "
+                            return false
+                        }
+                    }
+                }
+                true
+            }
+        }
+    }
+
 }
 
 
@@ -286,4 +412,26 @@ sealed class AcceptedEvent {
     data class EnteredStartAccepted(val value: Long?) : AcceptedEvent()
     data class EnteredEndAccepted(val value: Long?) : AcceptedEvent()
     data class FocusChange(val fieldName: AcceptedType) : AcceptedEvent()
+}
+
+enum class DeliveredType {
+    START, END
+}
+
+data class DeliveredTimeState(
+    val time: Long? = null,
+    val type: DeliveredType
+)
+
+data class DeliveryBlockState(
+    val startDelivered: DeliveredTimeState = DeliveredTimeState(type = DeliveredType.START),
+    val endDelivered: DeliveredTimeState = DeliveredTimeState(type = DeliveredType.END),
+    val formValid: Boolean,
+    var errorMessage: String = ""
+)
+
+sealed class DeliveryEvent {
+    data class EnteredStartDelivery(val value: Long?) : DeliveryEvent()
+    data class EnteredEndDelivery(val value: Long?) : DeliveryEvent()
+    data class FocusChange(val fieldName: DeliveredType) : DeliveryEvent()
 }
