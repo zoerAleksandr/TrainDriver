@@ -1,6 +1,5 @@
 package com.example.traindriver.ui.screen.adding_screen
 
-import android.util.Log
 import androidx.compose.runtime.*
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
@@ -28,12 +27,12 @@ class AddingViewModel : ViewModel(), KoinComponent {
     var numberRouteState by mutableStateOf(TextFieldValue(""))
         private set
 
-    fun setNumber(newValue: TextFieldValue){
+    fun setNumber(newValue: TextFieldValue) {
         numberRouteState = newValue
     }
 
     private val _stateLocoList = mutableStateOf(
-        listOf<Locomotive>(
+        listOf(
             Locomotive(series = "2эс4к", number = "103"),
             Locomotive(series = "3эс4к", number = "078")
         )
@@ -114,6 +113,37 @@ class AddingViewModel : ViewModel(), KoinComponent {
         list.add(0, it)
         _stateLocoList.value = list
     }
+
+    var acceptedTimeState = mutableStateOf(AcceptedBlockState(formValid = true))
+        private set
+
+    fun createEventAccepted(event: AcceptedEvent){
+        onAcceptedEvent(event)
+    }
+
+    private fun onAcceptedEvent(event: AcceptedEvent) {
+        when(event){
+            is AcceptedEvent.EnteredStartAccepted -> {
+                acceptedTimeState.value = acceptedTimeState.value.copy(
+                    startAccepted = acceptedTimeState.value.startAccepted.copy(
+                        time = event.value
+                    )
+                )
+            }
+            is AcceptedEvent.EnteredEndAccepted -> {
+                acceptedTimeState.value = acceptedTimeState.value.copy(
+                    endAccepted = acceptedTimeState.value.endAccepted.copy(
+                        time = event.value
+                    )
+                )
+            }
+            is AcceptedEvent.FocusChange -> {
+                acceptedTimeState.value = acceptedTimeState.value.copy(
+                    formValid = true
+                )
+            }
+        }
+    }
 }
 
 
@@ -138,3 +168,25 @@ data class WorkTimeEditState(
     val formValid: Boolean,
     val errorMessage: String = "Время явки позже сдачи"
 )
+
+enum class AcceptedType {
+    START, END
+}
+
+data class AcceptedTimeState(
+    val time: Long? = null,
+    val type: AcceptedType
+)
+
+data class AcceptedBlockState(
+    val startAccepted: AcceptedTimeState = AcceptedTimeState(type = AcceptedType.START),
+    val endAccepted: AcceptedTimeState = AcceptedTimeState(type = AcceptedType.END),
+    val formValid: Boolean,
+    val errorMessage: String? = null
+)
+
+sealed class AcceptedEvent {
+    data class EnteredStartAccepted(val value: Long?): AcceptedEvent()
+    data class EnteredEndAccepted(val value: Long?): AcceptedEvent()
+    data class FocusChange(val fieldName: AcceptedType) : AcceptedEvent()
+}

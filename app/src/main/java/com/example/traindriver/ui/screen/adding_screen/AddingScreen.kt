@@ -304,8 +304,6 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                     }
                 }
 
-//                val checkedState = remember { mutableStateOf(false) }
-
                 Row(
                     modifier = Modifier
                         .padding(end = 16.dp, top = 24.dp)
@@ -501,7 +499,10 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
 fun SheetLayout(sheet: BottomSheetScreen, closeSheet: () -> Unit, viewModel: AddingViewModel) {
     BottomSheetWithCloseDialog(closeSheet) {
         when (sheet) {
-            BottomSheetScreen.AddingLoco -> AddingLocoScreen(addingLocomotive = viewModel.addLocomotive)
+            BottomSheetScreen.AddingLoco -> AddingLocoScreen(
+                addingLocomotive = viewModel.addLocomotive,
+                viewModel = viewModel
+            )
             BottomSheetScreen.AddingTrain -> AddingTrainScreen()
             BottomSheetScreen.AddingPass -> AddingPassScreen()
         }
