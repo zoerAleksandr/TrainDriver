@@ -12,6 +12,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -19,6 +20,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.traindriver.ui.theme.ShapeBackground
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.PagerState
+import kotlinx.coroutines.launch
 
 @Composable
 private fun MyTabIndicator(
@@ -57,7 +61,7 @@ private fun MyTabItem(
         } else {
             MaterialTheme.colors.primaryVariant
         },
-        animationSpec = tween(durationMillis = 300, easing = LinearEasing),
+        animationSpec = tween(durationMillis = 100),
     )
     Text(
         modifier = Modifier
@@ -76,13 +80,14 @@ private fun MyTabItem(
     )
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun CustomTab(
     selectedItemIndex: Int,
     items: List<String>,
     modifier: Modifier = Modifier,
     tabWidth: Dp,
-    onClick: (index: Int) -> Unit,
+    pagerState: PagerState,
 ) {
     val indicatorOffset: Dp by animateDpAsState(
         targetValue = tabWidth * selectedItemIndex,
@@ -109,12 +114,17 @@ fun CustomTab(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.clip(ShapeBackground.small),
         ) {
+            val scope = rememberCoroutineScope()
             items.mapIndexed { index, text ->
                 val isSelected = index == selectedItemIndex
                 MyTabItem(
                     isSelected = isSelected,
                     onClick = {
-                        onClick(index)
+                        scope.launch {
+                            pagerState.animateScrollToPage(
+                                page = index, animationSpec = tween(durationMillis = 300)
+                            )
+                        }
                     },
                     tabWidth = tabWidth,
                     text = text,

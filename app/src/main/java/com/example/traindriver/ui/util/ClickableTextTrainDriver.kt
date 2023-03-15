@@ -12,13 +12,14 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
+import com.example.traindriver.ui.theme.Typography
 
 @Composable
 fun ClickableTextTrainDriver(
     text: AnnotatedString,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    style: TextStyle = TextStyle.Default,
+    style: TextStyle = Typography.button,
     softWrap: Boolean = true,
     overflow: TextOverflow = TextOverflow.Clip,
     maxLines: Int = Int.MAX_VALUE,

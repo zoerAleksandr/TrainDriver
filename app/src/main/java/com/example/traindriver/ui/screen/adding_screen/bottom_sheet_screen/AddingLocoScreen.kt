@@ -5,6 +5,8 @@ import android.app.TimePickerDialog
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -20,17 +23,25 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.traindriver.R
 import com.example.traindriver.domain.entity.Locomotive
+import com.example.traindriver.domain.entity.SectionDiesel
+import com.example.traindriver.domain.entity.SectionElectric
 import com.example.traindriver.ui.screen.adding_screen.*
 import com.example.traindriver.ui.screen.adding_screen.custom_tab.CustomTab
 import com.example.traindriver.ui.screen.viewing_route_screen.element.setTextColor
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
+import com.example.traindriver.ui.util.ClickableTextTrainDriver
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.DateAndTimeFormat
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.rememberPagerState
 import java.text.SimpleDateFormat
 import java.util.*
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun AddingLocoScreen(
     locomotive: Locomotive? = null,
@@ -40,7 +51,11 @@ fun AddingLocoScreen(
     ConstraintLayout(
         modifier = Modifier.fillMaxSize(),
     ) {
-        val (buttonSave, editSeries, editNumber, typeLoco, acceptanceBlock, deliveryBlock) = createRefs()
+        val (
+            buttonSave, editSeries, editNumber,
+            typeLoco, acceptanceBlock, deliveryBlock,
+            sectionBlock
+        ) = createRefs()
         var number by remember { mutableStateOf(TextFieldValue(locomotive?.number ?: "")) }
         var series by remember { mutableStateOf(TextFieldValue(locomotive?.series ?: "")) }
 
@@ -97,11 +112,9 @@ fun AddingLocoScreen(
             onValueChange = { number = it }
         )
 
-        val (selected, setSelected) = remember {
-            mutableStateOf(0)
-        }
         val configuration = LocalConfiguration.current
         val screenWidth = configuration.screenWidthDp.dp
+        val pagerState = rememberPagerState(pageCount = 2, initialPage = 0)
 
         CustomTab(
             modifier = Modifier
@@ -110,11 +123,11 @@ fun AddingLocoScreen(
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-                .padding(16.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp),
             items = listOf("Тепловоз", "Электровоз"),
             tabWidth = (screenWidth - 32.dp) / 2,
-            selectedItemIndex = selected,
-            onClick = setSelected,
+            selectedItemIndex = pagerState.currentPage,
+            pagerState = pagerState,
         )
 
         val stateAccepted = viewModel.acceptedTimeState.value
@@ -190,7 +203,7 @@ fun AddingLocoScreen(
 
         Column(
             modifier = Modifier
-                .padding(horizontal = 16.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 32.dp)
                 .constrainAs(acceptanceBlock) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
@@ -469,6 +482,92 @@ fun AddingLocoScreen(
                 }
             }
         }
+
+        SectionPager(
+            modifier = Modifier
+                .constrainAs(sectionBlock) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(deliveryBlock.bottom)
+                    width = Dimension.fillToConstraints
+                }
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+            pagerState = pagerState
+        )
+    }
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun SectionPager(modifier: Modifier = Modifier, pagerState: PagerState) {
+    Column(modifier = modifier, horizontalAlignment = Alignment.End) {
+        HorizontalPager(
+            dragEnabled = false,
+            state = pagerState
+        ) { page ->
+            when (page) {
+                0 -> DieselSectionList()
+                1 -> ElectricSectionList()
+            }
+        }
+
+        ClickableTextTrainDriver(
+            modifier = Modifier.padding(top = 8.dp),
+            text = AnnotatedString("Добавить секцию")
+        ) {
+
+        }
+    }
+}
+
+@Composable
+fun DieselSectionList() {
+    val sectionList = listOf(SectionDiesel(), SectionDiesel())
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        items(sectionList) { item ->
+            DieselSectionItem(item)
+        }
+    }
+}
+
+@Composable
+fun DieselSectionItem(sectionDiesel: SectionDiesel) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colors.primaryVariant,
+                shape = ShapeBackground.small
+            )
+    ) {
+        Text(text = "I am Item Diesel Section")
+    }
+}
+
+@Composable
+fun ElectricSectionList() {
+    val sectionList = listOf(SectionElectric(), SectionElectric())
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        items(sectionList) { item ->
+            ElectricSectionItem(item)
+        }
+    }
+}
+
+@Composable
+fun ElectricSectionItem(sectionDiesel: SectionElectric) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+    ) {
+        Text(text = "I am Item Electric Section")
     }
 }
 
