@@ -169,8 +169,8 @@ class MockDataRepository : DataRepository {
         callbackFlow {
             trySend(ResultState.Loading())
             delay(2000)
-            trySend(ResultState.Failure(Throwable()))
-//            trySend(ResultState.Success(one))
+//            trySend(ResultState.Failure(Throwable()))
+            trySend(ResultState.Success(one))
             awaitClose { close() }
         }
 }

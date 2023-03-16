@@ -1,12 +1,10 @@
-package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen
+package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.adding_loco
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,7 +13,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -23,20 +20,20 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.traindriver.R
 import com.example.traindriver.domain.entity.Locomotive
-import com.example.traindriver.domain.entity.SectionDiesel
-import com.example.traindriver.domain.entity.SectionElectric
+import com.example.traindriver.ui.element_screen.OutlinedTextFieldCustom
 import com.example.traindriver.ui.screen.adding_screen.*
 import com.example.traindriver.ui.screen.adding_screen.custom_tab.CustomTab
+import com.example.traindriver.ui.screen.adding_screen.state_holder.AcceptedEvent
+import com.example.traindriver.ui.screen.adding_screen.state_holder.AcceptedType
+import com.example.traindriver.ui.screen.adding_screen.state_holder.DeliveredType
+import com.example.traindriver.ui.screen.adding_screen.state_holder.DeliveryEvent
 import com.example.traindriver.ui.screen.viewing_route_screen.element.setTextColor
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
-import com.example.traindriver.ui.util.ClickableTextTrainDriver
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.DateAndTimeFormat
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import java.text.SimpleDateFormat
 import java.util.*
@@ -45,7 +42,6 @@ import java.util.*
 @Composable
 fun AddingLocoScreen(
     locomotive: Locomotive? = null,
-    addingLocomotive: (Locomotive) -> Unit,
     viewModel: AddingViewModel
 ) {
     ConstraintLayout(
@@ -66,13 +62,13 @@ fun AddingLocoScreen(
                     end.linkTo(parent.end)
                 }
                 .clickable {
-                    addingLocomotive.invoke(Locomotive(series = "ВЛ15", number = "033"))
+                    viewModel.addLocomotive(Locomotive(series = "ВЛ15", number = "033"))
                 }
                 .padding(end = 32.dp, top = 16.dp),
             text = "Сохранить",
             style = Typography.button.copy(color = MaterialTheme.colors.secondaryVariant))
 
-        OutlinedTextField(
+        OutlinedTextFieldCustom(
             modifier = Modifier
                 .constrainAs(editSeries) {
                     start.linkTo(parent.start)
@@ -82,17 +78,11 @@ fun AddingLocoScreen(
                 }
                 .padding(top = 32.dp, start = 16.dp, end = 8.dp),
             value = series,
-            label = {
-                Text(text = "Серия", style = Typography.body1)
-            },
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                textColor = MaterialTheme.colors.primary,
-                unfocusedBorderColor = MaterialTheme.colors.secondary
-            ),
+            labelText = "Серия",
             onValueChange = { series = it }
         )
 
-        OutlinedTextField(
+        OutlinedTextFieldCustom(
             modifier = Modifier
                 .constrainAs(editNumber) {
                     start.linkTo(editSeries.end)
@@ -102,13 +92,7 @@ fun AddingLocoScreen(
                 }
                 .padding(top = 32.dp, end = 16.dp, start = 8.dp),
             value = number,
-            label = {
-                Text("Номер", style = Typography.body1)
-            },
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                textColor = MaterialTheme.colors.primary,
-                unfocusedBorderColor = MaterialTheme.colors.secondary
-            ),
+            labelText = "Номер",
             onValueChange = { number = it }
         )
 
@@ -492,82 +476,9 @@ fun AddingLocoScreen(
                     width = Dimension.fillToConstraints
                 }
                 .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-            pagerState = pagerState
+            pagerState = pagerState,
+            viewModel = viewModel
         )
-    }
-}
-
-@OptIn(ExperimentalPagerApi::class)
-@Composable
-fun SectionPager(modifier: Modifier = Modifier, pagerState: PagerState) {
-    Column(modifier = modifier, horizontalAlignment = Alignment.End) {
-        HorizontalPager(
-            dragEnabled = false,
-            state = pagerState
-        ) { page ->
-            when (page) {
-                0 -> DieselSectionList()
-                1 -> ElectricSectionList()
-            }
-        }
-
-        ClickableTextTrainDriver(
-            modifier = Modifier.padding(top = 8.dp),
-            text = AnnotatedString("Добавить секцию")
-        ) {
-
-        }
-    }
-}
-
-@Composable
-fun DieselSectionList() {
-    val sectionList = listOf(SectionDiesel(), SectionDiesel())
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        items(sectionList) { item ->
-            DieselSectionItem(item)
-        }
-    }
-}
-
-@Composable
-fun DieselSectionItem(sectionDiesel: SectionDiesel) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp)
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colors.primaryVariant,
-                shape = ShapeBackground.small
-            )
-    ) {
-        Text(text = "I am Item Diesel Section")
-    }
-}
-
-@Composable
-fun ElectricSectionList() {
-    val sectionList = listOf(SectionElectric(), SectionElectric())
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        items(sectionList) { item ->
-            ElectricSectionItem(item)
-        }
-    }
-}
-
-@Composable
-fun ElectricSectionItem(sectionDiesel: SectionElectric) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp)
-    ) {
-        Text(text = "I am Item Electric Section")
     }
 }
 
@@ -575,6 +486,6 @@ fun ElectricSectionItem(sectionDiesel: SectionElectric) {
 @DarkLightPreviews
 private fun AddingLocoPreviews() {
     TrainDriverTheme {
-        AddingLocoScreen(addingLocomotive = {}, viewModel = viewModel())
+        AddingLocoScreen(viewModel = viewModel())
     }
 }

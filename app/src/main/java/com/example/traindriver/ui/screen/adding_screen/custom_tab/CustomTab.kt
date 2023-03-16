@@ -121,8 +121,8 @@ fun CustomTab(
                     isSelected = isSelected,
                     onClick = {
                         scope.launch {
-                            pagerState.animateScrollToPage(
-                                page = index, animationSpec = tween(durationMillis = 300)
+                            pagerState.scrollToPage(
+                                page = index
                             )
                         }
                     },

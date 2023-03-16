@@ -44,6 +44,9 @@ import com.example.traindriver.domain.entity.Locomotive
 import com.example.traindriver.ui.element_screen.HorizontalDividerTrainDriver
 import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.*
+import com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.adding_loco.AddingLocoScreen
+import com.example.traindriver.ui.screen.adding_screen.state_holder.WorkTimeEvent
+import com.example.traindriver.ui.screen.adding_screen.state_holder.WorkTimeType
 import com.example.traindriver.ui.screen.viewing_route_screen.element.LINK_TO_SETTING
 import com.example.traindriver.ui.screen.viewing_route_screen.element.setTextColor
 import com.example.traindriver.ui.screen.viewing_route_screen.element.startIndexLastWord
@@ -500,7 +503,6 @@ fun SheetLayout(sheet: BottomSheetScreen, closeSheet: () -> Unit, viewModel: Add
     BottomSheetWithCloseDialog(closeSheet) {
         when (sheet) {
             BottomSheetScreen.AddingLoco -> AddingLocoScreen(
-                addingLocomotive = viewModel.addLocomotive,
                 viewModel = viewModel
             )
             BottomSheetScreen.AddingTrain -> AddingTrainScreen()

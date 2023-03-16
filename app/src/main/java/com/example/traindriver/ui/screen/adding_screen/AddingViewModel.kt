@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traindriver.data.repository.DataStoreRepository
 import com.example.traindriver.domain.entity.Locomotive
+import com.example.traindriver.domain.entity.SectionDiesel
+import com.example.traindriver.domain.entity.SectionElectric
+import com.example.traindriver.ui.screen.adding_screen.state_holder.*
 import com.example.traindriver.ui.util.DateAndTimeFormat
 import com.example.traindriver.ui.util.long_util.minus
 import kotlinx.coroutines.flow.first
@@ -385,70 +388,21 @@ class AddingViewModel : ViewModel(), KoinComponent {
         }
     }
 
-}
+    var dieselSectionListState = mutableStateOf(listOf(SectionDiesel()))
+        private set
 
-sealed class WorkTimeEvent {
-    data class EnteredStartTime(val value: Long?) : WorkTimeEvent()
-    data class EnteredEndTime(val value: Long?) : WorkTimeEvent()
-    data class FocusChange(val fieldName: WorkTimeType) : WorkTimeEvent()
-}
+    var electricSectionListState = mutableStateOf(listOf<SectionElectric>())
+        private set
 
-enum class WorkTimeType {
-    START, END
-}
+    fun addDieselSection() {
+        val list = dieselSectionListState.value.toMutableList()
+        list.add(SectionDiesel())
+        dieselSectionListState.value = list
+    }
 
-data class WorkTimeState(
-    val time: Long? = null,
-    val type: WorkTimeType,
-)
-
-data class WorkTimeEditState(
-    val startTime: WorkTimeState = WorkTimeState(type = WorkTimeType.START),
-    val endTime: WorkTimeState = WorkTimeState(type = WorkTimeType.END),
-    val formValid: Boolean,
-    val errorMessage: String = "Время явки позже сдачи"
-)
-
-enum class AcceptedType {
-    START, END
-}
-
-data class AcceptedTimeState(
-    val time: Long? = null,
-    val type: AcceptedType
-)
-
-data class AcceptedBlockState(
-    val startAccepted: AcceptedTimeState = AcceptedTimeState(type = AcceptedType.START),
-    val endAccepted: AcceptedTimeState = AcceptedTimeState(type = AcceptedType.END),
-    val formValid: Boolean,
-    var errorMessage: String = ""
-)
-
-sealed class AcceptedEvent {
-    data class EnteredStartAccepted(val value: Long?) : AcceptedEvent()
-    data class EnteredEndAccepted(val value: Long?) : AcceptedEvent()
-    data class FocusChange(val fieldName: AcceptedType) : AcceptedEvent()
-}
-
-enum class DeliveredType {
-    START, END
-}
-
-data class DeliveredTimeState(
-    val time: Long? = null,
-    val type: DeliveredType
-)
-
-data class DeliveryBlockState(
-    val startDelivered: DeliveredTimeState = DeliveredTimeState(type = DeliveredType.START),
-    val endDelivered: DeliveredTimeState = DeliveredTimeState(type = DeliveredType.END),
-    val formValid: Boolean,
-    var errorMessage: String = ""
-)
-
-sealed class DeliveryEvent {
-    data class EnteredStartDelivery(val value: Long?) : DeliveryEvent()
-    data class EnteredEndDelivery(val value: Long?) : DeliveryEvent()
-    data class FocusChange(val fieldName: DeliveredType) : DeliveryEvent()
+    fun addElectricSection() {
+        val list = electricSectionListState.value.toMutableList()
+        list.add(SectionElectric())
+        electricSectionListState.value = list
+    }
 }
