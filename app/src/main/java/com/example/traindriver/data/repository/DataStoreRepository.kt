@@ -21,11 +21,13 @@ class DataStoreRepository(context: Context) {
 
     private val oneHourInMillis = 3_600_000L
     private val defaultTimeRest = oneHourInMillis * 3
+    private val defaultDieselCoefficient = 0.83
 
     private object PreferencesKey {
         val isRegistered = booleanPreferencesKey(name = "is_registered")
         val uid = stringPreferencesKey(name = "uid")
         val minTimeRest = longPreferencesKey(name = "minTimeRest")
+        val dieselCoefficient = doublePreferencesKey(name = "dieselCoefficient")
     }
 
     private val dataStore = context.dataStore
@@ -65,7 +67,6 @@ class DataStoreRepository(context: Context) {
             }
         }
 
-
     suspend fun getMinTimeRest(): Flow<Long> {
         return dataStore.data
             .catch { exception ->
@@ -100,4 +101,31 @@ class DataStoreRepository(context: Context) {
                 pref[PreferencesKey.uid]
             }
     }
+
+    fun readDieselCoefficient(): Flow<Double> {
+        return dataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }
+            .map { pref ->
+                pref[PreferencesKey.dieselCoefficient] ?: defaultDieselCoefficient
+            }
+    }
+
+    suspend fun saveDieselCoefficient(coefficient: Double): Flow<ResultState<Boolean>> =
+        callbackFlow {
+            trySend(ResultState.Loading(null))
+            try {
+                dataStore.edit { pref ->
+                    pref[PreferencesKey.dieselCoefficient] = coefficient
+                }
+                trySend(ResultState.Success(data = true))
+            } catch (e: Exception) {
+                trySend(ResultState.Failure(e))
+            }
+        }
 }

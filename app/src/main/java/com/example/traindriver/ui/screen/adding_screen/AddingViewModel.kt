@@ -11,8 +11,8 @@ import com.example.traindriver.domain.entity.SectionElectric
 import com.example.traindriver.ui.screen.adding_screen.state_holder.*
 import com.example.traindriver.ui.util.DateAndTimeFormat
 import com.example.traindriver.ui.util.long_util.minus
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.text.SimpleDateFormat
@@ -366,12 +366,18 @@ class AddingViewModel : ViewModel(), KoinComponent {
         private set
 
     fun addDieselSection(sectionDiesel: SectionDiesel) {
-        dieselSectionListState.add(
-            DieselSectionFormState(
-                sectionId = sectionDiesel.id,
-                formValid = true
+        viewModelScope.launch {
+            dieselSectionListState.add(
+                DieselSectionFormState(
+                    sectionId = sectionDiesel.id,
+                    formValid = true,
+                    coefficient = DieselSectionFieldState(
+                        type = DieselSectionType.COEFFICIENT,
+                        data = getCoefficient()
+                    )
+                )
             )
-        )
+        }
     }
 
     fun createEventDieselSection(event: DieselSectionEvent) {
@@ -394,9 +400,22 @@ class AddingViewModel : ViewModel(), KoinComponent {
                     )
                 )
             }
+            is DieselSectionEvent.EnteredCoefficient -> {
+                dieselSectionListState[event.index] = dieselSectionListState[event.index].copy(
+                    coefficient = dieselSectionListState[event.index].coefficient.copy(
+                        data = event.data
+                    )
+                )
+            }
             is DieselSectionEvent.FocusChange -> {}
         }
     }
+
+    private suspend fun getCoefficient(): Double =
+        withContext(viewModelScope.coroutineContext) {
+            dataStoreRepository.readDieselCoefficient().first()
+        }
+
 
     var electricSectionListState = mutableStateOf(listOf<SectionElectric>())
         private set

@@ -23,461 +23,502 @@ import com.example.traindriver.domain.entity.Locomotive
 import com.example.traindriver.ui.element_screen.OutlinedTextFieldCustom
 import com.example.traindriver.ui.screen.adding_screen.*
 import com.example.traindriver.ui.screen.adding_screen.custom_tab.CustomTab
-import com.example.traindriver.ui.screen.adding_screen.state_holder.AcceptedEvent
-import com.example.traindriver.ui.screen.adding_screen.state_holder.AcceptedType
-import com.example.traindriver.ui.screen.adding_screen.state_holder.DeliveredType
-import com.example.traindriver.ui.screen.adding_screen.state_holder.DeliveryEvent
+import com.example.traindriver.ui.screen.adding_screen.state_holder.*
 import com.example.traindriver.ui.screen.viewing_route_screen.element.setTextColor
 import com.example.traindriver.ui.theme.ShapeBackground
+import com.example.traindriver.ui.theme.ShapeSurface
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.DateAndTimeFormat
+import com.example.traindriver.ui.util.double_util.str
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
 import java.text.SimpleDateFormat
 import java.util.*
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun AddingLocoScreen(
     locomotive: Locomotive? = null,
     viewModel: AddingViewModel
 ) {
-    ConstraintLayout(
-        modifier = Modifier.fillMaxSize(),
+    val scaffoldState = rememberBottomSheetScaffoldState()
+    val coefficientState: MutableState<Pair<Int, Double?>> = remember {
+        mutableStateOf(Pair<Int, Double?>(0, 0.0))
+    }
+    BottomSheetScaffold(
+        scaffoldState = scaffoldState,
+        sheetPeekHeight = 0.dp,
+        sheetShape = ShapeSurface.medium,
+        sheetContent = {
+            BottomSheetCoefficient(viewModel = viewModel, coefficientData = coefficientState)
+        }
     ) {
-        val (
-            buttonSave, editSeries, editNumber,
-            typeLoco, acceptanceBlock, deliveryBlock,
-            sectionBlock
-        ) = createRefs()
-        var number by remember { mutableStateOf(TextFieldValue(locomotive?.number ?: "")) }
-        var series by remember { mutableStateOf(TextFieldValue(locomotive?.series ?: "")) }
-
-        Text(
-            modifier = Modifier
-                .constrainAs(buttonSave) {
-                    top.linkTo(parent.top)
-                    end.linkTo(parent.end)
-                }
-                .clickable {
-                    viewModel.addLocomotive(Locomotive(series = "ВЛ15", number = "033"))
-                }
-                .padding(end = 32.dp, top = 16.dp),
-            text = "Сохранить",
-            style = Typography.button.copy(color = MaterialTheme.colors.secondaryVariant))
-
-        OutlinedTextFieldCustom(
-            modifier = Modifier
-                .constrainAs(editSeries) {
-                    start.linkTo(parent.start)
-                    end.linkTo(editNumber.start)
-                    top.linkTo(buttonSave.bottom)
-                    width = Dimension.fillToConstraints
-                }
-                .padding(top = 32.dp, start = 16.dp, end = 8.dp),
-            value = series,
-            labelText = "Серия",
-            onValueChange = { series = it }
-        )
-
-        OutlinedTextFieldCustom(
-            modifier = Modifier
-                .constrainAs(editNumber) {
-                    start.linkTo(editSeries.end)
-                    end.linkTo(parent.end)
-                    top.linkTo(buttonSave.bottom)
-                    width = Dimension.fillToConstraints
-                }
-                .padding(top = 32.dp, end = 16.dp, start = 8.dp),
-            value = number,
-            labelText = "Номер",
-            onValueChange = { number = it }
-        )
-
-        val configuration = LocalConfiguration.current
-        val screenWidth = configuration.screenWidthDp.dp
-        val pagerState = rememberPagerState(pageCount = 2, initialPage = 0)
-
-        CustomTab(
-            modifier = Modifier
-                .constrainAs(typeLoco) {
-                    top.linkTo(editNumber.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-            items = listOf("Тепловоз", "Электровоз"),
-            tabWidth = (screenWidth - 32.dp) / 2,
-            selectedItemIndex = pagerState.currentPage,
-            pagerState = pagerState,
-        )
-
-        val stateAccepted = viewModel.acceptedTimeState.value
-        val startAcceptedTime = stateAccepted.startAccepted.time
-        val endAcceptedTime = stateAccepted.endAccepted.time
-
-        val startAcceptedCalendar = Calendar.getInstance()
-        startAcceptedTime?.let {
-            startAcceptedCalendar.timeInMillis = it
-        }
-
-        val endAcceptedCalendar = Calendar.getInstance()
-        endAcceptedTime?.let {
-            endAcceptedCalendar.timeInMillis = it
-        }
-
-        val startAcceptedTimePicker = TimePickerDialog(
-            LocalContext.current,
-            { _, h: Int, m: Int ->
-                startAcceptedCalendar[Calendar.HOUR_OF_DAY] = h
-                startAcceptedCalendar[Calendar.MINUTE] = m
-                startAcceptedCalendar[Calendar.SECOND] = 0
-                startAcceptedCalendar[Calendar.MILLISECOND] = 0
-                viewModel.createEventAccepted(
-                    AcceptedEvent.EnteredStartAccepted(
-                        startAcceptedCalendar.timeInMillis
-                    )
-                )
-                viewModel.createEventAccepted(AcceptedEvent.FocusChange(AcceptedType.START))
-            },
-            startAcceptedCalendar[Calendar.HOUR_OF_DAY],
-            startAcceptedCalendar[Calendar.MINUTE],
-            true
-        )
-
-        val startAcceptedDatePicker = DatePickerDialog(
-            LocalContext.current,
-            { _, y: Int, m: Int, d: Int ->
-                startAcceptedCalendar[Calendar.YEAR] = y
-                startAcceptedCalendar[Calendar.MONTH] = m
-                startAcceptedCalendar[Calendar.DAY_OF_MONTH] = d
-                startAcceptedTimePicker.show()
-            },
-            startAcceptedCalendar[Calendar.YEAR],
-            startAcceptedCalendar[Calendar.MONTH],
-            startAcceptedCalendar[Calendar.DAY_OF_MONTH]
-        )
-
-        val endAcceptedTimePicker = TimePickerDialog(
-            LocalContext.current, { _, h: Int, m: Int ->
-                endAcceptedCalendar[Calendar.HOUR_OF_DAY] = h
-                endAcceptedCalendar[Calendar.MINUTE] = m
-                endAcceptedCalendar[Calendar.SECOND] = 0
-                endAcceptedCalendar[Calendar.MILLISECOND] = 0
-                viewModel.createEventAccepted(AcceptedEvent.EnteredEndAccepted(endAcceptedCalendar.timeInMillis))
-                viewModel.createEventAccepted(AcceptedEvent.FocusChange(AcceptedType.END))
-            }, endAcceptedCalendar[Calendar.HOUR_OF_DAY], endAcceptedCalendar[Calendar.MINUTE], true
-        )
-
-        val endAcceptedDatePicker = DatePickerDialog(
-            LocalContext.current,
-            { _, y: Int, m: Int, d: Int ->
-                endAcceptedCalendar[Calendar.YEAR] = y
-                endAcceptedCalendar[Calendar.MONTH] = m
-                endAcceptedCalendar[Calendar.DAY_OF_MONTH] = d
-                endAcceptedTimePicker.show()
-            },
-            endAcceptedCalendar[Calendar.YEAR],
-            endAcceptedCalendar[Calendar.MONTH],
-            endAcceptedCalendar[Calendar.DAY_OF_MONTH]
-        )
-
-
-        Column(
-            modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, top = 32.dp)
-                .constrainAs(acceptanceBlock) {
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    top.linkTo(typeLoco.bottom)
-                    width = Dimension.fillToConstraints
-                }
-                .border(
-                    width = 1.dp,
-                    shape = ShapeBackground.small,
-                    color = MaterialTheme.colors.secondary
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally
+        ConstraintLayout(
+            modifier = Modifier.fillMaxSize(),
         ) {
-            if (!stateAccepted.formValid) {
-                Row(
-                    modifier = Modifier
-                        .padding(top = 12.dp, start = 16.dp, end = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_error_24),
-                        tint = Color.Red,
-                        contentDescription = null
-                    )
-                    Text(
-                        modifier = Modifier.padding(start = 8.dp),
-                        text = stateAccepted.errorMessage,
-                        style = Typography.caption.copy(color = Color.Red),
-                        color = Color.Red
-                    )
-                }
+            val (
+                buttonSave, editSeries, editNumber,
+                typeLoco, acceptanceBlock, deliveryBlock,
+                sectionBlock
+            ) = createRefs()
+            var number by remember { mutableStateOf(TextFieldValue(locomotive?.number ?: "")) }
+            var series by remember { mutableStateOf(TextFieldValue(locomotive?.series ?: "")) }
+            Text(
+                modifier = Modifier
+                    .constrainAs(buttonSave) {
+                        top.linkTo(parent.top)
+                        end.linkTo(parent.end)
+                    }
+                    .clickable {
+                        viewModel.addLocomotive(Locomotive(series = "ВЛ15", number = "033"))
+                    }
+                    .padding(end = 32.dp, top = 16.dp),
+                text = "Сохранить",
+                style = Typography.button.copy(color = MaterialTheme.colors.secondaryVariant))
+
+            OutlinedTextFieldCustom(
+                modifier = Modifier
+                    .constrainAs(editSeries) {
+                        start.linkTo(parent.start)
+                        end.linkTo(editNumber.start)
+                        top.linkTo(buttonSave.bottom)
+                        width = Dimension.fillToConstraints
+                    }
+                    .padding(top = 32.dp, start = 16.dp, end = 8.dp),
+                value = series,
+                labelText = "Серия",
+                onValueChange = { series = it }
+            )
+
+            OutlinedTextFieldCustom(
+                modifier = Modifier
+                    .constrainAs(editNumber) {
+                        start.linkTo(editSeries.end)
+                        end.linkTo(parent.end)
+                        top.linkTo(buttonSave.bottom)
+                        width = Dimension.fillToConstraints
+                    }
+                    .padding(top = 32.dp, end = 16.dp, start = 8.dp),
+                value = number,
+                labelText = "Номер",
+                onValueChange = { number = it }
+            )
+
+            val configuration = LocalConfiguration.current
+            val screenWidth = configuration.screenWidthDp.dp
+            val pagerState = rememberPagerState(pageCount = 2, initialPage = 0)
+
+            CustomTab(
+                modifier = Modifier
+                    .constrainAs(typeLoco) {
+                        top.linkTo(editNumber.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                items = listOf("Тепловоз", "Электровоз"),
+                tabWidth = (screenWidth - 32.dp) / 2,
+                selectedItemIndex = pagerState.currentPage,
+                pagerState = pagerState,
+            )
+
+            val stateAccepted = viewModel.acceptedTimeState.value
+            val startAcceptedTime = stateAccepted.startAccepted.time
+            val endAcceptedTime = stateAccepted.endAccepted.time
+
+            val startAcceptedCalendar = Calendar.getInstance()
+            startAcceptedTime?.let {
+                startAcceptedCalendar.timeInMillis = it
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+
+            val endAcceptedCalendar = Calendar.getInstance()
+            endAcceptedTime?.let {
+                endAcceptedCalendar.timeInMillis = it
+            }
+
+            val startAcceptedTimePicker = TimePickerDialog(
+                LocalContext.current,
+                { _, h: Int, m: Int ->
+                    startAcceptedCalendar[Calendar.HOUR_OF_DAY] = h
+                    startAcceptedCalendar[Calendar.MINUTE] = m
+                    startAcceptedCalendar[Calendar.SECOND] = 0
+                    startAcceptedCalendar[Calendar.MILLISECOND] = 0
+                    viewModel.createEventAccepted(
+                        AcceptedEvent.EnteredStartAccepted(
+                            startAcceptedCalendar.timeInMillis
+                        )
+                    )
+                    viewModel.createEventAccepted(AcceptedEvent.FocusChange(AcceptedType.START))
+                },
+                startAcceptedCalendar[Calendar.HOUR_OF_DAY],
+                startAcceptedCalendar[Calendar.MINUTE],
+                true
+            )
+
+            val startAcceptedDatePicker = DatePickerDialog(
+                LocalContext.current,
+                { _, y: Int, m: Int, d: Int ->
+                    startAcceptedCalendar[Calendar.YEAR] = y
+                    startAcceptedCalendar[Calendar.MONTH] = m
+                    startAcceptedCalendar[Calendar.DAY_OF_MONTH] = d
+                    startAcceptedTimePicker.show()
+                },
+                startAcceptedCalendar[Calendar.YEAR],
+                startAcceptedCalendar[Calendar.MONTH],
+                startAcceptedCalendar[Calendar.DAY_OF_MONTH]
+            )
+
+            val endAcceptedTimePicker = TimePickerDialog(
+                LocalContext.current,
+                { _, h: Int, m: Int ->
+                    endAcceptedCalendar[Calendar.HOUR_OF_DAY] = h
+                    endAcceptedCalendar[Calendar.MINUTE] = m
+                    endAcceptedCalendar[Calendar.SECOND] = 0
+                    endAcceptedCalendar[Calendar.MILLISECOND] = 0
+                    viewModel.createEventAccepted(
+                        AcceptedEvent.EnteredEndAccepted(
+                            endAcceptedCalendar.timeInMillis
+                        )
+                    )
+                    viewModel.createEventAccepted(AcceptedEvent.FocusChange(AcceptedType.END))
+                },
+                endAcceptedCalendar[Calendar.HOUR_OF_DAY],
+                endAcceptedCalendar[Calendar.MINUTE],
+                true
+            )
+
+            val endAcceptedDatePicker = DatePickerDialog(
+                LocalContext.current,
+                { _, y: Int, m: Int, d: Int ->
+                    endAcceptedCalendar[Calendar.YEAR] = y
+                    endAcceptedCalendar[Calendar.MONTH] = m
+                    endAcceptedCalendar[Calendar.DAY_OF_MONTH] = d
+                    endAcceptedTimePicker.show()
+                },
+                endAcceptedCalendar[Calendar.YEAR],
+                endAcceptedCalendar[Calendar.MONTH],
+                endAcceptedCalendar[Calendar.DAY_OF_MONTH]
+            )
+
+
+            Column(
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp, top = 32.dp)
+                    .constrainAs(acceptanceBlock) {
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        top.linkTo(typeLoco.bottom)
+                        width = Dimension.fillToConstraints
+                    }
+                    .border(
+                        width = 1.dp,
+                        shape = ShapeBackground.small,
+                        color = MaterialTheme.colors.secondary
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    modifier = Modifier.padding(start = 16.dp),
-                    text = "Приемка",
-                    style = Typography.body1
-                )
-
-                Row(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
+                if (!stateAccepted.formValid) {
+                    Row(
                         modifier = Modifier
-                            .clickable {
-                                startAcceptedDatePicker.show()
-                            }
-                            .padding(horizontal = 18.dp),
-                        contentAlignment = Alignment.Center
+                            .padding(top = 12.dp, start = 16.dp, end = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val timeStartText = startAcceptedTime?.let { millis ->
-                            SimpleDateFormat(
-                                DateAndTimeFormat.TIME_FORMAT,
-                                Locale.getDefault()
-                            ).format(
-                                millis
-                            )
-                        } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
-
-                        Text(
-                            text = timeStartText,
-                            style = Typography.body1,
-                            color = setTextColor(startAcceptedTime)
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_error_24),
+                            tint = Color.Red,
+                            contentDescription = null
                         )
-                    }
-                    Text(" - ")
-                    Box(
-                        modifier = Modifier
-                            .padding(18.dp)
-                            .clickable {
-                                endAcceptedDatePicker.show()
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        val timeStartText = endAcceptedTime?.let { millis ->
-                            SimpleDateFormat(
-                                DateAndTimeFormat.TIME_FORMAT,
-                                Locale.getDefault()
-                            ).format(
-                                millis
-                            )
-                        } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
-
                         Text(
-                            text = timeStartText,
-                            style = Typography.body1,
-                            color = setTextColor(endAcceptedTime)
+                            modifier = Modifier.padding(start = 8.dp),
+                            text = stateAccepted.errorMessage,
+                            style = Typography.caption.copy(color = Color.Red),
+                            color = Color.Red
                         )
                     }
                 }
-            }
-        }
-
-        val stateDelivery = viewModel.deliveryTimeState.value
-        val startDeliveryTime = stateDelivery.startDelivered.time
-        val endDeliveryTime = stateDelivery.endDelivered.time
-
-        val startDeliveryCalendar = Calendar.getInstance()
-        startDeliveryTime?.let {
-            startAcceptedCalendar.timeInMillis = it
-        }
-
-        val endDeliveryCalendar = Calendar.getInstance()
-        endDeliveryTime?.let {
-            endDeliveryCalendar.timeInMillis = it
-        }
-
-        val startDeliveryTimePicker = TimePickerDialog(
-            LocalContext.current,
-            { _, h: Int, m: Int ->
-                startDeliveryCalendar[Calendar.HOUR_OF_DAY] = h
-                startDeliveryCalendar[Calendar.MINUTE] = m
-                startDeliveryCalendar[Calendar.SECOND] = 0
-                startDeliveryCalendar[Calendar.MILLISECOND] = 0
-                viewModel.createEventDelivery(
-                    DeliveryEvent.EnteredStartDelivery(
-                        startDeliveryCalendar.timeInMillis
-                    )
-                )
-                viewModel.createEventDelivery(DeliveryEvent.FocusChange(DeliveredType.START))
-            },
-            startDeliveryCalendar[Calendar.HOUR_OF_DAY],
-            startDeliveryCalendar[Calendar.MINUTE],
-            true
-        )
-
-        val startDeliveryDatePicker = DatePickerDialog(
-            LocalContext.current,
-            { _, y: Int, m: Int, d: Int ->
-                startDeliveryCalendar[Calendar.YEAR] = y
-                startDeliveryCalendar[Calendar.MONTH] = m
-                startDeliveryCalendar[Calendar.DAY_OF_MONTH] = d
-                startDeliveryTimePicker.show()
-            },
-            startDeliveryCalendar[Calendar.YEAR],
-            startDeliveryCalendar[Calendar.MONTH],
-            startDeliveryCalendar[Calendar.DAY_OF_MONTH]
-        )
-
-        val endDeliveryTimePicker = TimePickerDialog(
-            LocalContext.current,
-            { _, h: Int, m: Int ->
-                endDeliveryCalendar[Calendar.HOUR_OF_DAY] = h
-                endDeliveryCalendar[Calendar.MINUTE] = m
-                endDeliveryCalendar[Calendar.SECOND] = 0
-                endDeliveryCalendar[Calendar.MILLISECOND] = 0
-                viewModel.createEventDelivery(
-                    DeliveryEvent.EnteredEndDelivery(
-                        endDeliveryCalendar.timeInMillis
-                    )
-                )
-                viewModel.createEventDelivery(DeliveryEvent.FocusChange(DeliveredType.END))
-            },
-            endDeliveryCalendar[Calendar.HOUR_OF_DAY],
-            endDeliveryCalendar[Calendar.MINUTE],
-            true
-        )
-
-        val endDeliveryDatePicker = DatePickerDialog(
-            LocalContext.current,
-            { _, y: Int, m: Int, d: Int ->
-                endDeliveryCalendar[Calendar.YEAR] = y
-                endDeliveryCalendar[Calendar.MONTH] = m
-                endDeliveryCalendar[Calendar.DAY_OF_MONTH] = d
-                endDeliveryTimePicker.show()
-            },
-            endDeliveryCalendar[Calendar.YEAR],
-            endDeliveryCalendar[Calendar.MONTH],
-            endDeliveryCalendar[Calendar.DAY_OF_MONTH]
-        )
-
-        Column(
-            modifier = Modifier
-                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-                .constrainAs(deliveryBlock) {
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    top.linkTo(acceptanceBlock.bottom)
-                    width = Dimension.fillToConstraints
-                }
-                .border(
-                    width = 1.dp,
-                    shape = ShapeBackground.small,
-                    color = MaterialTheme.colors.secondary
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (!stateDelivery.formValid) {
                 Row(
-                    modifier = Modifier
-                        .padding(top = 12.dp, start = 16.dp, end = 16.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_error_24),
-                        tint = Color.Red,
-                        contentDescription = null
-                    )
                     Text(
-                        modifier = Modifier.padding(start = 8.dp),
-                        text = stateDelivery.errorMessage,
-                        style = Typography.caption.copy(color = Color.Red),
-                        color = Color.Red
+                        modifier = Modifier.padding(start = 16.dp),
+                        text = "Приемка",
+                        style = Typography.body1
                     )
+
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .clickable {
+                                    startAcceptedDatePicker.show()
+                                }
+                                .padding(horizontal = 18.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            val timeStartText = startAcceptedTime?.let { millis ->
+                                SimpleDateFormat(
+                                    DateAndTimeFormat.TIME_FORMAT,
+                                    Locale.getDefault()
+                                ).format(
+                                    millis
+                                )
+                            } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
+
+                            Text(
+                                text = timeStartText,
+                                style = Typography.body1,
+                                color = setTextColor(startAcceptedTime)
+                            )
+                        }
+                        Text(" - ")
+                        Box(
+                            modifier = Modifier
+                                .padding(18.dp)
+                                .clickable {
+                                    endAcceptedDatePicker.show()
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            val timeStartText = endAcceptedTime?.let { millis ->
+                                SimpleDateFormat(
+                                    DateAndTimeFormat.TIME_FORMAT,
+                                    Locale.getDefault()
+                                ).format(
+                                    millis
+                                )
+                            } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
+
+                            Text(
+                                text = timeStartText,
+                                style = Typography.body1,
+                                color = setTextColor(endAcceptedTime)
+                            )
+                        }
+                    }
                 }
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    modifier = Modifier.padding(start = 16.dp),
-                    text = "Сдача",
-                    style = Typography.body1
-                )
 
+            val stateDelivery = viewModel.deliveryTimeState.value
+            val startDeliveryTime = stateDelivery.startDelivered.time
+            val endDeliveryTime = stateDelivery.endDelivered.time
+
+            val startDeliveryCalendar = Calendar.getInstance()
+            startDeliveryTime?.let {
+                startAcceptedCalendar.timeInMillis = it
+            }
+
+            val endDeliveryCalendar = Calendar.getInstance()
+            endDeliveryTime?.let {
+                endDeliveryCalendar.timeInMillis = it
+            }
+
+            val startDeliveryTimePicker = TimePickerDialog(
+                LocalContext.current,
+                { _, h: Int, m: Int ->
+                    startDeliveryCalendar[Calendar.HOUR_OF_DAY] = h
+                    startDeliveryCalendar[Calendar.MINUTE] = m
+                    startDeliveryCalendar[Calendar.SECOND] = 0
+                    startDeliveryCalendar[Calendar.MILLISECOND] = 0
+                    viewModel.createEventDelivery(
+                        DeliveryEvent.EnteredStartDelivery(
+                            startDeliveryCalendar.timeInMillis
+                        )
+                    )
+                    viewModel.createEventDelivery(DeliveryEvent.FocusChange(DeliveredType.START))
+                },
+                startDeliveryCalendar[Calendar.HOUR_OF_DAY],
+                startDeliveryCalendar[Calendar.MINUTE],
+                true
+            )
+
+            val startDeliveryDatePicker = DatePickerDialog(
+                LocalContext.current,
+                { _, y: Int, m: Int, d: Int ->
+                    startDeliveryCalendar[Calendar.YEAR] = y
+                    startDeliveryCalendar[Calendar.MONTH] = m
+                    startDeliveryCalendar[Calendar.DAY_OF_MONTH] = d
+                    startDeliveryTimePicker.show()
+                },
+                startDeliveryCalendar[Calendar.YEAR],
+                startDeliveryCalendar[Calendar.MONTH],
+                startDeliveryCalendar[Calendar.DAY_OF_MONTH]
+            )
+
+            val endDeliveryTimePicker = TimePickerDialog(
+                LocalContext.current,
+                { _, h: Int, m: Int ->
+                    endDeliveryCalendar[Calendar.HOUR_OF_DAY] = h
+                    endDeliveryCalendar[Calendar.MINUTE] = m
+                    endDeliveryCalendar[Calendar.SECOND] = 0
+                    endDeliveryCalendar[Calendar.MILLISECOND] = 0
+                    viewModel.createEventDelivery(
+                        DeliveryEvent.EnteredEndDelivery(
+                            endDeliveryCalendar.timeInMillis
+                        )
+                    )
+                    viewModel.createEventDelivery(DeliveryEvent.FocusChange(DeliveredType.END))
+                },
+                endDeliveryCalendar[Calendar.HOUR_OF_DAY],
+                endDeliveryCalendar[Calendar.MINUTE],
+                true
+            )
+
+            val endDeliveryDatePicker = DatePickerDialog(
+                LocalContext.current,
+                { _, y: Int, m: Int, d: Int ->
+                    endDeliveryCalendar[Calendar.YEAR] = y
+                    endDeliveryCalendar[Calendar.MONTH] = m
+                    endDeliveryCalendar[Calendar.DAY_OF_MONTH] = d
+                    endDeliveryTimePicker.show()
+                },
+                endDeliveryCalendar[Calendar.YEAR],
+                endDeliveryCalendar[Calendar.MONTH],
+                endDeliveryCalendar[Calendar.DAY_OF_MONTH]
+            )
+
+            Column(
+                modifier = Modifier
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                    .constrainAs(deliveryBlock) {
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        top.linkTo(acceptanceBlock.bottom)
+                        width = Dimension.fillToConstraints
+                    }
+                    .border(
+                        width = 1.dp,
+                        shape = ShapeBackground.small,
+                        color = MaterialTheme.colors.secondary
+                    ),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if (!stateDelivery.formValid) {
+                    Row(
+                        modifier = Modifier
+                            .padding(top = 12.dp, start = 16.dp, end = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_error_24),
+                            tint = Color.Red,
+                            contentDescription = null
+                        )
+                        Text(
+                            modifier = Modifier.padding(start = 8.dp),
+                            text = stateDelivery.errorMessage,
+                            style = Typography.caption.copy(color = Color.Red),
+                            color = Color.Red
+                        )
+                    }
+                }
                 Row(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceAround,
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .clickable {
-                                startDeliveryDatePicker.show()
-                            }
-                            .padding(horizontal = 18.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        val timeStartText = startDeliveryTime?.let { millis ->
-                            SimpleDateFormat(
-                                DateAndTimeFormat.TIME_FORMAT,
-                                Locale.getDefault()
-                            ).format(
-                                millis
-                            )
-                        } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
+                    Text(
+                        modifier = Modifier.padding(start = 16.dp),
+                        text = "Сдача",
+                        style = Typography.body1
+                    )
 
-                        Text(
-                            text = timeStartText,
-                            style = Typography.body1,
-                            color = setTextColor(startDeliveryTime)
-                        )
-                    }
-                    Text(" - ")
-                    Box(
-                        modifier = Modifier
-                            .padding(18.dp)
-                            .clickable {
-                                endDeliveryDatePicker.show()
-                            },
-                        contentAlignment = Alignment.Center
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val timeEndText = endDeliveryTime?.let { millis ->
-                            SimpleDateFormat(
-                                DateAndTimeFormat.TIME_FORMAT,
-                                Locale.getDefault()
-                            ).format(
-                                millis
-                            )
-                        } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
+                        Box(
+                            modifier = Modifier
+                                .clickable {
+                                    startDeliveryDatePicker.show()
+                                }
+                                .padding(horizontal = 18.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            val timeStartText = startDeliveryTime?.let { millis ->
+                                SimpleDateFormat(
+                                    DateAndTimeFormat.TIME_FORMAT,
+                                    Locale.getDefault()
+                                ).format(
+                                    millis
+                                )
+                            } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
 
-                        Text(
-                            text = timeEndText,
-                            style = Typography.body1,
-                            color = setTextColor(endDeliveryTime)
-                        )
+                            Text(
+                                text = timeStartText,
+                                style = Typography.body1,
+                                color = setTextColor(startDeliveryTime)
+                            )
+                        }
+                        Text(" - ")
+                        Box(
+                            modifier = Modifier
+                                .padding(18.dp)
+                                .clickable {
+                                    endDeliveryDatePicker.show()
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            val timeEndText = endDeliveryTime?.let { millis ->
+                                SimpleDateFormat(
+                                    DateAndTimeFormat.TIME_FORMAT,
+                                    Locale.getDefault()
+                                ).format(
+                                    millis
+                                )
+                            } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
+
+                            Text(
+                                text = timeEndText,
+                                style = Typography.body1,
+                                color = setTextColor(endDeliveryTime)
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        SectionPager(
-            modifier = Modifier
-                .constrainAs(sectionBlock) {
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    top.linkTo(deliveryBlock.bottom)
-                    width = Dimension.fillToConstraints
-                }
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-            pagerState = pagerState,
-            viewModel = viewModel
+            SectionPager(
+                modifier = Modifier
+                    .constrainAs(sectionBlock) {
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        top.linkTo(deliveryBlock.bottom)
+                        width = Dimension.fillToConstraints
+                    }
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                pagerState = pagerState,
+                viewModel = viewModel,
+                scaffoldState = scaffoldState,
+                coefficientState = coefficientState
+            )
+        }
+    }
+}
+
+@Composable
+private fun BottomSheetCoefficient(viewModel: AddingViewModel, coefficientData: MutableState<Pair<Int, Double?>>) {
+    Box(modifier = Modifier.padding(16.dp)) {
+        OutlinedTextFieldCustom(
+            value = coefficientData.value.second?.str() ?: "",
+            onValueChange = {
+                viewModel.createEventDieselSection(
+                    DieselSectionEvent.EnteredCoefficient(
+                        index = coefficientData.value.first,
+                        data = it.toDoubleOrNull()
+                    )
+                )
+                coefficientData.value = coefficientData.value.copy(
+                    second =  it.toDoubleOrNull()
+                )
+            }
         )
     }
 }

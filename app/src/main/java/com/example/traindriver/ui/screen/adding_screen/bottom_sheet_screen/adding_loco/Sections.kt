@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.BottomSheetScaffoldState
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -23,18 +25,21 @@ import com.example.traindriver.ui.util.ClickableTextTrainDriver
 import com.example.traindriver.ui.util.double_util.str
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
+import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun SectionPager(
     modifier: Modifier = Modifier,
     pagerState: PagerState,
-    viewModel: AddingViewModel
+    viewModel: AddingViewModel,
+    scaffoldState: BottomSheetScaffoldState,
+    coefficientState: MutableState<Pair<Int, Double?>>
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.End) {
         when (pagerState.currentPage) {
-            0 -> DieselSectionList(viewModel)
+            0 -> DieselSectionList(viewModel, scaffoldState, coefficientState)
             1 -> ElectricSectionList(viewModel.electricSectionListState.value)
         }
 
@@ -50,20 +55,31 @@ fun SectionPager(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun DieselSectionList(viewModel: AddingViewModel) {
+fun DieselSectionList(
+    viewModel: AddingViewModel,
+    scaffoldState: BottomSheetScaffoldState,
+    coefficientState: MutableState<Pair<Int, Double?>>) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
     ) {
         val state = viewModel.dieselSectionListState
         itemsIndexed(state) { index, item ->
-            DieselSectionItem(index, item, viewModel)
+            DieselSectionItem(index, item, viewModel, scaffoldState, coefficientState)
         }
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun DieselSectionItem(index: Int, item: DieselSectionFormState, viewModel: AddingViewModel) {
+fun DieselSectionItem(
+    index: Int,
+    item: DieselSectionFormState,
+    viewModel: AddingViewModel,
+    scaffoldState: BottomSheetScaffoldState,
+    coefficientState: MutableState<Pair<Int, Double?>>
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -72,18 +88,19 @@ fun DieselSectionItem(index: Int, item: DieselSectionFormState, viewModel: Addin
                 width = 1.dp,
                 color = MaterialTheme.colors.primaryVariant,
                 shape = ShapeBackground.small
-            )
+            ),
+        horizontalAlignment = Alignment.End
     ) {
+        val accepted = item.accepted.data
+        val delivery = item.delivery.data
+        val coefficient = item.coefficient.data
+
         Row(
             modifier = Modifier.padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            val accepted = item.accepted.data
-            val delivery = item.delivery.data
-
             val acceptedFuelText = accepted?.str() ?: ""
             val deliveryFuelText = delivery?.str() ?: ""
-
 
             OutlinedTextFieldCustom(
                 modifier = Modifier
@@ -115,6 +132,29 @@ fun DieselSectionItem(index: Int, item: DieselSectionFormState, viewModel: Addin
                     )
                 },
                 labelText = "Сдал"
+            )
+
+        }
+        val scope = rememberCoroutineScope()
+        ClickableTextTrainDriver(
+            modifier = Modifier.padding(end = 16.dp),
+            text = AnnotatedString("k = $coefficient"),
+            onClick = {
+                coefficientState.value = coefficientState.value.copy(
+                    first = index,
+                    second = coefficient
+                )
+                scope.launch {
+                    scaffoldState.bottomSheetState.expand()
+                }
+            }
+        )
+
+        if (accepted != null && delivery != null) {
+            val result = accepted - delivery
+            Text(
+                modifier = Modifier.padding(8.dp),
+                text = result.str()
             )
         }
     }
