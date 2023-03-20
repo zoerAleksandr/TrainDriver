@@ -1,5 +1,7 @@
 package com.example.traindriver.ui.element_screen
 
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
@@ -14,7 +16,9 @@ fun OutlinedTextFieldCustom(
     modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
-    labelText: String? = null
+    labelText: String? = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions()
 ) {
     val colors = TextFieldDefaults.outlinedTextFieldColors(
         textColor = MaterialTheme.colors.primary,
@@ -26,7 +30,9 @@ fun OutlinedTextFieldCustom(
         value = value,
         onValueChange = onValueChange,
         colors = colors,
-        label = { Text(text = labelText ?: "", style = Typography.body1) }
+        label = { Text(text = labelText ?: "", style = Typography.body1) },
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions
     )
 }
 
@@ -35,7 +41,9 @@ fun OutlinedTextFieldCustom(
     modifier: Modifier = Modifier,
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
-    labelText: String? = null
+    labelText: String? = null,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions()
 ) {
     val colors = TextFieldDefaults.outlinedTextFieldColors(
         textColor = MaterialTheme.colors.primary,
@@ -47,6 +55,8 @@ fun OutlinedTextFieldCustom(
         value = value,
         onValueChange = onValueChange,
         colors = colors,
-        label = { Text(text = labelText ?: "", style = Typography.body1) }
+        label = { Text(text = labelText ?: "", style = Typography.body1) },
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions
     )
 }

@@ -15,11 +15,17 @@ import androidx.compose.ui.unit.dp
 import com.example.traindriver.R
 
 @Composable
-fun BottomSheetWithCloseDialog(closeSheet: () -> Unit, content: @Composable () -> Unit) {
-    Box(modifier = Modifier
-        .background(color = MaterialTheme.colors.background)
-        .fillMaxWidth()
-        .fillMaxHeight(0.96f), contentAlignment = Alignment.TopStart) {
+fun BottomSheetWithCloseDialog(
+    modifier: Modifier = Modifier,
+    closeSheet: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .background(color = MaterialTheme.colors.background)
+            .fillMaxWidth(),
+        contentAlignment = Alignment.TopStart
+    ) {
         IconButton(
             modifier = Modifier
                 .padding(start = 8.dp)

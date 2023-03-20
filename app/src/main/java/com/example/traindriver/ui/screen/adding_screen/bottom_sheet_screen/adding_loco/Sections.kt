@@ -138,7 +138,7 @@ fun DieselSectionItem(
         val scope = rememberCoroutineScope()
         ClickableTextTrainDriver(
             modifier = Modifier.padding(end = 16.dp),
-            text = AnnotatedString("k = $coefficient"),
+            text = AnnotatedString("k = ${coefficient ?: 0.0}"),
             onClick = {
                 coefficientState.value = coefficientState.value.copy(
                     first = index,

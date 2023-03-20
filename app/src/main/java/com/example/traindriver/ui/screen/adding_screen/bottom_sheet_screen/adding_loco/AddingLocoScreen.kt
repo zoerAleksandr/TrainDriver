@@ -2,26 +2,39 @@ package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.addi
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.traindriver.R
 import com.example.traindriver.domain.entity.Locomotive
 import com.example.traindriver.ui.element_screen.OutlinedTextFieldCustom
 import com.example.traindriver.ui.screen.adding_screen.*
+import com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.BottomSheetWithCloseDialog
 import com.example.traindriver.ui.screen.adding_screen.custom_tab.CustomTab
 import com.example.traindriver.ui.screen.adding_screen.state_holder.*
 import com.example.traindriver.ui.screen.viewing_route_screen.element.setTextColor
@@ -34,6 +47,7 @@ import com.example.traindriver.ui.util.DateAndTimeFormat
 import com.example.traindriver.ui.util.double_util.str
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -47,12 +61,25 @@ fun AddingLocoScreen(
     val coefficientState: MutableState<Pair<Int, Double?>> = remember {
         mutableStateOf(Pair<Int, Double?>(0, 0.0))
     }
+    val scope = rememberCoroutineScope()
+
+    val closeSheet: () -> Unit = {
+        scope.launch {
+            scaffoldState.bottomSheetState.collapse()
+        }
+    }
+
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
         sheetPeekHeight = 0.dp,
         sheetShape = ShapeSurface.medium,
         sheetContent = {
-            BottomSheetCoefficient(viewModel = viewModel, coefficientData = coefficientState)
+            BottomSheetCoefficient(
+                viewModel = viewModel,
+                coefficientData = coefficientState,
+                closeSheet = closeSheet,
+                sheetState = scaffoldState
+            )
         }
     ) {
         ConstraintLayout(
@@ -503,23 +530,74 @@ fun AddingLocoScreen(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun BottomSheetCoefficient(viewModel: AddingViewModel, coefficientData: MutableState<Pair<Int, Double?>>) {
-    Box(modifier = Modifier.padding(16.dp)) {
-        OutlinedTextFieldCustom(
-            value = coefficientData.value.second?.str() ?: "",
-            onValueChange = {
-                viewModel.createEventDieselSection(
-                    DieselSectionEvent.EnteredCoefficient(
-                        index = coefficientData.value.first,
-                        data = it.toDoubleOrNull()
-                    )
-                )
-                coefficientData.value = coefficientData.value.copy(
-                    second =  it.toDoubleOrNull()
-                )
-            }
+private fun BottomSheetCoefficient(
+    viewModel: AddingViewModel,
+    coefficientData: MutableState<Pair<Int, Double?>>,
+    closeSheet: () -> Unit,
+    sheetState: BottomSheetScaffoldState
+) {
+    BottomSheetWithCloseDialog(
+        modifier = Modifier.fillMaxHeight(0.6f),
+        closeSheet = closeSheet
+    ) {
+        val scope = rememberCoroutineScope()
+        val requester = FocusRequester()
+        val focusManager = LocalFocusManager.current
+        val text = coefficientData.value.second?.str() ?: ""
+        val textData = TextFieldValue(
+            text = text,
+            selection = TextRange(text.length)
         )
+        Column(
+            modifier = Modifier
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "Коэффициент", style = Typography.subtitle1,
+                textAlign = TextAlign.Center
+            )
+            OutlinedTextFieldCustom(
+                modifier = Modifier
+                    .focusable(true)
+                    .focusRequester(requester)
+                    .fillMaxWidth(0.5f)
+                    .padding(top = 16.dp, bottom = 65.dp),
+                value = textData,
+                onValueChange = {
+                    viewModel.createEventDieselSection(
+                        DieselSectionEvent.EnteredCoefficient(
+                            index = coefficientData.value.first,
+                            data = it.text.toDoubleOrNull()
+                        )
+                    )
+                    coefficientData.value = coefficientData.value.copy(
+                        second = it.text.toDoubleOrNull()
+                    )
+                    Log.d("ZZZ", "onValueChange it = ${it.text.toDoubleOrNull()}")
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Go
+                ),
+                keyboardActions = KeyboardActions(
+                    onGo = {
+                        scope.launch {
+                            sheetState.bottomSheetState.collapse()
+                            focusManager.clearFocus()
+                        }
+                    }
+                )
+            )
+        }
+        if (sheetState.bottomSheetState.isExpanded) {
+            SideEffect {
+                requester.requestFocus()
+            }
+        }
     }
 }
 

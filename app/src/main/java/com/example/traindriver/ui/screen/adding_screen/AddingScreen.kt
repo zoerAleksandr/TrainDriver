@@ -500,7 +500,9 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
 
 @Composable
 fun SheetLayout(sheet: BottomSheetScreen, closeSheet: () -> Unit, viewModel: AddingViewModel) {
-    BottomSheetWithCloseDialog(closeSheet) {
+    BottomSheetWithCloseDialog(
+        modifier = Modifier.fillMaxHeight(0.96f), closeSheet = closeSheet
+    ) {
         when (sheet) {
             BottomSheetScreen.AddingLoco -> AddingLocoScreen(
                 viewModel = viewModel
