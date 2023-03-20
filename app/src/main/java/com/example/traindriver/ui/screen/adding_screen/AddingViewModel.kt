@@ -147,8 +147,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
                 when (event.fieldName) {
                     AcceptedType.START -> {
                         val valid = validateAccepted(
-                            acceptedTimeState.value.startAccepted.time,
-                            AcceptedType.START
+                            acceptedTimeState.value.startAccepted.time, AcceptedType.START
                         )
                         acceptedTimeState.value = acceptedTimeState.value.copy(
                             formValid = valid
@@ -156,8 +155,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
                     }
                     AcceptedType.END -> {
                         val valid = validateAccepted(
-                            acceptedTimeState.value.endAccepted.time,
-                            AcceptedType.END
+                            acceptedTimeState.value.endAccepted.time, AcceptedType.END
                         )
                         acceptedTimeState.value = acceptedTimeState.value.copy(
                             formValid = valid
@@ -172,8 +170,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
         acceptedTimeState.value.endAccepted.time?.let { endAccepted ->
             deliveryTimeState.value.startDelivered.time?.let { startDelivery ->
                 if (startDelivery > endAccepted) {
-                    acceptedTimeState.value.errorMessage =
-                        "Начало приемки позже окончания"
+                    acceptedTimeState.value.errorMessage = "Начало приемки позже окончания"
                     return false
                 }
             }
@@ -183,11 +180,9 @@ class AddingViewModel : ViewModel(), KoinComponent {
                 inputValue?.let { input ->
                     timeEditState.value.startTime.time?.let { timeStart ->
                         if (input < timeStart) {
-                            val timeStartText =
-                                SimpleDateFormat(
-                                    DateAndTimeFormat.TIME_FORMAT,
-                                    Locale.getDefault()
-                                ).format(timeStart)
+                            val timeStartText = SimpleDateFormat(
+                                DateAndTimeFormat.TIME_FORMAT, Locale.getDefault()
+                            ).format(timeStart)
                             acceptedTimeState.value.errorMessage =
                                 "Время приемки раньше явки $timeStartText"
                             return false
@@ -195,11 +190,9 @@ class AddingViewModel : ViewModel(), KoinComponent {
                     }
                     timeEditState.value.endTime.time?.let { endTime ->
                         if (input > endTime) {
-                            val timeEndText =
-                                SimpleDateFormat(
-                                    DateAndTimeFormat.TIME_FORMAT,
-                                    Locale.getDefault()
-                                ).format(endTime)
+                            val timeEndText = SimpleDateFormat(
+                                DateAndTimeFormat.TIME_FORMAT, Locale.getDefault()
+                            ).format(endTime)
                             acceptedTimeState.value.errorMessage =
                                 "Время приемки позже окончания работы $timeEndText"
                             return false
@@ -207,8 +200,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
                     }
                     acceptedTimeState.value.endAccepted.time?.let { endAccepted ->
                         if (input > endAccepted) {
-                            acceptedTimeState.value.errorMessage =
-                                "Начало приемки позже окончания"
+                            acceptedTimeState.value.errorMessage = "Начало приемки позже окончания"
                             return false
                         }
                     }
@@ -219,11 +211,9 @@ class AddingViewModel : ViewModel(), KoinComponent {
                 inputValue?.let { input ->
                     timeEditState.value.startTime.time?.let { timeStart ->
                         if (input < timeStart) {
-                            val timeStartText =
-                                SimpleDateFormat(
-                                    DateAndTimeFormat.TIME_FORMAT,
-                                    Locale.getDefault()
-                                ).format(timeStart)
+                            val timeStartText = SimpleDateFormat(
+                                DateAndTimeFormat.TIME_FORMAT, Locale.getDefault()
+                            ).format(timeStart)
                             acceptedTimeState.value.errorMessage =
                                 "Время приемки раньше явки $timeStartText"
                             return false
@@ -231,11 +221,9 @@ class AddingViewModel : ViewModel(), KoinComponent {
                     }
                     timeEditState.value.endTime.time?.let { endTime ->
                         if (input > endTime) {
-                            val timeEndText =
-                                SimpleDateFormat(
-                                    DateAndTimeFormat.TIME_FORMAT,
-                                    Locale.getDefault()
-                                ).format(endTime)
+                            val timeEndText = SimpleDateFormat(
+                                DateAndTimeFormat.TIME_FORMAT, Locale.getDefault()
+                            ).format(endTime)
                             acceptedTimeState.value.errorMessage =
                                 "Время приемки позже окончания работы $timeEndText"
                             return false
@@ -243,8 +231,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
                     }
                     acceptedTimeState.value.startAccepted.time?.let { startAccepted ->
                         if (input < startAccepted) {
-                            acceptedTimeState.value.errorMessage =
-                                "Окончание приемки раньше начала"
+                            acceptedTimeState.value.errorMessage = "Окончание приемки раньше начала"
                             return false
                         }
                     }
@@ -281,8 +268,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
                 when (event.fieldName) {
                     DeliveredType.START -> {
                         val valid = validateDelivery(
-                            deliveryTimeState.value.startDelivered.time,
-                            DeliveredType.START
+                            deliveryTimeState.value.startDelivered.time, DeliveredType.START
                         )
                         deliveryTimeState.value = deliveryTimeState.value.copy(
                             formValid = valid
@@ -290,8 +276,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
                     }
                     DeliveredType.END -> {
                         val valid = validateDelivery(
-                            deliveryTimeState.value.endDelivered.time,
-                            DeliveredType.END
+                            deliveryTimeState.value.endDelivered.time, DeliveredType.END
                         )
                         deliveryTimeState.value = deliveryTimeState.value.copy(
                             formValid = valid
@@ -306,8 +291,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
         acceptedTimeState.value.endAccepted.time?.let { endAccepted ->
             deliveryTimeState.value.startDelivered.time?.let { startDelivery ->
                 if (startDelivery < endAccepted) {
-                    deliveryTimeState.value.errorMessage =
-                        "Начало сдачи раньше окончания приемки"
+                    deliveryTimeState.value.errorMessage = "Начало сдачи раньше окончания приемки"
                     return false
                 }
             }
@@ -317,11 +301,9 @@ class AddingViewModel : ViewModel(), KoinComponent {
                 inputValue?.let { input ->
                     timeEditState.value.startTime.time?.let { timeStart ->
                         if (input < timeStart) {
-                            val timeStartText =
-                                SimpleDateFormat(
-                                    DateAndTimeFormat.TIME_FORMAT,
-                                    Locale.getDefault()
-                                ).format(timeStart)
+                            val timeStartText = SimpleDateFormat(
+                                DateAndTimeFormat.TIME_FORMAT, Locale.getDefault()
+                            ).format(timeStart)
                             deliveryTimeState.value.errorMessage =
                                 "Время сдачи раньше явки $timeStartText"
                             return false
@@ -329,11 +311,9 @@ class AddingViewModel : ViewModel(), KoinComponent {
                     }
                     timeEditState.value.endTime.time?.let { timeEnd ->
                         if (input > timeEnd) {
-                            val timeStartText =
-                                SimpleDateFormat(
-                                    DateAndTimeFormat.TIME_FORMAT,
-                                    Locale.getDefault()
-                                ).format(timeEnd)
+                            val timeStartText = SimpleDateFormat(
+                                DateAndTimeFormat.TIME_FORMAT, Locale.getDefault()
+                            ).format(timeEnd)
                             deliveryTimeState.value.errorMessage =
                                 "Время сдачи позже окончания работы $timeStartText"
                             return false
@@ -341,8 +321,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
                     }
                     deliveryTimeState.value.endDelivered.time?.let { endDelivery ->
                         if (input > endDelivery) {
-                            deliveryTimeState.value.errorMessage =
-                                "Начало сдачи позже окончания"
+                            deliveryTimeState.value.errorMessage = "Начало сдачи позже окончания"
                             return false
                         }
                     }
@@ -353,11 +332,9 @@ class AddingViewModel : ViewModel(), KoinComponent {
                 inputValue?.let { input ->
                     timeEditState.value.startTime.time?.let { timeStart ->
                         if (input < timeStart) {
-                            val timeStartText =
-                                SimpleDateFormat(
-                                    DateAndTimeFormat.TIME_FORMAT,
-                                    Locale.getDefault()
-                                ).format(timeStart)
+                            val timeStartText = SimpleDateFormat(
+                                DateAndTimeFormat.TIME_FORMAT, Locale.getDefault()
+                            ).format(timeStart)
                             deliveryTimeState.value.errorMessage =
                                 "Время сдачи раньше явки $timeStartText"
                             return false
@@ -365,11 +342,9 @@ class AddingViewModel : ViewModel(), KoinComponent {
                     }
                     timeEditState.value.endTime.time?.let { timeEnd ->
                         if (input > timeEnd) {
-                            val timeStartText =
-                                SimpleDateFormat(
-                                    DateAndTimeFormat.TIME_FORMAT,
-                                    Locale.getDefault()
-                                ).format(timeEnd)
+                            val timeStartText = SimpleDateFormat(
+                                DateAndTimeFormat.TIME_FORMAT, Locale.getDefault()
+                            ).format(timeEnd)
                             deliveryTimeState.value.errorMessage =
                                 "Время сдачи позже окончания работы $timeStartText"
                             return false
@@ -377,8 +352,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
                     }
                     deliveryTimeState.value.startDelivered.time?.let { startDelivery ->
                         if (input < startDelivery) {
-                            deliveryTimeState.value.errorMessage =
-                                "Окончание сдачи раньше начала "
+                            deliveryTimeState.value.errorMessage = "Окончание сдачи раньше начала "
                             return false
                         }
                     }
@@ -388,17 +362,44 @@ class AddingViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    var dieselSectionListState = mutableStateOf(listOf(SectionDiesel()))
+    var dieselSectionListState = mutableStateListOf<DieselSectionFormState>()
         private set
+
+    fun addDieselSection(sectionDiesel: SectionDiesel) {
+        dieselSectionListState.add(
+            DieselSectionFormState(
+                sectionId = sectionDiesel.id,
+                formValid = true
+            )
+        )
+    }
+
+    fun createEventDieselSection(event: DieselSectionEvent) {
+        onDieselSectionEvent(event)
+    }
+
+    private fun onDieselSectionEvent(event: DieselSectionEvent) {
+        when (event) {
+            is DieselSectionEvent.EnteredAccepted -> {
+                dieselSectionListState[event.index] = dieselSectionListState[event.index].copy(
+                    accepted = dieselSectionListState[event.index].accepted.copy(
+                        data = event.data
+                    )
+                )
+            }
+            is DieselSectionEvent.EnteredDelivery -> {
+                dieselSectionListState[event.index] = dieselSectionListState[event.index].copy(
+                    delivery = dieselSectionListState[event.index].delivery.copy(
+                        data = event.data
+                    )
+                )
+            }
+            is DieselSectionEvent.FocusChange -> {}
+        }
+    }
 
     var electricSectionListState = mutableStateOf(listOf<SectionElectric>())
         private set
-
-    fun addDieselSection() {
-        val list = dieselSectionListState.value.toMutableList()
-        list.add(SectionDiesel())
-        dieselSectionListState.value = list
-    }
 
     fun addElectricSection() {
         val list = electricSectionListState.value.toMutableList()

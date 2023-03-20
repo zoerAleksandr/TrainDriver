@@ -4,6 +4,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -15,6 +16,8 @@ import com.example.traindriver.domain.entity.SectionDiesel
 import com.example.traindriver.domain.entity.SectionElectric
 import com.example.traindriver.ui.element_screen.OutlinedTextFieldCustom
 import com.example.traindriver.ui.screen.adding_screen.AddingViewModel
+import com.example.traindriver.ui.screen.adding_screen.state_holder.DieselSectionEvent
+import com.example.traindriver.ui.screen.adding_screen.state_holder.DieselSectionFormState
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.util.ClickableTextTrainDriver
 import com.example.traindriver.ui.util.double_util.str
@@ -31,7 +34,7 @@ fun SectionPager(
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.End) {
         when (pagerState.currentPage) {
-            0 -> DieselSectionList(viewModel.dieselSectionListState.value)
+            0 -> DieselSectionList(viewModel)
             1 -> ElectricSectionList(viewModel.electricSectionListState.value)
         }
 
@@ -40,7 +43,7 @@ fun SectionPager(
             text = AnnotatedString("Добавить секцию")
         ) {
             when (pagerState.currentPage) {
-                0 -> viewModel.addDieselSection()
+                0 -> viewModel.addDieselSection(SectionDiesel())
                 1 -> viewModel.addElectricSection()
             }
         }
@@ -48,18 +51,19 @@ fun SectionPager(
 }
 
 @Composable
-fun DieselSectionList(sectionList: List<SectionDiesel>) {
+fun DieselSectionList(viewModel: AddingViewModel) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
     ) {
-        items(sectionList) { item ->
-            DieselSectionItem(item)
+        val state = viewModel.dieselSectionListState
+        itemsIndexed(state) { index, item ->
+            DieselSectionItem(index, item, viewModel)
         }
     }
 }
 
 @Composable
-fun DieselSectionItem(section: SectionDiesel) {
+fun DieselSectionItem(index: Int, item: DieselSectionFormState, viewModel: AddingViewModel) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -68,25 +72,32 @@ fun DieselSectionItem(section: SectionDiesel) {
                 width = 1.dp,
                 color = MaterialTheme.colors.primaryVariant,
                 shape = ShapeBackground.small
-            ),
+            )
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            var acceptedFuel by remember {
-                mutableStateOf(section.acceptedEnergy?.str() ?: "")
-            }
-            var deliveryFuelText by remember {
-                mutableStateOf(section.deliveryEnergy?.str() ?: "")
-            }
+            val accepted = item.accepted.data
+            val delivery = item.delivery.data
+
+            val acceptedFuelText = accepted?.str() ?: ""
+            val deliveryFuelText = delivery?.str() ?: ""
+
 
             OutlinedTextFieldCustom(
                 modifier = Modifier
                     .padding(8.dp)
                     .weight(0.5f),
-                value = acceptedFuel,
-                onValueChange = { acceptedFuel = it },
+                value = acceptedFuelText,
+                onValueChange = {
+                    viewModel.createEventDieselSection(
+                        DieselSectionEvent.EnteredAccepted(
+                            index = index,
+                            data = it.toDoubleOrNull()
+                        )
+                    )
+                },
                 labelText = "Принял"
             )
 
@@ -95,18 +106,17 @@ fun DieselSectionItem(section: SectionDiesel) {
                     .padding(8.dp)
                     .weight(0.5f),
                 value = deliveryFuelText,
-                onValueChange = { deliveryFuelText = it },
+                onValueChange = {
+                    viewModel.createEventDieselSection(
+                        DieselSectionEvent.EnteredDelivery(
+                            index = index,
+                            data = it.toDoubleOrNull()
+                        )
+                    )
+                },
                 labelText = "Сдал"
             )
         }
-
-//        section.fuelSupply?.let {
-//            Text(
-//                text = it.str(),
-//                modifier = Modifier.padding(start = 8.dp, bottom = 8.dp),
-//                style = Typography.body1
-//            )
-//        }
     }
 }
 
