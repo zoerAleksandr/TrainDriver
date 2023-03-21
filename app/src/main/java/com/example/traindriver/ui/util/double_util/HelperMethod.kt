@@ -31,4 +31,8 @@ fun reverseDifferenceBetweenDouble(value1: Double?, value2: Double?): Double? {
     }
 }
 
-fun rounding(value: Double, count: Int) = (value * 10.0.pow(count)).roundToInt() / 10.0.pow(count)
+fun rounding(value: Double?, count: Int): Double? {
+    return value?.let {
+        (it * 10.0.pow(count)).roundToInt() / 10.0.pow(count)
+    }
+}

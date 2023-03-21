@@ -1,19 +1,21 @@
 package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.adding_loco
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.BottomSheetScaffoldState
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import com.example.traindriver.R
 import com.example.traindriver.domain.entity.SectionDiesel
 import com.example.traindriver.domain.entity.SectionElectric
 import com.example.traindriver.ui.element_screen.OutlinedTextFieldCustom
@@ -21,11 +23,15 @@ import com.example.traindriver.ui.screen.adding_screen.AddingViewModel
 import com.example.traindriver.ui.screen.adding_screen.state_holder.DieselSectionEvent
 import com.example.traindriver.ui.screen.adding_screen.state_holder.DieselSectionFormState
 import com.example.traindriver.ui.theme.ShapeBackground
+import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.ClickableTextTrainDriver
+import com.example.traindriver.ui.util.double_util.rounding
 import com.example.traindriver.ui.util.double_util.str
+import com.example.traindriver.ui.util.double_util.times
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.launch
+import com.example.traindriver.ui.util.double_util.minus
 
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
@@ -34,18 +40,17 @@ fun SectionPager(
     modifier: Modifier = Modifier,
     pagerState: PagerState,
     viewModel: AddingViewModel,
-    scaffoldState: BottomSheetScaffoldState,
-    coefficientState: MutableState<Pair<Int, Double?>>
+    bottomSheetState: ModalBottomSheetState,
+    coefficientState: MutableState<Pair<Int, String>>
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.End) {
         when (pagerState.currentPage) {
-            0 -> DieselSectionList(viewModel, scaffoldState, coefficientState)
+            0 -> DieselSectionList(viewModel, bottomSheetState, coefficientState)
             1 -> ElectricSectionList(viewModel.electricSectionListState.value)
         }
 
         ClickableTextTrainDriver(
-            modifier = Modifier.padding(top = 8.dp),
-            text = AnnotatedString("Добавить секцию")
+            modifier = Modifier.padding(top = 8.dp), text = AnnotatedString("Добавить секцию")
         ) {
             when (pagerState.currentPage) {
                 0 -> viewModel.addDieselSection(SectionDiesel())
@@ -59,8 +64,9 @@ fun SectionPager(
 @Composable
 fun DieselSectionList(
     viewModel: AddingViewModel,
-    scaffoldState: BottomSheetScaffoldState,
-    coefficientState: MutableState<Pair<Int, Double?>>) {
+    scaffoldState: ModalBottomSheetState,
+    coefficientState: MutableState<Pair<Int, String>>
+) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -77,9 +83,19 @@ fun DieselSectionItem(
     index: Int,
     item: DieselSectionFormState,
     viewModel: AddingViewModel,
-    scaffoldState: BottomSheetScaffoldState,
-    coefficientState: MutableState<Pair<Int, Double?>>
+    bottomSheetState: ModalBottomSheetState,
+    coefficientState: MutableState<Pair<Int, String>>
 ) {
+    val scope = rememberCoroutineScope()
+    val accepted = item.accepted.data
+    val delivery = item.delivery.data
+    val coefficient = item.coefficient.data
+    val acceptedInKilo = accepted.times(coefficient)
+    val deliveryInKilo = delivery.times(coefficient)
+    val result = accepted - delivery
+    val resultInKilo = acceptedInKilo - deliveryInKilo
+    val refuel = 2000.0
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -88,12 +104,39 @@ fun DieselSectionItem(
                 width = 1.dp,
                 color = MaterialTheme.colors.primaryVariant,
                 shape = ShapeBackground.small
-            ),
-        horizontalAlignment = Alignment.End
+            ), horizontalAlignment = Alignment.Start
     ) {
-        val accepted = item.accepted.data
-        val delivery = item.delivery.data
-        val coefficient = item.coefficient.data
+        fun maskInKilo(string: String?): String? {
+            return string?.let {
+                "$it кг"
+            }
+        }
+
+        fun maskInLiter(string: String?): String? {
+            return string?.let {
+                "$it л"
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(end = 16.dp, top = 8.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                modifier = Modifier
+                    .size(dimensionResource(id = R.dimen.icon_size))
+                    .padding(end = 8.dp),
+                painter = painterResource(id = R.drawable.refuel_icon),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.secondaryVariant)
+            )
+            Text(
+                text = "${refuel.str()} л",
+                style = Typography.body2,
+                color = MaterialTheme.colors.primary
+            )
+        }
 
         Row(
             modifier = Modifier.padding(horizontal = 8.dp),
@@ -110,8 +153,7 @@ fun DieselSectionItem(
                 onValueChange = {
                     viewModel.createEventDieselSection(
                         DieselSectionEvent.EnteredAccepted(
-                            index = index,
-                            data = it.toDoubleOrNull()
+                            index = index, data = it.toDoubleOrNull()
                         )
                     )
                 },
@@ -126,8 +168,7 @@ fun DieselSectionItem(
                 onValueChange = {
                     viewModel.createEventDieselSection(
                         DieselSectionEvent.EnteredDelivery(
-                            index = index,
-                            data = it.toDoubleOrNull()
+                            index = index, data = it.toDoubleOrNull()
                         )
                     )
                 },
@@ -135,27 +176,59 @@ fun DieselSectionItem(
             )
 
         }
-        val scope = rememberCoroutineScope()
-        ClickableTextTrainDriver(
-            modifier = Modifier.padding(end = 16.dp),
-            text = AnnotatedString("k = ${coefficient ?: 0.0}"),
-            onClick = {
-                coefficientState.value = coefficientState.value.copy(
-                    first = index,
-                    second = coefficient
-                )
-                scope.launch {
-                    scaffoldState.bottomSheetState.expand()
+
+        if (item.accepted.data != null || item.delivery.data != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    val acceptedInKiloText = rounding(acceptedInKilo, 2)?.str()
+                    Text(text = maskInKilo(acceptedInKiloText) ?: "", style = Typography.body1)
+                }
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 8.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    val deliveryInKiloText = rounding(deliveryInKilo, 2)?.str()
+                    Text(text = maskInKilo(deliveryInKiloText) ?: "", style = Typography.body1)
                 }
             }
-        )
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            ClickableTextTrainDriver(
+                text = AnnotatedString("k = ${coefficient ?: 0.0}"),
+                onClick = {
+                    coefficientState.value = coefficientState.value.copy(
+                        first = index, second = coefficient?.str() ?: ""
+                    )
+                    scope.launch {
+                        bottomSheetState.show()
+                    }
+                })
 
-        if (accepted != null && delivery != null) {
-            val result = accepted - delivery
-            Text(
-                modifier = Modifier.padding(8.dp),
-                text = result.str()
-            )
+            if (result != null) {
+                val resultInLiterText = maskInLiter(result.str())
+                val resultInKiloText = maskInKilo(resultInKilo?.str())
+                Text(
+                    text = "${resultInLiterText ?: ""} / ${resultInKiloText ?: ""}",
+                    style = Typography.body1
+                )
+            }
         }
     }
 }

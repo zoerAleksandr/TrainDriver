@@ -2,7 +2,6 @@ package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.addi
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -28,7 +27,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.traindriver.R
 import com.example.traindriver.domain.entity.Locomotive
@@ -44,7 +42,6 @@ import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.DateAndTimeFormat
-import com.example.traindriver.ui.util.double_util.str
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
@@ -57,28 +54,27 @@ fun AddingLocoScreen(
     locomotive: Locomotive? = null,
     viewModel: AddingViewModel
 ) {
-    val scaffoldState = rememberBottomSheetScaffoldState()
-    val coefficientState: MutableState<Pair<Int, Double?>> = remember {
-        mutableStateOf(Pair<Int, Double?>(0, 0.0))
+    val bottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val coefficientState: MutableState<Pair<Int, String>> = remember {
+        mutableStateOf(Pair<Int, String>(0, "0.0"))
     }
     val scope = rememberCoroutineScope()
 
     val closeSheet: () -> Unit = {
         scope.launch {
-            scaffoldState.bottomSheetState.collapse()
+            bottomSheetState.hide()
         }
     }
 
-    BottomSheetScaffold(
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = 0.dp,
+    ModalBottomSheetLayout(
+        sheetState = bottomSheetState,
         sheetShape = ShapeSurface.medium,
         sheetContent = {
             BottomSheetCoefficient(
                 viewModel = viewModel,
                 coefficientData = coefficientState,
                 closeSheet = closeSheet,
-                sheetState = scaffoldState
+                sheetState = bottomSheetState
             )
         }
     ) {
@@ -523,7 +519,7 @@ fun AddingLocoScreen(
                     .padding(start = 16.dp, end = 16.dp, top = 16.dp),
                 pagerState = pagerState,
                 viewModel = viewModel,
-                scaffoldState = scaffoldState,
+                bottomSheetState = bottomSheetState,
                 coefficientState = coefficientState
             )
         }
@@ -534,18 +530,18 @@ fun AddingLocoScreen(
 @Composable
 private fun BottomSheetCoefficient(
     viewModel: AddingViewModel,
-    coefficientData: MutableState<Pair<Int, Double?>>,
+    coefficientData: MutableState<Pair<Int, String>>,
     closeSheet: () -> Unit,
-    sheetState: BottomSheetScaffoldState
+    sheetState: ModalBottomSheetState
 ) {
     BottomSheetWithCloseDialog(
-        modifier = Modifier.fillMaxHeight(0.6f),
+        modifier = Modifier.fillMaxHeight(0.65f),
         closeSheet = closeSheet
     ) {
         val scope = rememberCoroutineScope()
         val requester = FocusRequester()
         val focusManager = LocalFocusManager.current
-        val text = coefficientData.value.second?.str() ?: ""
+        val text = coefficientData.value.second
         val textData = TextFieldValue(
             text = text,
             selection = TextRange(text.length)
@@ -564,7 +560,7 @@ private fun BottomSheetCoefficient(
                 modifier = Modifier
                     .focusable(true)
                     .focusRequester(requester)
-                    .fillMaxWidth(0.5f)
+                    .fillMaxWidth()
                     .padding(top = 16.dp, bottom = 65.dp),
                 value = textData,
                 onValueChange = {
@@ -575,25 +571,24 @@ private fun BottomSheetCoefficient(
                         )
                     )
                     coefficientData.value = coefficientData.value.copy(
-                        second = it.text.toDoubleOrNull()
+                        second = it.text
                     )
-                    Log.d("ZZZ", "onValueChange it = ${it.text.toDoubleOrNull()}")
                 },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Go
+                    imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
-                    onGo = {
+                    onDone = {
                         scope.launch {
-                            sheetState.bottomSheetState.collapse()
                             focusManager.clearFocus()
+                            sheetState.hide()
                         }
                     }
                 )
             )
         }
-        if (sheetState.bottomSheetState.isExpanded) {
+        if (sheetState.isVisible) {
             SideEffect {
                 requester.requestFocus()
             }
