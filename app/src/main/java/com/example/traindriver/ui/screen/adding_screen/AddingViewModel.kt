@@ -407,6 +407,13 @@ class AddingViewModel : ViewModel(), KoinComponent {
                     )
                 )
             }
+            is DieselSectionEvent.EnteredRefuel -> {
+                dieselSectionListState[event.index] = dieselSectionListState[event.index].copy(
+                    refuel = dieselSectionListState[event.index].coefficient.copy(
+                        data = event.data
+                    )
+                )
+            }
             is DieselSectionEvent.FocusChange -> {}
         }
     }

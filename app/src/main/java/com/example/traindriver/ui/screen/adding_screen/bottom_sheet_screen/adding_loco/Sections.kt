@@ -2,6 +2,7 @@ package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.addi
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -34,18 +35,24 @@ import kotlinx.coroutines.launch
 import com.example.traindriver.ui.util.double_util.minus
 
 
-@OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun SectionPager(
     modifier: Modifier = Modifier,
     pagerState: PagerState,
     viewModel: AddingViewModel,
-    bottomSheetState: ModalBottomSheetState,
-    coefficientState: MutableState<Pair<Int, String>>
+    coefficientState: MutableState<Pair<Int, String>>,
+    refuelState: MutableState<Pair<Int, String>>,
+    openSheet: (BottomSheetLoco) -> Unit
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.End) {
         when (pagerState.currentPage) {
-            0 -> DieselSectionList(viewModel, bottomSheetState, coefficientState)
+            0 -> DieselSectionList(
+                viewModel = viewModel,
+                coefficientState = coefficientState,
+                refuelState = refuelState,
+                openSheet = openSheet
+            )
             1 -> ElectricSectionList(viewModel.electricSectionListState.value)
         }
 
@@ -60,31 +67,38 @@ fun SectionPager(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DieselSectionList(
     viewModel: AddingViewModel,
-    scaffoldState: ModalBottomSheetState,
-    coefficientState: MutableState<Pair<Int, String>>
+    coefficientState: MutableState<Pair<Int, String>>,
+    refuelState: MutableState<Pair<Int, String>>,
+    openSheet: (BottomSheetLoco) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
     ) {
         val state = viewModel.dieselSectionListState
         itemsIndexed(state) { index, item ->
-            DieselSectionItem(index, item, viewModel, scaffoldState, coefficientState)
+            DieselSectionItem(
+                index = index,
+                item = item,
+                viewModel = viewModel,
+                coefficientState = coefficientState,
+                refuelState = refuelState,
+                openSheet = openSheet
+            )
         }
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DieselSectionItem(
     index: Int,
     item: DieselSectionFormState,
     viewModel: AddingViewModel,
-    bottomSheetState: ModalBottomSheetState,
-    coefficientState: MutableState<Pair<Int, String>>
+    coefficientState: MutableState<Pair<Int, String>>,
+    refuelState: MutableState<Pair<Int, String>>,
+    openSheet: (BottomSheetLoco) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val accepted = item.accepted.data
@@ -94,7 +108,7 @@ fun DieselSectionItem(
     val deliveryInKilo = delivery.times(coefficient)
     val result = accepted - delivery
     val resultInKilo = acceptedInKilo - deliveryInKilo
-    val refuel = 2000.0
+    val refuel = item.refuel.data
 
     Column(
         modifier = Modifier
@@ -119,7 +133,17 @@ fun DieselSectionItem(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth().padding(end = 16.dp, top = 8.dp),
+            modifier = Modifier
+                .clickable {
+                    refuelState.value = refuelState.value.copy(
+                        first = index, second = refuel?.str() ?: ""
+                    )
+                    scope.launch {
+                        openSheet.invoke(BottomSheetLoco.RefuelSheet)
+                    }
+                }
+                .fillMaxWidth()
+                .padding(end = 16.dp, top = 8.dp),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -131,11 +155,12 @@ fun DieselSectionItem(
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(MaterialTheme.colors.secondaryVariant)
             )
-            Text(
-                text = "${refuel.str()} л",
-                style = Typography.body2,
-                color = MaterialTheme.colors.primary
-            )
+            refuel?.let {
+                Text(
+                    text = "${it.str()} л",
+                    style = Typography.body1.copy(color = MaterialTheme.colors.primary),
+                )
+            }
         }
 
         Row(
@@ -217,7 +242,7 @@ fun DieselSectionItem(
                         first = index, second = coefficient?.str() ?: ""
                     )
                     scope.launch {
-                        bottomSheetState.show()
+                        openSheet.invoke(BottomSheetLoco.CoefficientSheet)
                     }
                 })
 

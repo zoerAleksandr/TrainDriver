@@ -54,11 +54,29 @@ fun AddingLocoScreen(
     locomotive: Locomotive? = null,
     viewModel: AddingViewModel
 ) {
-    val bottomSheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    val bottomSheetState =
+        rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val coefficientState: MutableState<Pair<Int, String>> = remember {
-        mutableStateOf(Pair<Int, String>(0, "0.0"))
+        mutableStateOf(Pair(0, "0.0"))
+    }
+    val refuelState: MutableState<Pair<Int, String>> = remember {
+        mutableStateOf(Pair(0, "0.0"))
     }
     val scope = rememberCoroutineScope()
+
+
+    var currentSheet: BottomSheetLoco? by remember {
+        mutableStateOf(null)
+    }
+
+    if (!bottomSheetState.isVisible) currentSheet = null
+
+    val openSheet: (BottomSheetLoco) -> Unit = { screen ->
+        scope.launch {
+            currentSheet = screen
+            bottomSheetState.show()
+        }
+    }
 
     val closeSheet: () -> Unit = {
         scope.launch {
@@ -69,13 +87,19 @@ fun AddingLocoScreen(
     ModalBottomSheetLayout(
         sheetState = bottomSheetState,
         sheetShape = ShapeSurface.medium,
+        sheetBackgroundColor = MaterialTheme.colors.background,
         sheetContent = {
-            BottomSheetCoefficient(
-                viewModel = viewModel,
-                coefficientData = coefficientState,
-                closeSheet = closeSheet,
-                sheetState = bottomSheetState
-            )
+            Spacer(modifier = Modifier.height(1.dp))
+            currentSheet?.let { sheet ->
+                SheetLayoutLoco(
+                    sheet = sheet,
+                    viewModel = viewModel,
+                    closeSheet = closeSheet,
+                    bottomSheetState = bottomSheetState,
+                    coefficientState = coefficientState,
+                    refuelState = refuelState
+                )
+            }
         }
     ) {
         ConstraintLayout(
@@ -519,9 +543,109 @@ fun AddingLocoScreen(
                     .padding(start = 16.dp, end = 16.dp, top = 16.dp),
                 pagerState = pagerState,
                 viewModel = viewModel,
-                bottomSheetState = bottomSheetState,
-                coefficientState = coefficientState
+                coefficientState = coefficientState,
+                refuelState = refuelState,
+                openSheet = openSheet
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun SheetLayoutLoco(
+    sheet: BottomSheetLoco,
+    viewModel: AddingViewModel,
+    closeSheet: () -> Unit,
+    bottomSheetState: ModalBottomSheetState,
+    coefficientState: MutableState<Pair<Int, String>>,
+    refuelState: MutableState<Pair<Int, String>>
+) {
+    BottomSheetWithCloseDialog(
+        modifier = Modifier
+            .fillMaxHeight(0.65f),
+        closeSheet = closeSheet
+    ) {
+        when (sheet) {
+            is BottomSheetLoco.CoefficientSheet -> {
+                BottomSheetCoefficient(
+                    viewModel = viewModel,
+                    coefficientData = coefficientState,
+                    sheetState = bottomSheetState
+                )
+            }
+            is BottomSheetLoco.RefuelSheet -> {
+                BottomSheetRefuel(
+                    viewModel = viewModel,
+                    refuelData = refuelState,
+                    sheetState = bottomSheetState
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun BottomSheetRefuel(
+    viewModel: AddingViewModel,
+    refuelData: MutableState<Pair<Int, String>>,
+    sheetState: ModalBottomSheetState
+) {
+    val scope = rememberCoroutineScope()
+    val requester = FocusRequester()
+    val focusManager = LocalFocusManager.current
+    val text = refuelData.value.second
+    val textData = TextFieldValue(
+        text = text,
+        selection = TextRange(text.length)
+    )
+
+    Column(
+        modifier = Modifier
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+        horizontalAlignment = Alignment.Start
+    ) {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = "Экипировка", style = Typography.subtitle1,
+            textAlign = TextAlign.Center
+        )
+        OutlinedTextFieldCustom(
+            modifier = Modifier
+                .focusable(true)
+                .focusRequester(requester)
+                .fillMaxWidth()
+                .padding(top = 16.dp, bottom = 65.dp),
+            value = textData,
+            onValueChange = {
+                viewModel.createEventDieselSection(
+                    DieselSectionEvent.EnteredRefuel(
+                        index = refuelData.value.first,
+                        data = it.text.toDoubleOrNull()
+                    )
+                )
+                refuelData.value = refuelData.value.copy(
+                    second = it.text
+                )
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    scope.launch {
+                        focusManager.clearFocus()
+                        sheetState.hide()
+                    }
+                }
+            )
+        )
+    }
+    if (sheetState.isVisible) {
+        SideEffect {
+            requester.requestFocus()
         }
     }
 }
@@ -531,69 +655,64 @@ fun AddingLocoScreen(
 private fun BottomSheetCoefficient(
     viewModel: AddingViewModel,
     coefficientData: MutableState<Pair<Int, String>>,
-    closeSheet: () -> Unit,
     sheetState: ModalBottomSheetState
 ) {
-    BottomSheetWithCloseDialog(
-        modifier = Modifier.fillMaxHeight(0.65f),
-        closeSheet = closeSheet
+    val scope = rememberCoroutineScope()
+    val requester = FocusRequester()
+    val focusManager = LocalFocusManager.current
+    val text = coefficientData.value.second
+    val textData = TextFieldValue(
+        text = text,
+        selection = TextRange(text.length)
+    )
+    Column(
+        modifier = Modifier
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+        horizontalAlignment = Alignment.Start
     ) {
-        val scope = rememberCoroutineScope()
-        val requester = FocusRequester()
-        val focusManager = LocalFocusManager.current
-        val text = coefficientData.value.second
-        val textData = TextFieldValue(
-            text = text,
-            selection = TextRange(text.length)
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = "Коэффициент", style = Typography.subtitle1,
+            textAlign = TextAlign.Center
         )
-        Column(
+        OutlinedTextFieldCustom(
             modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-            horizontalAlignment = Alignment.Start
-        ) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "Коэффициент", style = Typography.subtitle1,
-                textAlign = TextAlign.Center
-            )
-            OutlinedTextFieldCustom(
-                modifier = Modifier
-                    .focusable(true)
-                    .focusRequester(requester)
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 65.dp),
-                value = textData,
-                onValueChange = {
-                    viewModel.createEventDieselSection(
-                        DieselSectionEvent.EnteredCoefficient(
-                            index = coefficientData.value.first,
-                            data = it.text.toDoubleOrNull()
-                        )
+                .focusable(true)
+                .focusRequester(requester)
+                .fillMaxWidth()
+                .padding(top = 16.dp, bottom = 65.dp),
+            value = textData,
+            onValueChange = {
+                viewModel.createEventDieselSection(
+                    DieselSectionEvent.EnteredCoefficient(
+                        index = coefficientData.value.first,
+                        data = it.text.toDoubleOrNull()
                     )
-                    coefficientData.value = coefficientData.value.copy(
-                        second = it.text
-                    )
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        scope.launch {
-                            focusManager.clearFocus()
-                            sheetState.hide()
-                        }
-                    }
                 )
+                coefficientData.value = coefficientData.value.copy(
+                    second = it.text
+                )
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    scope.launch {
+                        focusManager.clearFocus()
+                        sheetState.hide()
+                    }
+                }
             )
-        }
-        if (sheetState.isVisible) {
-            SideEffect {
-                requester.requestFocus()
-            }
+        )
+    }
+    if (sheetState.isVisible) {
+        SideEffect {
+            requester.requestFocus()
         }
     }
+
 }
 
 @Composable
