@@ -10,6 +10,7 @@ import com.example.traindriver.domain.entity.SectionDiesel
 import com.example.traindriver.domain.entity.SectionElectric
 import com.example.traindriver.ui.screen.adding_screen.state_holder.*
 import com.example.traindriver.ui.util.DateAndTimeFormat
+import com.example.traindriver.ui.util.double_util.str
 import com.example.traindriver.ui.util.long_util.minus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
@@ -373,7 +374,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
                     formValid = true,
                     coefficient = DieselSectionFieldState(
                         type = DieselSectionType.COEFFICIENT,
-                        data = getCoefficient()
+                        data = getCoefficient().str()
                     )
                 )
             )
@@ -403,14 +404,14 @@ class AddingViewModel : ViewModel(), KoinComponent {
             is DieselSectionEvent.EnteredCoefficient -> {
                 dieselSectionListState[event.index] = dieselSectionListState[event.index].copy(
                     coefficient = dieselSectionListState[event.index].coefficient.copy(
-                        data = event.data
+                        data = event.data?.str()
                     )
                 )
             }
             is DieselSectionEvent.EnteredRefuel -> {
                 dieselSectionListState[event.index] = dieselSectionListState[event.index].copy(
                     refuel = dieselSectionListState[event.index].coefficient.copy(
-                        data = event.data
+                        data = event.data?.str()
                     )
                 )
             }

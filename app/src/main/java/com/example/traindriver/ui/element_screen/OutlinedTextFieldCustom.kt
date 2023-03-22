@@ -17,6 +17,7 @@ fun OutlinedTextFieldCustom(
     value: String,
     onValueChange: (String) -> Unit,
     labelText: String? = null,
+    singleLine: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions()
 ) {
@@ -31,6 +32,7 @@ fun OutlinedTextFieldCustom(
         onValueChange = onValueChange,
         colors = colors,
         label = { Text(text = labelText ?: "", style = Typography.body1) },
+        singleLine = singleLine,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions
     )
@@ -42,6 +44,7 @@ fun OutlinedTextFieldCustom(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     labelText: String? = null,
+    singleLine: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions()
 ) {
@@ -56,6 +59,7 @@ fun OutlinedTextFieldCustom(
         onValueChange = onValueChange,
         colors = colors,
         label = { Text(text = labelText ?: "", style = Typography.body1) },
+        singleLine = singleLine,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions
     )

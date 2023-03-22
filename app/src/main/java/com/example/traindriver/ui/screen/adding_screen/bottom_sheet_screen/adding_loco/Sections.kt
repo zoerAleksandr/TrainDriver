@@ -4,19 +4,23 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.traindriver.R
+import com.example.traindriver.domain.entity.Calculation
 import com.example.traindriver.domain.entity.SectionDiesel
 import com.example.traindriver.domain.entity.SectionElectric
 import com.example.traindriver.ui.element_screen.OutlinedTextFieldCustom
@@ -26,13 +30,10 @@ import com.example.traindriver.ui.screen.adding_screen.state_holder.DieselSectio
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.ClickableTextTrainDriver
-import com.example.traindriver.ui.util.double_util.rounding
-import com.example.traindriver.ui.util.double_util.str
-import com.example.traindriver.ui.util.double_util.times
+import com.example.traindriver.ui.util.double_util.*
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.launch
-import com.example.traindriver.ui.util.double_util.minus
 
 
 @OptIn(ExperimentalPagerApi::class)
@@ -53,7 +54,7 @@ fun SectionPager(
                 refuelState = refuelState,
                 openSheet = openSheet
             )
-            1 -> ElectricSectionList(viewModel.electricSectionListState.value)
+            1 -> ElectricSectionList(viewModel)
         }
 
         ClickableTextTrainDriver(
@@ -74,11 +75,11 @@ fun DieselSectionList(
     refuelState: MutableState<Pair<Int, String>>,
     openSheet: (BottomSheetLoco) -> Unit
 ) {
-    LazyColumn(
+    Column(
         modifier = Modifier.fillMaxWidth(),
     ) {
         val state = viewModel.dieselSectionListState
-        itemsIndexed(state) { index, item ->
+        state.forEachIndexed { index, item ->
             DieselSectionItem(
                 index = index,
                 item = item,
@@ -101,14 +102,18 @@ fun DieselSectionItem(
     openSheet: (BottomSheetLoco) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val accepted = item.accepted.data
-    val delivery = item.delivery.data
-    val coefficient = item.coefficient.data
+    val focusManager = LocalFocusManager.current
+
+    val acceptedText = item.accepted.data ?: ""
+    val accepted = acceptedText.toDoubleOrNull()
+    val deliveryText = item.delivery.data ?: ""
+    val delivery = deliveryText.toDoubleOrNull()
+    val coefficient = item.coefficient.data?.toDoubleOrNull()
+    val refuel = item.refuel.data?.toDoubleOrNull()
     val acceptedInKilo = accepted.times(coefficient)
     val deliveryInKilo = delivery.times(coefficient)
-    val result = accepted - delivery
-    val resultInKilo = acceptedInKilo - deliveryInKilo
-    val refuel = item.refuel.data
+    val result = Calculation.getTotalFuelConsumption(accepted, delivery, refuel)
+    val resultInKilo = Calculation.getTotalFuelInKiloConsumption(result, coefficient)
 
     Column(
         modifier = Modifier
@@ -118,7 +123,7 @@ fun DieselSectionItem(
                 width = 1.dp,
                 color = MaterialTheme.colors.primaryVariant,
                 shape = ShapeBackground.small
-            ), horizontalAlignment = Alignment.Start
+            ), horizontalAlignment = Alignment.End
     ) {
         fun maskInKilo(string: String?): String? {
             return string?.let {
@@ -133,33 +138,43 @@ fun DieselSectionItem(
         }
 
         Row(
-            modifier = Modifier
-                .clickable {
-                    refuelState.value = refuelState.value.copy(
-                        first = index, second = refuel?.str() ?: ""
-                    )
-                    scope.launch {
-                        openSheet.invoke(BottomSheetLoco.RefuelSheet)
-                    }
-                }
-                .fillMaxWidth()
-                .padding(end = 16.dp, top = 8.dp),
-            horizontalArrangement = Arrangement.End,
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                modifier = Modifier
-                    .size(dimensionResource(id = R.dimen.icon_size))
-                    .padding(end = 8.dp),
-                painter = painterResource(id = R.drawable.refuel_icon),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(MaterialTheme.colors.secondaryVariant)
+            Text(
+                modifier = Modifier.padding(start = 16.dp),
+                text = "${index + 1}",
+                style = Typography.subtitle1.copy(color = MaterialTheme.colors.primary)
             )
-            refuel?.let {
-                Text(
-                    text = "${it.str()} л",
-                    style = Typography.body1.copy(color = MaterialTheme.colors.primary),
+            Row(
+                modifier = Modifier
+                    .clickable {
+                        refuelState.value = refuelState.value.copy(
+                            first = index, second = refuel?.str() ?: ""
+                        )
+                        scope.launch {
+                            openSheet.invoke(BottomSheetLoco.RefuelSheet)
+                        }
+                    }
+                    .padding(start = 16.dp, end = 16.dp, top = 8.dp),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    modifier = Modifier
+                        .size(dimensionResource(id = R.dimen.icon_size))
+                        .padding(end = 8.dp),
+                    painter = painterResource(id = R.drawable.refuel_icon),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(MaterialTheme.colors.secondaryVariant)
                 )
+                refuel?.let {
+                    Text(
+                        text = maskInLiter(it.str()) ?: "",
+                        style = Typography.body1.copy(color = MaterialTheme.colors.primary),
+                    )
+                }
             }
         }
 
@@ -167,37 +182,57 @@ fun DieselSectionItem(
             modifier = Modifier.padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            val acceptedFuelText = accepted?.str() ?: ""
-            val deliveryFuelText = delivery?.str() ?: ""
 
             OutlinedTextFieldCustom(
                 modifier = Modifier
-                    .padding(8.dp)
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
                     .weight(0.5f),
-                value = acceptedFuelText,
+                value = acceptedText,
                 onValueChange = {
                     viewModel.createEventDieselSection(
                         DieselSectionEvent.EnteredAccepted(
-                            index = index, data = it.toDoubleOrNull()
+                            index = index, data = it
                         )
                     )
                 },
-                labelText = "Принял"
+                labelText = "Принял",
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        scope.launch {
+                            focusManager.moveFocus(FocusDirection.Right)
+                        }
+                    }
+                )
             )
 
             OutlinedTextFieldCustom(
                 modifier = Modifier
-                    .padding(8.dp)
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
                     .weight(0.5f),
-                value = deliveryFuelText,
+                value = deliveryText,
                 onValueChange = {
                     viewModel.createEventDieselSection(
                         DieselSectionEvent.EnteredDelivery(
-                            index = index, data = it.toDoubleOrNull()
+                            index = index, data = it
                         )
                     )
                 },
-                labelText = "Сдал"
+                labelText = "Сдал",
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        scope.launch {
+                            focusManager.clearFocus()
+                        }
+                    }
+                )
             )
 
         }
@@ -213,26 +248,33 @@ fun DieselSectionItem(
                     modifier = Modifier
                         .weight(1f)
                         .padding(end = 8.dp),
-                    contentAlignment = Alignment.CenterStart
+                    contentAlignment = Alignment.TopStart
                 ) {
                     val acceptedInKiloText = rounding(acceptedInKilo, 2)?.str()
-                    Text(text = maskInKilo(acceptedInKiloText) ?: "", style = Typography.body1)
+                    Text(
+                        text = maskInKilo(acceptedInKiloText) ?: "",
+                        style = Typography.body1
+                    )
                 }
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .padding(start = 8.dp),
-                    contentAlignment = Alignment.CenterStart
+                    contentAlignment = Alignment.TopStart
                 ) {
                     val deliveryInKiloText = rounding(deliveryInKilo, 2)?.str()
-                    Text(text = maskInKilo(deliveryInKiloText) ?: "", style = Typography.body1)
+                    Text(
+                        text = maskInKilo(deliveryInKiloText) ?: "",
+                        style = Typography.body1
+                    )
                 }
             }
         }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             ClickableTextTrainDriver(
@@ -248,7 +290,7 @@ fun DieselSectionItem(
 
             if (result != null) {
                 val resultInLiterText = maskInLiter(result.str())
-                val resultInKiloText = maskInKilo(resultInKilo?.str())
+                val resultInKiloText = maskInKilo(rounding(resultInKilo, 2)?.str())
                 Text(
                     text = "${resultInLiterText ?: ""} / ${resultInKiloText ?: ""}",
                     style = Typography.body1
@@ -259,13 +301,15 @@ fun DieselSectionItem(
 }
 
 @Composable
-fun ElectricSectionList(sectionList: List<SectionElectric>) {
-    LazyColumn(
+fun ElectricSectionList(viewModel: AddingViewModel) {
+    Column(
         modifier = Modifier.fillMaxWidth(),
     ) {
-        items(sectionList) { item ->
-            ElectricSectionItem(item)
-        }
+        val state = viewModel.electricSectionListState
+//        state.
+//        items(sectionList) { item ->
+//            ElectricSectionItem(item)
+//        }
     }
 }
 

@@ -96,10 +96,9 @@ data class SectionDiesel(
     var coefficientSupply: Double? = null,
     var fuelSupplyInKilo: Double? = fuelSupply * coefficientSupply
 ) : Section(id, acceptedEnergy, deliveryEnergy) {
-    override fun getConsumption() =
-        reverseDifferenceBetweenDouble(acceptedEnergy, deliveryEnergy).plusNullableValue(fuelSupply)
+    override fun getConsumption() = Calculation.getTotalFuelConsumption(acceptedEnergy, deliveryEnergy, fuelSupply)
 
-    fun getConsumptionInKilo() = getConsumption() * coefficient
+    fun getConsumptionInKilo() = Calculation.getTotalFuelInKiloConsumption(getConsumption(), coefficient)
 }
 
 abstract class Section(

@@ -5,13 +5,13 @@ enum class DieselSectionType{
 }
 
 data class DieselSectionFieldState(
-    val data: Double? = null,
+    val data: String? = null,
     val type: DieselSectionType
 )
 
 sealed class DieselSectionEvent{
-    data class EnteredAccepted(val index: Int, val data: Double?): DieselSectionEvent()
-    data class EnteredDelivery(val index: Int, val data: Double?): DieselSectionEvent()
+    data class EnteredAccepted(val index: Int, val data: String?): DieselSectionEvent()
+    data class EnteredDelivery(val index: Int, val data: String?): DieselSectionEvent()
     data class EnteredCoefficient(val index: Int, val data: Double?): DieselSectionEvent()
     data class EnteredRefuel(val index :Int, val data: Double?): DieselSectionEvent()
     data class FocusChange(val index: Int, val fieldName: DieselSectionType): DieselSectionEvent()
