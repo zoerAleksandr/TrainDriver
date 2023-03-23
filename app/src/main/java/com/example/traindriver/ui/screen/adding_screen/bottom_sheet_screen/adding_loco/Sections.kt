@@ -1,18 +1,28 @@
 package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.adding_loco
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -44,39 +54,23 @@ fun SectionPager(
     viewModel: AddingViewModel,
     coefficientState: MutableState<Pair<Int, String>>,
     refuelState: MutableState<Pair<Int, String>>,
-    openSheet: (BottomSheetLoco) -> Unit
+    openSheet: (BottomSheetLoco) -> Unit,
+    contentDiesel: @Composable LazyListScope.() -> Unit,
+    contentElectric: @Composable LazyListScope.() -> Unit
 ) {
-    Column(modifier = modifier, horizontalAlignment = Alignment.End) {
-        when (pagerState.currentPage) {
-            0 -> DieselSectionList(
-                viewModel = viewModel,
-                coefficientState = coefficientState,
-                refuelState = refuelState,
-                openSheet = openSheet
-            )
-            1 -> ElectricSectionList(viewModel)
-        }
-
-        ClickableTextTrainDriver(
-            modifier = Modifier.padding(top = 8.dp), text = AnnotatedString("Добавить секцию")
-        ) {
-            when (pagerState.currentPage) {
-                0 -> viewModel.addDieselSection(SectionDiesel())
-                1 -> viewModel.addElectricSection()
-            }
-        }
-    }
 }
 
 @Composable
 fun DieselSectionList(
+    modifier: Modifier = Modifier,
     viewModel: AddingViewModel,
     coefficientState: MutableState<Pair<Int, String>>,
     refuelState: MutableState<Pair<Int, String>>,
-    openSheet: (BottomSheetLoco) -> Unit
+    openSheet: (BottomSheetLoco) -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
     ) {
         val state = viewModel.dieselSectionListState
         state.forEachIndexed { index, item ->
@@ -94,12 +88,13 @@ fun DieselSectionList(
 
 @Composable
 fun DieselSectionItem(
+    modifier: Modifier = Modifier,
     index: Int,
     item: DieselSectionFormState,
     viewModel: AddingViewModel,
     coefficientState: MutableState<Pair<Int, String>>,
     refuelState: MutableState<Pair<Int, String>>,
-    openSheet: (BottomSheetLoco) -> Unit
+    openSheet: (BottomSheetLoco) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
@@ -116,14 +111,15 @@ fun DieselSectionItem(
     val resultInKilo = Calculation.getTotalFuelInKiloConsumption(result, coefficient)
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(top = 8.dp)
+            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colors.primaryVariant,
                 shape = ShapeBackground.small
-            ), horizontalAlignment = Alignment.End
+            ),
+        horizontalAlignment = Alignment.End
     ) {
         fun maskInKilo(string: String?): String? {
             return string?.let {
@@ -301,16 +297,15 @@ fun DieselSectionItem(
 }
 
 @Composable
-fun ElectricSectionList(viewModel: AddingViewModel) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        val state = viewModel.electricSectionListState
-//        state.
-//        items(sectionList) { item ->
-//            ElectricSectionItem(item)
-//        }
-    }
+fun ElectricSectionList(
+    viewModel: AddingViewModel
+) {
+//    Column(
+//        modifier = Modifier
+//            .fillMaxWidth(),
+//    ) {
+//        val state = viewModel.electricSectionListState
+//    }
 }
 
 @Composable
