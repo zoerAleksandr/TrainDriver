@@ -1,28 +1,18 @@
 package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.adding_loco
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -31,7 +21,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.traindriver.R
 import com.example.traindriver.domain.entity.Calculation
-import com.example.traindriver.domain.entity.SectionDiesel
 import com.example.traindriver.domain.entity.SectionElectric
 import com.example.traindriver.ui.element_screen.OutlinedTextFieldCustom
 import com.example.traindriver.ui.screen.adding_screen.AddingViewModel
@@ -41,50 +30,7 @@ import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.ClickableTextTrainDriver
 import com.example.traindriver.ui.util.double_util.*
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.launch
-
-
-@OptIn(ExperimentalPagerApi::class)
-@Composable
-fun SectionPager(
-    modifier: Modifier = Modifier,
-    pagerState: PagerState,
-    viewModel: AddingViewModel,
-    coefficientState: MutableState<Pair<Int, String>>,
-    refuelState: MutableState<Pair<Int, String>>,
-    openSheet: (BottomSheetLoco) -> Unit,
-    contentDiesel: @Composable LazyListScope.() -> Unit,
-    contentElectric: @Composable LazyListScope.() -> Unit
-) {
-}
-
-@Composable
-fun DieselSectionList(
-    modifier: Modifier = Modifier,
-    viewModel: AddingViewModel,
-    coefficientState: MutableState<Pair<Int, String>>,
-    refuelState: MutableState<Pair<Int, String>>,
-    openSheet: (BottomSheetLoco) -> Unit,
-) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-    ) {
-        val state = viewModel.dieselSectionListState
-        state.forEachIndexed { index, item ->
-            DieselSectionItem(
-                index = index,
-                item = item,
-                viewModel = viewModel,
-                coefficientState = coefficientState,
-                refuelState = refuelState,
-                openSheet = openSheet
-            )
-        }
-    }
-}
 
 @Composable
 fun DieselSectionItem(
@@ -113,7 +59,7 @@ fun DieselSectionItem(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 8.dp, start = 16.dp, end = 16.dp)
+            .padding(top = 12.dp)
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colors.primaryVariant,
@@ -294,18 +240,6 @@ fun DieselSectionItem(
             }
         }
     }
-}
-
-@Composable
-fun ElectricSectionList(
-    viewModel: AddingViewModel
-) {
-//    Column(
-//        modifier = Modifier
-//            .fillMaxWidth(),
-//    ) {
-//        val state = viewModel.electricSectionListState
-//    }
 }
 
 @Composable

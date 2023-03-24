@@ -32,6 +32,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.traindriver.R
 import com.example.traindriver.domain.entity.Locomotive
@@ -41,6 +43,7 @@ import com.example.traindriver.ui.screen.adding_screen.*
 import com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.BottomSheetWithCloseDialog
 import com.example.traindriver.ui.screen.adding_screen.custom_tab.CustomTab
 import com.example.traindriver.ui.screen.adding_screen.state_holder.*
+import com.example.traindriver.ui.screen.signin_screen.elements.SecondarySpacer
 import com.example.traindriver.ui.screen.viewing_route_screen.element.BottomShadow
 import com.example.traindriver.ui.screen.viewing_route_screen.element.isScrollInInitialState
 import com.example.traindriver.ui.screen.viewing_route_screen.element.setTextColor
@@ -115,27 +118,49 @@ fun AddingLocoScreen(
     ) {
         val scrollState = rememberLazyListState()
 
-        Column(
+        ConstraintLayout(
             modifier = Modifier
+                .fillMaxWidth()
                 .padding(bottom = 56.dp),
-            horizontalAlignment = Alignment.End
         ) {
+            val (saveButton, divider, topShadow, lazyColumn) = createRefs()
             var number by remember { mutableStateOf(TextFieldValue(locomotive?.number ?: "")) }
             var series by remember { mutableStateOf(TextFieldValue(locomotive?.series ?: "")) }
             val pagerState = rememberPagerState(pageCount = 2, initialPage = 0)
 
             Text(
                 modifier = Modifier
+                    .constrainAs(saveButton) {
+                        top.linkTo(parent.top)
+                        end.linkTo(parent.end)
+                    }
                     .clickable {
                         viewModel.addLocomotive(Locomotive(series = "ВЛ15", number = "033"))
                     }
-                    .padding(end = 32.dp, top = 16.dp, bottom = 32.dp),
+                    .padding(end = 16.dp, top = 16.dp),
                 text = "Сохранить",
                 style = Typography.button.copy(color = MaterialTheme.colors.secondaryVariant)
             )
 
+            Divider(modifier = Modifier
+                .constrainAs(divider) {
+                    top.linkTo(saveButton.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    width = Dimension.fillToConstraints
+                }
+                .padding(top = 24.dp)
+            )
+
             AnimatedVisibility(
-                modifier = Modifier.zIndex(1f),
+                modifier = Modifier
+                    .zIndex(1f)
+                    .constrainAs(topShadow) {
+                        top.linkTo(divider.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        width = Dimension.fillToConstraints
+                    },
                 visible = !scrollState.isScrollInInitialState(),
                 enter = fadeIn(animationSpec = tween(durationMillis = 300)),
                 exit = fadeOut(animationSpec = tween(durationMillis = 300))
@@ -144,15 +169,21 @@ fun AddingLocoScreen(
             }
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .constrainAs(lazyColumn) {
+                        top.linkTo(divider.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        width = Dimension.fillToConstraints
+                    }.padding(top = 16.dp),
                 state = scrollState,
-                horizontalAlignment = Alignment.End
+                horizontalAlignment = Alignment.End,
+                contentPadding = PaddingValues(horizontal = 24.dp)
             ) {
                 item {
                     Row(modifier = Modifier.fillMaxWidth()) {
                         OutlinedTextFieldCustom(
                             modifier = Modifier
-                                .padding(start = 16.dp, end = 8.dp)
+                                .padding(end = 8.dp)
                                 .weight(1f),
                             value = series,
                             labelText = "Серия",
@@ -160,7 +191,7 @@ fun AddingLocoScreen(
                         )
                         OutlinedTextFieldCustom(
                             modifier = Modifier
-                                .padding(end = 16.dp, start = 8.dp)
+                                .padding(start = 8.dp)
                                 .weight(1f),
                             value = number,
                             labelText = "Номер",
@@ -174,7 +205,7 @@ fun AddingLocoScreen(
 
                     CustomTab(
                         modifier = Modifier
-                            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                            .padding(top = 12.dp),
                         items = listOf("Тепловоз", "Электровоз"),
                         tabWidth = (screenWidth - 32.dp) / 2,
                         selectedItemIndex = pagerState.currentPage,
@@ -262,7 +293,7 @@ fun AddingLocoScreen(
 
                     Column(
                         modifier = Modifier
-                            .padding(start = 16.dp, end = 16.dp, top = 32.dp)
+                            .padding(top = 32.dp)
                             .border(
                                 width = 1.dp,
                                 shape = ShapeBackground.small,
@@ -437,7 +468,7 @@ fun AddingLocoScreen(
 
                     Column(
                         modifier = Modifier
-                            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+                            .padding(top = 12.dp)
                             .border(
                                 width = 1.dp,
                                 shape = ShapeBackground.small,
@@ -535,24 +566,26 @@ fun AddingLocoScreen(
                     0 -> {
                         val list = viewModel.dieselSectionListState
                         itemsIndexed(items = list) { index, item ->
-                                DieselSectionItem(
-                                    index = index,
-                                    item = item,
-                                    viewModel = viewModel,
-                                    coefficientState = coefficientState,
-                                    refuelState = refuelState,
-                                    openSheet = openSheet
-                                )
+                            if (index == 0) {
+                                SecondarySpacer()
+                            }
+                            DieselSectionItem(
+                                index = index,
+                                item = item,
+                                viewModel = viewModel,
+                                coefficientState = coefficientState,
+                                refuelState = refuelState,
+                                openSheet = openSheet
+                            )
                         }
                     }
                     1 -> {
                         viewModel.electricSectionListState.value
                     }
                 }
-
                 item {
                     ClickableTextTrainDriver(
-                        modifier = Modifier.padding(top = 8.dp, end = 16.dp),
+                        modifier = Modifier.padding(top = 16.dp),
                         text = AnnotatedString("Добавить секцию")
                     ) {
                         when (pagerState.currentPage) {
@@ -566,6 +599,7 @@ fun AddingLocoScreen(
                         }
                     }
                 }
+                item { Spacer(modifier = Modifier.padding(50.dp)) }
             }
         }
     }

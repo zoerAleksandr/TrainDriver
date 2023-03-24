@@ -424,7 +424,6 @@ class AddingViewModel : ViewModel(), KoinComponent {
             dataStoreRepository.readDieselCoefficient().first()
         }
 
-
     var electricSectionListState = mutableStateOf(listOf<SectionElectric>())
         private set
 
