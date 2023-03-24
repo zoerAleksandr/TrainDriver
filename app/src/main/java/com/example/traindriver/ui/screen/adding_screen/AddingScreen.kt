@@ -18,6 +18,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -143,7 +144,25 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
         }, endCalendar[YEAR], endCalendar[MONTH], endCalendar[DAY_OF_MONTH]
     )
     val scope = rememberCoroutineScope()
-    val scaffoldState = rememberBottomSheetScaffoldState()
+    var confirmStateChange by remember {
+        mutableStateOf(false)
+    }
+
+    val scaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberBottomSheetState(
+            initialValue = BottomSheetValue.Collapsed,
+            confirmStateChange = {
+                confirmStateChange
+            }
+        )
+    )
+
+    /**
+     * Изменятся параметр bottomSheetState в зависимости от положения шторки
+     */
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+    confirmStateChange = scaffoldState.bottomSheetState.offset.value > screenHeight.div(2)
+
     var currentBottomSheet: BottomSheetScreen? by remember {
         mutableStateOf(null)
     }
