@@ -1,42 +1,55 @@
 package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.adding_loco
 
+import android.annotation.SuppressLint
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.traindriver.R
 import com.example.traindriver.domain.entity.Calculation
-import com.example.traindriver.domain.entity.SectionElectric
 import com.example.traindriver.ui.element_screen.OutlinedTextFieldCustom
 import com.example.traindriver.ui.screen.adding_screen.AddingViewModel
 import com.example.traindriver.ui.screen.adding_screen.state_holder.DieselSectionEvent
-import com.example.traindriver.ui.screen.adding_screen.state_holder.DieselSectionFormState
+import com.example.traindriver.ui.screen.adding_screen.state_holder.SectionType
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.ClickableTextTrainDriver
 import com.example.traindriver.ui.util.double_util.*
+import com.example.traindriver.ui.util.float_util.dp
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 @Composable
 fun DieselSectionItem(
     modifier: Modifier = Modifier,
+    backgroundColor: Color,
     index: Int,
-    item: DieselSectionFormState,
+    item: SectionType.DieselSectionFormState,
     viewModel: AddingViewModel,
     coefficientState: MutableState<Pair<Int, String>>,
     refuelState: MutableState<Pair<Int, String>>,
@@ -59,7 +72,7 @@ fun DieselSectionItem(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 12.dp)
+            .background(backgroundColor)
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colors.primaryVariant,
@@ -243,7 +256,7 @@ fun DieselSectionItem(
 }
 
 @Composable
-fun ElectricSectionItem(section: SectionElectric) {
+fun ElectricSectionItem(section: SectionType.ElectricSectionFormState) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -255,5 +268,113 @@ fun ElectricSectionItem(section: SectionElectric) {
             )
     ) {
         Text(text = "I am Item Electric Section")
+    }
+}
+
+const val ANIMATION_DURATION = 300
+const val MIN_DRAG_AMOUNT = 6
+const val CARD_OFFSET = 86f
+
+@SuppressLint("UnusedTransitionTargetStateParameter")
+@Composable
+fun DraggableItem(
+    modifier: Modifier = Modifier,
+    item: SectionType,
+    isRevealed: Boolean,
+    onExpand: () -> Unit,
+    onCollapse: () -> Unit,
+    index: Int,
+    viewModel: AddingViewModel,
+    coefficientState: MutableState<Pair<Int, String>>,
+    refuelState: MutableState<Pair<Int, String>>,
+    openSheet: (BottomSheetLoco) -> Unit
+) {
+    val cardCollapsedBackgroundColor = MaterialTheme.colors.background
+    val cardExpandedBackgroundColor = MaterialTheme.colors.background
+
+    val transitionState = remember {
+        MutableTransitionState(isRevealed).apply {
+            targetState = !isRevealed
+        }
+    }
+    val transition = updateTransition(transitionState, "itemTransition")
+
+    val backgroundColor by transition.animateColor(
+        label = "cardBgColorTransition",
+        transitionSpec = { tween(durationMillis = ANIMATION_DURATION) },
+        targetValueByState = {
+            if (isRevealed) cardExpandedBackgroundColor else cardCollapsedBackgroundColor
+        }
+    )
+    val offsetTransition by transition.animateFloat(
+        label = "cardOffsetTransition",
+        transitionSpec = { tween(durationMillis = ANIMATION_DURATION) },
+        targetValueByState = { if (isRevealed) -CARD_OFFSET.dp() else 0f },
+    )
+    val cardElevation by transition.animateDp(
+        label = "cardElevation",
+        transitionSpec = { tween(durationMillis = ANIMATION_DURATION) },
+        targetValueByState = { if (isRevealed) 30.dp else 0.dp }
+    )
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .offset { IntOffset(offsetTransition.roundToInt(), 0) }
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures { _, dragAmount ->
+                    when {
+                        dragAmount <= MIN_DRAG_AMOUNT -> onExpand()
+                        dragAmount > -MIN_DRAG_AMOUNT -> onCollapse()
+                    }
+                }
+            },
+        shape = ShapeBackground.small,
+        elevation = cardElevation,
+        content = {
+            when (item) {
+                is SectionType.DieselSectionFormState -> {
+                    DieselSectionItem(
+                        modifier = modifier,
+                        backgroundColor = backgroundColor,
+                        index = index,
+                        item = item,
+                        viewModel = viewModel,
+                        coefficientState = coefficientState,
+                        refuelState = refuelState,
+                        openSheet = openSheet
+                    )
+                }
+                is SectionType.ElectricSectionFormState -> {
+                    ElectricSectionItem(section = item)
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun ActionsRow(
+    onDelete: () -> Unit
+) {
+    Box(
+        contentAlignment = Alignment.CenterEnd
+    ) {
+        IconButton(
+            modifier = Modifier
+                .size(dimensionResource(id = R.dimen.min_size_view))
+                .background(
+                    color = MaterialTheme.colors.surface, shape = CircleShape
+                ),
+            onClick = onDelete
+        ) {
+            Image(
+                modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size)),
+                imageVector = Icons.Default.Delete,
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(Color.Red)
+            )
+        }
     }
 }

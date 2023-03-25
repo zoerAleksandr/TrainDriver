@@ -363,13 +363,26 @@ class AddingViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    var dieselSectionListState = mutableStateListOf<DieselSectionFormState>()
+    var dieselSectionListState = mutableStateListOf<SectionType.DieselSectionFormState>()
         private set
+
+    var revealedItemDieselSectionIdsList = mutableStateListOf<String>()
+        private set
+
+    fun onExpandedDieselSection(sectionId: String){
+        if (revealedItemDieselSectionIdsList.contains(sectionId)) return
+        revealedItemDieselSectionIdsList.add(sectionId)
+    }
+
+    fun onCollapsedDieselSection(sectionId: String){
+        if (!revealedItemDieselSectionIdsList.contains(sectionId)) return
+        revealedItemDieselSectionIdsList.remove(sectionId)
+    }
 
     fun addDieselSection(sectionDiesel: SectionDiesel) {
         viewModelScope.launch {
             dieselSectionListState.add(
-                DieselSectionFormState(
+                SectionType.DieselSectionFormState(
                     sectionId = sectionDiesel.id,
                     formValid = true,
                     coefficient = DieselSectionFieldState(
@@ -379,6 +392,10 @@ class AddingViewModel : ViewModel(), KoinComponent {
                 )
             )
         }
+    }
+
+    fun removeDieselSection(sectionState: SectionType.DieselSectionFormState) {
+        dieselSectionListState.remove(sectionState)
     }
 
     fun createEventDieselSection(event: DieselSectionEvent) {

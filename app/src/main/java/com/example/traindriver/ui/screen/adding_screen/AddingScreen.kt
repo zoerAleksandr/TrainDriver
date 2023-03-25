@@ -161,7 +161,8 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
      * Изменятся параметр bottomSheetState в зависимости от положения шторки
      */
     val screenHeight = LocalConfiguration.current.screenHeightDp
-    confirmStateChange = scaffoldState.bottomSheetState.offset.value > screenHeight.div(2)
+    val offset = scaffoldState.bottomSheetState.offset.value
+    confirmStateChange = offset > screenHeight.times(1.4)
 
     var currentBottomSheet: BottomSheetScreen? by remember {
         mutableStateOf(null)

@@ -3,6 +3,8 @@ package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.addi
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -62,6 +64,7 @@ import java.util.*
 
 @OptIn(
     ExperimentalPagerApi::class, ExperimentalMaterialApi::class,
+    ExperimentalFoundationApi::class
 )
 @Composable
 fun AddingLocoScreen(
@@ -167,6 +170,7 @@ fun AddingLocoScreen(
             ) {
                 BottomShadow()
             }
+
             LazyColumn(
                 modifier = Modifier
                     .constrainAs(lazyColumn) {
@@ -174,13 +178,17 @@ fun AddingLocoScreen(
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                         width = Dimension.fillToConstraints
-                    }.padding(top = 16.dp),
+                    },
                 state = scrollState,
                 horizontalAlignment = Alignment.End,
                 contentPadding = PaddingValues(horizontal = 24.dp)
             ) {
                 item {
-                    Row(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp)
+                    ) {
                         OutlinedTextFieldCustom(
                             modifier = Modifier
                                 .padding(end = 8.dp)
@@ -565,18 +573,43 @@ fun AddingLocoScreen(
                 when (pagerState.currentPage) {
                     0 -> {
                         val list = viewModel.dieselSectionListState
-                        itemsIndexed(items = list) { index, item ->
+                        val revealedSectionIds = viewModel.revealedItemDieselSectionIdsList
+                        itemsIndexed(
+                            items = list,
+                            key = { _, item -> item.sectionId }
+                        ) { index, item ->
                             if (index == 0) {
                                 SecondarySpacer()
                             }
-                            DieselSectionItem(
-                                index = index,
-                                item = item,
-                                viewModel = viewModel,
-                                coefficientState = coefficientState,
-                                refuelState = refuelState,
-                                openSheet = openSheet
-                            )
+                            Box(
+                                modifier = Modifier
+                                    .animateItemPlacement(
+                                        animationSpec = tween(
+                                            durationMillis = 500,
+                                            delayMillis = 100,
+                                            easing = FastOutLinearInEasing
+                                        )
+                                    )
+                                    .wrapContentSize()
+                                    .padding(bottom = 12.dp),
+                                contentAlignment = Alignment.CenterEnd
+                            ) {
+                                ActionsRow(
+                                    onDelete = { viewModel.removeDieselSection(item) }
+                                )
+                                DraggableItem(
+                                    item = item,
+                                    index = index,
+                                    viewModel = viewModel,
+                                    coefficientState = coefficientState,
+                                    refuelState = refuelState,
+                                    openSheet = openSheet,
+                                    isRevealed = revealedSectionIds.contains(item.sectionId),
+                                    onCollapse = { viewModel.onCollapsedDieselSection(item.sectionId) },
+                                    onExpand = { viewModel.onExpandedDieselSection(item.sectionId) },
+                                )
+                            }
+
                         }
                     }
                     1 -> {
@@ -585,7 +618,7 @@ fun AddingLocoScreen(
                 }
                 item {
                     ClickableTextTrainDriver(
-                        modifier = Modifier.padding(top = 16.dp),
+                        modifier = Modifier.padding(top = 12.dp),
                         text = AnnotatedString("Добавить секцию")
                     ) {
                         when (pagerState.currentPage) {
