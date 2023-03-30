@@ -12,6 +12,12 @@ sealed class SectionType {
     ) : SectionType()
 
     data class ElectricSectionFormState(
-        val sectionId: String
+        val sectionId: String,
+        val accepted: ElectricSectionFieldState = ElectricSectionFieldState(type = ElectricSectionType.ACCEPTED),
+        val delivery: ElectricSectionFieldState = ElectricSectionFieldState(type = ElectricSectionType.DELIVERY),
+        val recoveryAccepted: ElectricSectionFieldState = ElectricSectionFieldState(type = ElectricSectionType.RECOVERY_ACCEPTED),
+        val recoveryDelivery: ElectricSectionFieldState = ElectricSectionFieldState(type = ElectricSectionType.RECOVERY_DELIVERY),
+        val formValid: Boolean,
+        val errorMessage: String = ""
     ) : SectionType()
 }

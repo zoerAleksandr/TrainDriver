@@ -3,10 +3,7 @@ package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.addi
 import android.annotation.SuppressLint
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -35,6 +32,7 @@ import com.example.traindriver.domain.entity.Calculation
 import com.example.traindriver.ui.element_screen.OutlinedTextFieldCustom
 import com.example.traindriver.ui.screen.adding_screen.AddingViewModel
 import com.example.traindriver.ui.screen.adding_screen.state_holder.DieselSectionEvent
+import com.example.traindriver.ui.screen.adding_screen.state_holder.ElectricSectionEvent
 import com.example.traindriver.ui.screen.adding_screen.state_holder.SectionType
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.Typography
@@ -46,8 +44,6 @@ import kotlin.math.roundToInt
 
 @Composable
 fun DieselSectionItem(
-    modifier: Modifier = Modifier,
-    backgroundColor: Color,
     index: Int,
     item: SectionType.DieselSectionFormState,
     viewModel: AddingViewModel,
@@ -70,14 +66,6 @@ fun DieselSectionItem(
     val resultInKilo = Calculation.getTotalFuelInKiloConsumption(result, coefficient)
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(backgroundColor)
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colors.primaryVariant,
-                shape = ShapeBackground.small
-            ),
         horizontalAlignment = Alignment.End
     ) {
         fun maskInKilo(string: String?): String? {
@@ -256,18 +244,85 @@ fun DieselSectionItem(
 }
 
 @Composable
-fun ElectricSectionItem(section: SectionType.ElectricSectionFormState) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp)
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colors.primaryVariant,
-                shape = ShapeBackground.small
-            )
+fun ElectricSectionItem(
+    item: SectionType.ElectricSectionFormState,
+    index: Int,
+    viewModel: AddingViewModel,
+) {
+    val scope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
+
+    val acceptedText = item.accepted.data ?: ""
+//    val accepted = acceptedText.toDoubleOrNull()
+    val deliveryText = item.delivery.data ?: ""
+//    val delivery = deliveryText.toDoubleOrNull()
+
+    Column(
+        horizontalAlignment = Alignment.Start
     ) {
-        Text(text = "I am Item Electric Section")
+        Text(
+            modifier = Modifier.padding(start = 16.dp),
+            text = "${index + 1}",
+            style = Typography.subtitle1.copy(color = MaterialTheme.colors.primary)
+        )
+        Row(
+            modifier = Modifier.padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+
+            OutlinedTextFieldCustom(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .weight(0.5f),
+                value = acceptedText,
+                onValueChange = {
+                    viewModel.createEventElectricSection(
+                        ElectricSectionEvent.EnteredAccepted(
+                            index = index, data = it
+                        )
+                    )
+                },
+                labelText = "Принял",
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        scope.launch {
+                            focusManager.moveFocus(FocusDirection.Right)
+                        }
+                    }
+                )
+            )
+
+            OutlinedTextFieldCustom(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .weight(0.5f),
+                value = deliveryText,
+                onValueChange = {
+                    viewModel.createEventElectricSection(
+                        ElectricSectionEvent.EnteredDelivery(
+                            index = index, data = it
+                        )
+                    )
+                },
+                labelText = "Сдал",
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        scope.launch {
+                            focusManager.clearFocus()
+                        }
+                    }
+                )
+            )
+
+        }
     }
 }
 
@@ -279,15 +334,10 @@ const val CARD_OFFSET = 86f
 @Composable
 fun DraggableItem(
     modifier: Modifier = Modifier,
-    item: SectionType,
     isRevealed: Boolean,
     onExpand: () -> Unit,
     onCollapse: () -> Unit,
-    index: Int,
-    viewModel: AddingViewModel,
-    coefficientState: MutableState<Pair<Int, String>>,
-    refuelState: MutableState<Pair<Int, String>>,
-    openSheet: (BottomSheetLoco) -> Unit
+    content: @Composable () -> Unit
 ) {
     val cardCollapsedBackgroundColor = MaterialTheme.colors.background
     val cardExpandedBackgroundColor = MaterialTheme.colors.background
@@ -318,7 +368,7 @@ fun DraggableItem(
     )
 
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .offset { IntOffset(offsetTransition.roundToInt(), 0) }
@@ -330,26 +380,71 @@ fun DraggableItem(
                     }
                 }
             },
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colors.primaryVariant
+        ),
+        backgroundColor = backgroundColor,
         shape = ShapeBackground.small,
         elevation = cardElevation,
+        content = content
+    )
+}
+
+@SuppressLint("UnusedTransitionTargetStateParameter")
+@Composable
+fun DraggableElectricItem(
+    modifier: Modifier = Modifier,
+    item: SectionType.ElectricSectionFormState,
+    isRevealed: Boolean,
+    onExpand: () -> Unit,
+    onCollapse: () -> Unit,
+    index: Int,
+    viewModel: AddingViewModel,
+) {
+    DraggableItem(
+        modifier = modifier,
+        isRevealed = isRevealed,
+        onExpand = onExpand,
+        onCollapse = onCollapse,
         content = {
-            when (item) {
-                is SectionType.DieselSectionFormState -> {
-                    DieselSectionItem(
-                        modifier = modifier,
-                        backgroundColor = backgroundColor,
-                        index = index,
-                        item = item,
-                        viewModel = viewModel,
-                        coefficientState = coefficientState,
-                        refuelState = refuelState,
-                        openSheet = openSheet
-                    )
-                }
-                is SectionType.ElectricSectionFormState -> {
-                    ElectricSectionItem(section = item)
-                }
-            }
+            ElectricSectionItem(
+                item = item,
+                index = index,
+                viewModel = viewModel
+            )
+        }
+    )
+}
+
+@SuppressLint("UnusedTransitionTargetStateParameter")
+@Composable
+fun DraggableDieselItem(
+    modifier: Modifier = Modifier,
+    item: SectionType.DieselSectionFormState,
+    isRevealed: Boolean,
+    onExpand: () -> Unit,
+    onCollapse: () -> Unit,
+    index: Int,
+    viewModel: AddingViewModel,
+    coefficientState: MutableState<Pair<Int, String>>,
+    refuelState: MutableState<Pair<Int, String>>,
+    openSheet: (BottomSheetLoco) -> Unit,
+) {
+    DraggableItem(
+        modifier = modifier,
+        isRevealed = isRevealed,
+        onExpand = onExpand,
+        onCollapse = onCollapse,
+        content = {
+            DieselSectionItem(
+                index = index,
+                item = item,
+                viewModel = viewModel,
+                coefficientState = coefficientState,
+                refuelState = refuelState,
+                openSheet = openSheet
+            )
         }
     )
 }

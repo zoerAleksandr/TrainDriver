@@ -40,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.traindriver.R
 import com.example.traindriver.domain.entity.Locomotive
 import com.example.traindriver.domain.entity.SectionDiesel
+import com.example.traindriver.domain.entity.SectionElectric
 import com.example.traindriver.ui.element_screen.OutlinedTextFieldCustom
 import com.example.traindriver.ui.screen.adding_screen.*
 import com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.BottomSheetWithCloseDialog
@@ -597,7 +598,7 @@ fun AddingLocoScreen(
                                 ActionsRow(
                                     onDelete = { viewModel.removeDieselSection(item) }
                                 )
-                                DraggableItem(
+                                DraggableDieselItem(
                                     item = item,
                                     index = index,
                                     viewModel = viewModel,
@@ -613,7 +614,41 @@ fun AddingLocoScreen(
                         }
                     }
                     1 -> {
-                        viewModel.electricSectionListState.value
+                        val list = viewModel.electricSectionListState
+                        val revealedSectionIds = viewModel.revealedItemElectricSectionIdsList
+                        itemsIndexed(
+                            items = list,
+                            key = { _, item -> item.sectionId }
+                        ) {index, item ->
+                            if (index == 0) {
+                                SecondarySpacer()
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .animateItemPlacement(
+                                        animationSpec = tween(
+                                            durationMillis = 500,
+                                            delayMillis = 100,
+                                            easing = FastOutLinearInEasing
+                                        )
+                                    )
+                                    .wrapContentSize()
+                                    .padding(bottom = 12.dp),
+                                contentAlignment = Alignment.CenterEnd
+                            ){
+                                ActionsRow(
+                                    onDelete = { viewModel.removeElectricSection(item) }
+                                )
+                                DraggableElectricItem(
+                                    item = item,
+                                    isRevealed = revealedSectionIds.contains(item.sectionId),
+                                    onExpand = { viewModel.onExpandedElectricSection(item.sectionId) },
+                                    onCollapse = { viewModel.onCollapsedElectricSection(item.sectionId) },
+                                    index = index,
+                                    viewModel = viewModel
+                                )
+                            }
+                        }
                     }
                 }
                 item {
@@ -623,7 +658,7 @@ fun AddingLocoScreen(
                     ) {
                         when (pagerState.currentPage) {
                             0 -> viewModel.addDieselSection(SectionDiesel())
-                            1 -> viewModel.addElectricSection()
+                            1 -> viewModel.addElectricSection(SectionElectric())
                         }
 
                         scope.launch {

@@ -441,12 +441,72 @@ class AddingViewModel : ViewModel(), KoinComponent {
             dataStoreRepository.readDieselCoefficient().first()
         }
 
-    var electricSectionListState = mutableStateOf(listOf<SectionElectric>())
+    var electricSectionListState = mutableStateListOf<SectionType.ElectricSectionFormState>()
         private set
 
-    fun addElectricSection() {
-        val list = electricSectionListState.value.toMutableList()
-        list.add(SectionElectric())
-        electricSectionListState.value = list
+    var revealedItemElectricSectionIdsList = mutableStateListOf<String>()
+        private set
+
+    fun onExpandedElectricSection(sectionId: String){
+        if (revealedItemElectricSectionIdsList.contains(sectionId)) return
+        revealedItemElectricSectionIdsList.add(sectionId)
+    }
+
+    fun onCollapsedElectricSection(sectionId: String){
+        if (!revealedItemElectricSectionIdsList.contains(sectionId)) return
+        revealedItemElectricSectionIdsList.remove(sectionId)
+    }
+
+    fun createEventElectricSection(event: ElectricSectionEvent) {
+        onElectricSectionEvent(event)
+    }
+
+    private fun onElectricSectionEvent(event: ElectricSectionEvent){
+        when(event){
+            is ElectricSectionEvent.EnteredAccepted -> {
+                electricSectionListState[event.index] = electricSectionListState[event.index].copy(
+                    accepted = electricSectionListState[event.index].accepted.copy(
+                        data = event.data
+                    )
+                )
+            }
+            is ElectricSectionEvent.EnteredDelivery -> {
+                electricSectionListState[event.index] = electricSectionListState[event.index].copy(
+                    delivery = electricSectionListState[event.index].delivery.copy(
+                        data = event.data
+                    )
+                )
+            }
+            is ElectricSectionEvent.EnteredRecoveryAccepted -> {
+                electricSectionListState[event.index] = electricSectionListState[event.index].copy(
+                    recoveryAccepted = electricSectionListState[event.index].recoveryAccepted.copy(
+                        data = event.data
+                    )
+                )
+            }
+            is ElectricSectionEvent.EnteredRecoveryDelivery -> {
+                electricSectionListState[event.index] = electricSectionListState[event.index].copy(
+                    recoveryDelivery = electricSectionListState[event.index].recoveryDelivery.copy(
+                        data = event.data
+                    )
+                )
+            }
+            is ElectricSectionEvent.FocusChange -> {}
+        }
+    }
+
+    fun addElectricSection(sectionElectric: SectionElectric) {
+        viewModelScope.launch {
+            electricSectionListState.add(
+                SectionType.ElectricSectionFormState(
+                    sectionId = sectionElectric.id,
+                    formValid = true
+                )
+            )
+        }
+    }
+
+    fun removeElectricSection(sectionState: SectionType.ElectricSectionFormState){
+        electricSectionListState.remove(sectionState)
     }
 }
