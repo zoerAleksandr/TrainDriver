@@ -14,6 +14,7 @@ import com.example.traindriver.ui.util.double_util.str
 import com.example.traindriver.ui.util.long_util.minus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.single
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.text.SimpleDateFormat
@@ -119,6 +120,34 @@ class AddingViewModel : ViewModel(), KoinComponent {
         val list = _stateLocoList.value.toMutableList()
         list.add(0, it)
         _stateLocoList.value = list
+    }
+
+    var seriesLocoState by mutableStateOf(TextFieldValue(""))
+        private set
+
+    fun setSeriesLoco(newValue: TextFieldValue) {
+        seriesLocoState = newValue
+    }
+
+    var numberLocoState by mutableStateOf(TextFieldValue(""))
+        private set
+
+    fun setNumberLoco(newValue: TextFieldValue) {
+        numberLocoState = newValue
+    }
+
+    var pagerState by mutableStateOf(0)
+        private set
+
+    private suspend fun getTypeLoco(): Boolean =
+        withContext(viewModelScope.coroutineContext) {
+            dataStoreRepository.getTypeLoco().first()
+        }
+
+    init {
+        viewModelScope.launch {
+            pagerState = if (getTypeLoco()) 1 else 0
+        }
     }
 
     var acceptedTimeState = mutableStateOf(AcceptedBlockState(formValid = true))
@@ -369,12 +398,12 @@ class AddingViewModel : ViewModel(), KoinComponent {
     var revealedItemDieselSectionIdsList = mutableStateListOf<String>()
         private set
 
-    fun onExpandedDieselSection(sectionId: String){
+    fun onExpandedDieselSection(sectionId: String) {
         if (revealedItemDieselSectionIdsList.contains(sectionId)) return
         revealedItemDieselSectionIdsList.add(sectionId)
     }
 
-    fun onCollapsedDieselSection(sectionId: String){
+    fun onCollapsedDieselSection(sectionId: String) {
         if (!revealedItemDieselSectionIdsList.contains(sectionId)) return
         revealedItemDieselSectionIdsList.remove(sectionId)
     }
@@ -447,12 +476,12 @@ class AddingViewModel : ViewModel(), KoinComponent {
     var revealedItemElectricSectionIdsList = mutableStateListOf<String>()
         private set
 
-    fun onExpandedElectricSection(sectionId: String){
+    fun onExpandedElectricSection(sectionId: String) {
         if (revealedItemElectricSectionIdsList.contains(sectionId)) return
         revealedItemElectricSectionIdsList.add(sectionId)
     }
 
-    fun onCollapsedElectricSection(sectionId: String){
+    fun onCollapsedElectricSection(sectionId: String) {
         if (!revealedItemElectricSectionIdsList.contains(sectionId)) return
         revealedItemElectricSectionIdsList.remove(sectionId)
     }
@@ -461,8 +490,8 @@ class AddingViewModel : ViewModel(), KoinComponent {
         onElectricSectionEvent(event)
     }
 
-    private fun onElectricSectionEvent(event: ElectricSectionEvent){
-        when(event){
+    private fun onElectricSectionEvent(event: ElectricSectionEvent) {
+        when (event) {
             is ElectricSectionEvent.EnteredAccepted -> {
                 electricSectionListState[event.index] = electricSectionListState[event.index].copy(
                     accepted = electricSectionListState[event.index].accepted.copy(
@@ -506,7 +535,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun removeElectricSection(sectionState: SectionType.ElectricSectionFormState){
+    fun removeElectricSection(sectionState: SectionType.ElectricSectionFormState) {
         electricSectionListState.remove(sectionState)
     }
 }

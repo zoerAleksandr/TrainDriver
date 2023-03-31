@@ -128,9 +128,15 @@ fun AddingLocoScreen(
                 .padding(bottom = 56.dp),
         ) {
             val (saveButton, title, divider, topShadow, lazyColumn) = createRefs()
-            var number by remember { mutableStateOf(TextFieldValue(locomotive?.number ?: "")) }
-            var series by remember { mutableStateOf(TextFieldValue(locomotive?.series ?: "")) }
+            val number = viewModel.numberLocoState
+            val series = viewModel.seriesLocoState
             val pagerState = rememberPagerState(pageCount = 2, initialPage = 0)
+
+            LaunchedEffect(viewModel.pagerState) {
+                scope.launch {
+                    pagerState.scrollToPage(viewModel.pagerState)
+                }
+            }
 
             Text(
                 modifier = Modifier
@@ -209,7 +215,9 @@ fun AddingLocoScreen(
                                 .weight(1f),
                             value = series,
                             labelText = "Серия",
-                            onValueChange = { series = it },
+                            onValueChange = {
+                                viewModel.setSeriesLoco(it)
+                            },
                             keyboardOptions = KeyboardOptions(
                                 imeAction = ImeAction.Next
                             ),
@@ -227,7 +235,9 @@ fun AddingLocoScreen(
                                 .weight(1f),
                             value = number,
                             labelText = "Номер",
-                            onValueChange = { number = it },
+                            onValueChange = {
+                                viewModel.setNumberLoco(it)
+                            },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
                                 imeAction = ImeAction.Done
@@ -653,7 +663,7 @@ fun AddingLocoScreen(
                         itemsIndexed(
                             items = list,
                             key = { _, item -> item.sectionId }
-                        ) {index, item ->
+                        ) { index, item ->
                             if (index == 0) {
                                 SecondarySpacer()
                             }
@@ -669,7 +679,7 @@ fun AddingLocoScreen(
                                     .wrapContentSize()
                                     .padding(bottom = 12.dp),
                                 contentAlignment = Alignment.CenterEnd
-                            ){
+                            ) {
                                 ActionsRow(
                                     onDelete = { viewModel.removeElectricSection(item) }
                                 )
