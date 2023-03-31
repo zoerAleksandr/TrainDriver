@@ -18,6 +18,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -147,11 +148,11 @@ fun AddingLocoScreen(
 
             Text(
                 modifier = Modifier
-                    .constrainAs(title){
-                    top.linkTo(saveButton.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
+                    .constrainAs(title) {
+                        top.linkTo(saveButton.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
                     .padding(top = 12.dp),
                 text = "Локомотив",
                 style = Typography.subtitle1.copy(color = MaterialTheme.colors.primary)
@@ -196,6 +197,7 @@ fun AddingLocoScreen(
                 contentPadding = PaddingValues(horizontal = 24.dp)
             ) {
                 item {
+                    val focusManager = LocalFocusManager.current
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -207,7 +209,17 @@ fun AddingLocoScreen(
                                 .weight(1f),
                             value = series,
                             labelText = "Серия",
-                            onValueChange = { series = it }
+                            onValueChange = { series = it },
+                            keyboardOptions = KeyboardOptions(
+                                imeAction = ImeAction.Next
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onNext = {
+                                    scope.launch {
+                                        focusManager.moveFocus(FocusDirection.Right)
+                                    }
+                                }
+                            )
                         )
                         OutlinedTextFieldCustom(
                             modifier = Modifier
@@ -215,7 +227,18 @@ fun AddingLocoScreen(
                                 .weight(1f),
                             value = number,
                             labelText = "Номер",
-                            onValueChange = { number = it }
+                            onValueChange = { number = it },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    scope.launch {
+                                        focusManager.clearFocus()
+                                    }
+                                }
+                            )
                         )
                     }
                 }
