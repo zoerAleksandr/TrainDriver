@@ -81,8 +81,8 @@ data class SectionElectric(
     var deliveryRecovery: Double? = null
 ) : Section(id, acceptedEnergy, deliveryEnergy) {
 
-    override fun getConsumption() = differenceBetweenDouble(acceptedEnergy, deliveryEnergy)
-    fun getRecoveryResult() = differenceBetweenDouble(acceptedRecovery, deliveryRecovery)
+    override fun getConsumption() = Calculation.getTotalEnergyConsumption(acceptedEnergy, deliveryEnergy)
+    fun getRecoveryResult() = Calculation.getTotalEnergyConsumption(acceptedRecovery, deliveryRecovery)
 }
 
 data class SectionDiesel(

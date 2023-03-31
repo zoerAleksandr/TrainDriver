@@ -1,6 +1,8 @@
 package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.adding_loco
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
@@ -149,7 +151,14 @@ fun DieselSectionItem(
                             focusManager.moveFocus(FocusDirection.Right)
                         }
                     }
-                )
+                ),
+                onClickTrailingIcon = {
+                    viewModel.createEventDieselSection(
+                        DieselSectionEvent.EnteredAccepted(
+                            index = index, data = null
+                        )
+                    )
+                }
             )
 
             OutlinedTextFieldCustom(
@@ -175,7 +184,14 @@ fun DieselSectionItem(
                             focusManager.clearFocus()
                         }
                     }
-                )
+                ),
+                onClickTrailingIcon = {
+                    viewModel.createEventDieselSection(
+                        DieselSectionEvent.EnteredDelivery(
+                            index = index, data = null
+                        )
+                    )
+                }
             )
 
         }
@@ -231,8 +247,8 @@ fun DieselSectionItem(
                     }
                 })
 
-            if (result != null) {
-                val resultInLiterText = maskInLiter(result.str())
+            result?.let {
+                val resultInLiterText = maskInLiter(it.str())
                 val resultInKiloText = maskInKilo(rounding(resultInKilo, 2)?.str())
                 Text(
                     text = "${resultInLiterText ?: ""} / ${resultInKiloText ?: ""}",
@@ -243,6 +259,7 @@ fun DieselSectionItem(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ElectricSectionItem(
     item: SectionType.ElectricSectionFormState,
@@ -253,18 +270,57 @@ fun ElectricSectionItem(
     val focusManager = LocalFocusManager.current
 
     val acceptedText = item.accepted.data ?: ""
-//    val accepted = acceptedText.toDoubleOrNull()
+    val accepted = acceptedText.toDoubleOrNull()
     val deliveryText = item.delivery.data ?: ""
-//    val delivery = deliveryText.toDoubleOrNull()
+    val delivery = deliveryText.toDoubleOrNull()
+
+    val recoveryAcceptedText = item.recoveryAccepted.data ?: ""
+    val recoveryAccepted = recoveryAcceptedText.toDoubleOrNull()
+    val recoveryDeliveryText = item.recoveryDelivery.data ?: ""
+    val recoveryDelivery = recoveryDeliveryText.toDoubleOrNull()
+
+    val result = Calculation.getTotalEnergyConsumption(accepted, delivery)
+    val resultRecovery = Calculation.getTotalEnergyConsumption(recoveryAccepted, recoveryDelivery)
+
+    var expandState by remember { mutableStateOf(false) }
 
     Column(
-        horizontalAlignment = Alignment.Start
+        modifier = Modifier.padding(bottom = 8.dp),
+        horizontalAlignment = Alignment.End
     ) {
-        Text(
-            modifier = Modifier.padding(start = 16.dp),
-            text = "${index + 1}",
-            style = Typography.subtitle1.copy(color = MaterialTheme.colors.primary)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "${index + 1}",
+                style = Typography.subtitle1.copy(color = MaterialTheme.colors.primary)
+            )
+            Row(
+                modifier = Modifier.clickable {
+                    expandState = !expandState
+                },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Рекуперация",
+                    style = Typography.body2.copy(color = MaterialTheme.colors.secondaryVariant)
+                )
+                Icon(
+                    painter = if (expandState) {
+                        painterResource(R.drawable.ic_arrow_drop_up_36)
+                    } else {
+                        painterResource(R.drawable.ic_arrow_drop_down_36)
+                    },
+                    tint = MaterialTheme.colors.primaryVariant,
+                    contentDescription = null
+                )
+            }
+        }
+
         Row(
             modifier = Modifier.padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -293,7 +349,14 @@ fun ElectricSectionItem(
                             focusManager.moveFocus(FocusDirection.Right)
                         }
                     }
-                )
+                ),
+                onClickTrailingIcon = {
+                    viewModel.createEventElectricSection(
+                        ElectricSectionEvent.EnteredAccepted(
+                            index = index, data = null
+                        )
+                    )
+                }
             )
 
             OutlinedTextFieldCustom(
@@ -319,9 +382,101 @@ fun ElectricSectionItem(
                             focusManager.clearFocus()
                         }
                     }
-                )
+                ),
+                onClickTrailingIcon = {
+                    viewModel.createEventElectricSection(
+                        ElectricSectionEvent.EnteredDelivery(
+                            index = index, data = null
+                        )
+                    )
+                }
             )
+        }
 
+        AnimatedContent(
+            targetState = expandState,
+        ) { targetExpanded ->
+            if (targetExpanded) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    OutlinedTextFieldCustom(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .weight(0.5f),
+                        value = recoveryAcceptedText,
+                        onValueChange = {
+                            viewModel.createEventElectricSection(
+                                ElectricSectionEvent.EnteredRecoveryAccepted(
+                                    index = index, data = it
+                                )
+                            )
+                        },
+                        labelText = "Принял",
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Next
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = {
+                                scope.launch {
+                                    focusManager.moveFocus(FocusDirection.Right)
+                                }
+                            }
+                        ),
+                        onClickTrailingIcon = {
+                            viewModel.createEventElectricSection(
+                                ElectricSectionEvent.EnteredRecoveryAccepted(
+                                    index = index, data = null
+                                )
+                            )
+                        }
+                    )
+
+                    OutlinedTextFieldCustom(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .weight(0.5f),
+                        value = recoveryDeliveryText,
+                        onValueChange = {
+                            viewModel.createEventElectricSection(
+                                ElectricSectionEvent.EnteredRecoveryDelivery(
+                                    index = index, data = it
+                                )
+                            )
+                        },
+                        labelText = "Сдал",
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                scope.launch {
+                                    focusManager.clearFocus()
+                                }
+                            }
+                        ),
+                        onClickTrailingIcon = {
+                            viewModel.createEventElectricSection(
+                                ElectricSectionEvent.EnteredRecoveryDelivery(
+                                    index = index, data = null
+                                )
+                            )
+                        }
+                    )
+                }
+            }
+        }
+
+        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+            result?.let {
+                Text(text = it.str(), style = Typography.body1)
+            }
+            resultRecovery?.let {
+                Text(text = " / ${it.str()}", style = Typography.body1)
+            }
         }
     }
 }

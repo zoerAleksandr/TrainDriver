@@ -1,15 +1,16 @@
 package com.example.traindriver.ui.element_screen
 
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 import com.example.traindriver.ui.theme.Typography
+import com.example.traindriver.R
 
 @Composable
 fun OutlinedTextFieldCustom(
@@ -19,7 +20,8 @@ fun OutlinedTextFieldCustom(
     labelText: String? = null,
     singleLine: Boolean = true,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    keyboardActions: KeyboardActions = KeyboardActions()
+    keyboardActions: KeyboardActions = KeyboardActions(),
+    onClickTrailingIcon: (() -> Unit)
 ) {
     val colors = TextFieldDefaults.outlinedTextFieldColors(
         textColor = MaterialTheme.colors.primary,
@@ -34,7 +36,17 @@ fun OutlinedTextFieldCustom(
         label = { Text(text = labelText ?: "", style = Typography.body1) },
         singleLine = singleLine,
         keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions
+        keyboardActions = keyboardActions,
+        trailingIcon = {
+            IconButton(
+                onClick =  onClickTrailingIcon
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_close_24),
+                    contentDescription = null
+                )
+            }
+        }
     )
 }
 

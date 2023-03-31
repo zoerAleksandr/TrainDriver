@@ -4,7 +4,6 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -127,7 +126,7 @@ fun AddingLocoScreen(
                 .fillMaxWidth()
                 .padding(bottom = 56.dp),
         ) {
-            val (saveButton, divider, topShadow, lazyColumn) = createRefs()
+            val (saveButton, title, divider, topShadow, lazyColumn) = createRefs()
             var number by remember { mutableStateOf(TextFieldValue(locomotive?.number ?: "")) }
             var series by remember { mutableStateOf(TextFieldValue(locomotive?.series ?: "")) }
             val pagerState = rememberPagerState(pageCount = 2, initialPage = 0)
@@ -146,14 +145,26 @@ fun AddingLocoScreen(
                 style = Typography.button.copy(color = MaterialTheme.colors.secondaryVariant)
             )
 
+            Text(
+                modifier = Modifier
+                    .constrainAs(title){
+                    top.linkTo(saveButton.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }
+                    .padding(top = 12.dp),
+                text = "Локомотив",
+                style = Typography.subtitle1.copy(color = MaterialTheme.colors.primary)
+            )
+
             Divider(modifier = Modifier
                 .constrainAs(divider) {
-                    top.linkTo(saveButton.bottom)
+                    top.linkTo(title.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     width = Dimension.fillToConstraints
                 }
-                .padding(top = 24.dp)
+                .padding(top = 12.dp)
             )
 
             AnimatedVisibility(
