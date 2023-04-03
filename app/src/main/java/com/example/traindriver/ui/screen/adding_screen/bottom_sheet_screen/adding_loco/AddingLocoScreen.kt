@@ -82,7 +82,6 @@ fun AddingLocoScreen(
     }
     val scope = rememberCoroutineScope()
 
-
     var currentSheet: BottomSheetLoco? by remember {
         mutableStateOf(null)
     }
