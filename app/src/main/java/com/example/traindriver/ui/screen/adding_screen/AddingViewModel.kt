@@ -5,6 +5,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traindriver.data.repository.DataStoreRepository
+import com.example.traindriver.domain.entity.Calculation
 import com.example.traindriver.domain.entity.Locomotive
 import com.example.traindriver.domain.entity.SectionDiesel
 import com.example.traindriver.domain.entity.SectionElectric
@@ -14,7 +15,6 @@ import com.example.traindriver.ui.util.double_util.str
 import com.example.traindriver.ui.util.long_util.minus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.single
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.text.SimpleDateFormat
@@ -461,7 +461,124 @@ class AddingViewModel : ViewModel(), KoinComponent {
                     )
                 )
             }
-            is DieselSectionEvent.FocusChange -> {}
+
+            is DieselSectionEvent.FocusChange -> {
+                when (event.fieldName) {
+                    DieselSectionType.ACCEPTED -> {
+                        val isValid = validateDieselSection(
+                            index = event.index,
+                            inputValue = dieselSectionListState[event.index].accepted.data,
+                            type = DieselSectionType.ACCEPTED
+                        )
+                        dieselSectionListState[event.index] =
+                            dieselSectionListState[event.index].copy(
+                                formValid = isValid
+                            )
+                    }
+                    DieselSectionType.DELIVERY -> {
+                        val isValid = validateDieselSection(
+                            index = event.index,
+                            inputValue = dieselSectionListState[event.index].delivery.data,
+                            type = DieselSectionType.DELIVERY
+                        )
+                        dieselSectionListState[event.index] =
+                            dieselSectionListState[event.index].copy(
+                                formValid = isValid
+                            )
+                    }
+                    DieselSectionType.COEFFICIENT -> {
+                        val isValid = validateDieselSection(
+                            index = event.index,
+                            inputValue = dieselSectionListState[event.index].coefficient.data,
+                            type = DieselSectionType.COEFFICIENT
+                        )
+                        dieselSectionListState[event.index] =
+                            dieselSectionListState[event.index].copy(
+                                formValid = isValid
+                            )
+                    }
+                    DieselSectionType.REFUEL -> {
+                        val isValid = validateDieselSection(
+                            index = event.index,
+                            inputValue = dieselSectionListState[event.index].refuel.data,
+                            type = DieselSectionType.REFUEL
+                        )
+                        dieselSectionListState[event.index] =
+                            dieselSectionListState[event.index].copy(
+                                formValid = isValid
+                            )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun validateDieselSection(
+        index: Int,
+        inputValue: String?,
+        type: DieselSectionType
+    ): Boolean {
+        return when (type) {
+            DieselSectionType.ACCEPTED -> {
+                val accepted = inputValue?.toDoubleOrNull()
+                val delivery = dieselSectionListState[index].delivery.data?.toDoubleOrNull()
+                val refuel = dieselSectionListState[index].refuel.data?.toDoubleOrNull()
+
+                val result = Calculation.getTotalFuelConsumption(accepted, delivery, refuel)
+                result?.let {
+                    if (it < 0) {
+                        dieselSectionListState[index] = dieselSectionListState[index].copy(
+                            errorMessage = "Принял меньше чем сдал"
+                        )
+                        return false
+                    }
+                }
+                true
+            }
+            DieselSectionType.DELIVERY -> {
+                val accepted = dieselSectionListState[index].accepted.data?.toDoubleOrNull()
+                val delivery = inputValue?.toDoubleOrNull()
+                val refuel = dieselSectionListState[index].refuel.data?.toDoubleOrNull()
+
+                val result = Calculation.getTotalFuelConsumption(accepted, delivery, refuel)
+                result?.let {
+                    if (it < 0) {
+                        dieselSectionListState[index] = dieselSectionListState[index].copy(
+                            errorMessage = "Сдал больше чем принял"
+                        )
+                        return false
+                    }
+                }
+                true
+            }
+            DieselSectionType.COEFFICIENT -> {
+                val coefficient = inputValue?.toDoubleOrNull()
+                coefficient?.let {
+                    if (it > 1) {
+                        dieselSectionListState[index] = dieselSectionListState[index].copy(
+                            errorMessage = "Коэффициент больше 1.0"
+                        )
+                        return false
+                    }
+                }
+                true
+            }
+            DieselSectionType.REFUEL -> {
+                val accepted = dieselSectionListState[index].accepted.data?.toDoubleOrNull()
+                val delivery = dieselSectionListState[index].delivery.data?.toDoubleOrNull()
+                val refuel = inputValue?.toDoubleOrNull()
+
+                val result = Calculation.getTotalFuelConsumption(accepted, delivery, refuel)
+                result?.let {
+                    if (it < 0) {
+                        dieselSectionListState[index] = dieselSectionListState[index].copy(
+                            errorMessage = "Не хватает экипировки"
+                        )
+                        return false
+                    }
+                }
+                true
+            }
         }
     }
 
@@ -520,7 +637,137 @@ class AddingViewModel : ViewModel(), KoinComponent {
                     )
                 )
             }
-            is ElectricSectionEvent.FocusChange -> {}
+            is ElectricSectionEvent.FocusChange -> {
+                when (event.fieldName) {
+                    ElectricSectionType.ACCEPTED -> {
+                        val isValid = validateElectricSection(
+                            index = event.index,
+                            inputValue = electricSectionListState[event.index].accepted.data,
+                            type = ElectricSectionType.ACCEPTED
+                        )
+
+                        electricSectionListState[event.index] =
+                            electricSectionListState[event.index].copy(
+                                formValid = isValid
+                            )
+                    }
+                    ElectricSectionType.DELIVERY -> {
+                        val isValid = validateElectricSection(
+                            index = event.index,
+                            inputValue = electricSectionListState[event.index].delivery.data,
+                            type = ElectricSectionType.DELIVERY
+                        )
+
+                        electricSectionListState[event.index] =
+                            electricSectionListState[event.index].copy(
+                                formValid = isValid
+                            )
+                    }
+                    ElectricSectionType.RECOVERY_ACCEPTED -> {
+                        val isValid = validateElectricSection(
+                            index = event.index,
+                            inputValue = electricSectionListState[event.index].recoveryAccepted.data,
+                            type = ElectricSectionType.RECOVERY_ACCEPTED
+                        )
+
+                        electricSectionListState[event.index] =
+                            electricSectionListState[event.index].copy(
+                                formValid = isValid
+                            )
+                    }
+                    ElectricSectionType.RECOVERY_DELIVERY -> {
+                        val isValid = validateElectricSection(
+                            index = event.index,
+                            inputValue = electricSectionListState[event.index].recoveryDelivery.data,
+                            type = ElectricSectionType.RECOVERY_DELIVERY
+                        )
+
+                        electricSectionListState[event.index] =
+                            electricSectionListState[event.index].copy(
+                                formValid = isValid
+                            )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun validateElectricSection(
+        index: Int,
+        inputValue: String?,
+        type: ElectricSectionType
+    ): Boolean {
+        return when (type) {
+
+            ElectricSectionType.ACCEPTED -> {
+                val accepted = inputValue?.toDoubleOrNull()
+                val delivery = electricSectionListState[index].delivery.data?.toDoubleOrNull()
+
+                delivery?.let { del ->
+                    accepted?.let { acc ->
+                        if (acc > del) {
+                            electricSectionListState[index] = electricSectionListState[index].copy(
+                                errorMessage = "Принято больше чем сдано"
+                            )
+                            return false
+                        }
+                    }
+                }
+                true
+            }
+
+            ElectricSectionType.DELIVERY -> {
+                val accepted = electricSectionListState[index].accepted.data?.toDoubleOrNull()
+                val delivery = inputValue?.toDoubleOrNull()
+
+                accepted?.let { acc ->
+                    delivery?.let { del ->
+                        if (del < acc) {
+                            electricSectionListState[index] = electricSectionListState[index].copy(
+                                errorMessage = "Сдано меньше чем принято"
+                            )
+                            return false
+                        }
+                    }
+                }
+                true
+            }
+
+            ElectricSectionType.RECOVERY_ACCEPTED -> {
+                val accepted = inputValue?.toDoubleOrNull()
+                val delivery =
+                    electricSectionListState[index].recoveryDelivery.data?.toDoubleOrNull()
+
+                delivery?.let { del ->
+                    accepted?.let { acc ->
+                        if (acc > del) {
+                            electricSectionListState[index] = electricSectionListState[index].copy(
+                                errorMessage = "Принято больше чем сдано"
+                            )
+                            return false
+                        }
+                    }
+                }
+                true
+            }
+
+            ElectricSectionType.RECOVERY_DELIVERY -> {
+                val accepted =
+                    electricSectionListState[index].recoveryAccepted.data?.toDoubleOrNull()
+                val delivery = inputValue?.toDoubleOrNull()
+
+                accepted?.let { acc ->
+                    delivery?.let { del ->
+                        if (del < acc) {
+                            electricSectionListState[index] = electricSectionListState[index].copy(
+                                errorMessage = "Сдано меньше чем принято"
+                            )
+                            return false
+                        }
+                    }
+                }
+                true
+            }
         }
     }
 

@@ -710,7 +710,7 @@ fun AddingLocoScreen(
                         }
                     }
                 }
-                item { Spacer(modifier = Modifier.padding(50.dp)) }
+                item { Spacer(modifier = Modifier.padding(70.dp)) }
             }
         }
     }
@@ -790,6 +790,12 @@ fun BottomSheetRefuel(
                         data = it.text.toDoubleOrNull()
                     )
                 )
+                viewModel.createEventDieselSection(
+                    DieselSectionEvent.FocusChange(
+                        index = refuelData.value.first,
+                        fieldName = DieselSectionType.REFUEL
+                    )
+                )
                 refuelData.value = refuelData.value.copy(
                     second = it.text
                 )
@@ -852,6 +858,12 @@ private fun BottomSheetCoefficient(
                     DieselSectionEvent.EnteredCoefficient(
                         index = coefficientData.value.first,
                         data = it.text.toDoubleOrNull()
+                    )
+                )
+                viewModel.createEventDieselSection(
+                    DieselSectionEvent.FocusChange(
+                        index = coefficientData.value.first,
+                        fieldName = DieselSectionType.COEFFICIENT
                     )
                 )
                 coefficientData.value = coefficientData.value.copy(

@@ -34,9 +34,7 @@ import com.example.traindriver.R
 import com.example.traindriver.domain.entity.Calculation
 import com.example.traindriver.ui.element_screen.OutlinedTextFieldCustom
 import com.example.traindriver.ui.screen.adding_screen.AddingViewModel
-import com.example.traindriver.ui.screen.adding_screen.state_holder.DieselSectionEvent
-import com.example.traindriver.ui.screen.adding_screen.state_holder.ElectricSectionEvent
-import com.example.traindriver.ui.screen.adding_screen.state_holder.SectionType
+import com.example.traindriver.ui.screen.adding_screen.state_holder.*
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.ClickableTextTrainDriver
@@ -67,7 +65,8 @@ fun DieselSectionItem(
     val deliveryInKilo = delivery.times(coefficient)
     val result = Calculation.getTotalFuelConsumption(accepted, delivery, refuel)
     val resultInKilo = Calculation.getTotalFuelInKiloConsumption(result, coefficient)
-
+    val formValid = viewModel.dieselSectionListState[index].formValid
+    val errorMessageText = viewModel.dieselSectionListState[index].errorMessage
     ConstraintLayout {
         fun maskInKilo(string: String?): String? {
             return string?.let {
@@ -83,21 +82,57 @@ fun DieselSectionItem(
 
         val (sectionNum, refuelButton,
             energyAccepted, energyDelivery,
-            inKiloBlock, infoBlock) = createRefs()
+            inKiloBlock, infoBlock, errorMessage) = createRefs()
+
+        AnimatedVisibility(
+            modifier = Modifier
+                .fillMaxWidth()
+                .constrainAs(errorMessage) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(parent.top)
+
+                },
+            visible = !formValid,
+            enter = slideInVertically(animationSpec = tween(durationMillis = 300))
+                    + fadeIn(animationSpec = tween(durationMillis = 300)),
+            exit = slideOutVertically(animationSpec = tween(durationMillis = 300))
+                    + fadeOut(animationSpec = tween(durationMillis = 150))
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, start = 16.dp),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_error_24),
+                    tint = Color.Red,
+                    contentDescription = null
+                )
+                Text(
+                    modifier = Modifier.padding(start = 8.dp),
+                    text = errorMessageText,
+                    style = Typography.caption.copy(color = Color.Red),
+                    color = Color.Red
+                )
+            }
+        }
+
         Text(
             modifier = Modifier
                 .constrainAs(sectionNum) {
-                    top.linkTo(parent.top)
+                    top.linkTo(errorMessage.bottom)
                     start.linkTo(parent.start)
                 }
-                .padding(start = 16.dp, top = 8.dp),
+                .padding(top = 8.dp, start = 16.dp),
             text = "${index + 1} секция",
             style = Typography.body1.copy(color = MaterialTheme.colors.primaryVariant)
         )
 
         Row(modifier = Modifier
             .constrainAs(refuelButton) {
-                top.linkTo(parent.top)
+                top.linkTo(errorMessage.bottom)
                 end.linkTo(parent.end)
             }
             .clickable {
@@ -143,6 +178,12 @@ fun DieselSectionItem(
                         index = index, data = it
                     )
                 )
+                viewModel.createEventDieselSection(
+                    DieselSectionEvent.FocusChange(
+                        index = index,
+                        fieldName = DieselSectionType.ACCEPTED
+                    )
+                )
             },
             placeholderText = "Принято",
             keyboardOptions = KeyboardOptions(
@@ -168,6 +209,12 @@ fun DieselSectionItem(
                 viewModel.createEventDieselSection(
                     DieselSectionEvent.EnteredDelivery(
                         index = index, data = it
+                    )
+                )
+                viewModel.createEventDieselSection(
+                    DieselSectionEvent.FocusChange(
+                        index = index,
+                        fieldName = DieselSectionType.DELIVERY
                     )
                 )
             },
@@ -205,7 +252,8 @@ fun DieselSectionItem(
             ) {
                 val acceptedInKiloText = rounding(acceptedInKilo, 2)?.str()
                 Text(
-                    text = maskInKilo(acceptedInKiloText) ?: "", style = Typography.body1
+                    text = maskInKilo(acceptedInKiloText) ?: "",
+                    style = Typography.body2.copy(color = MaterialTheme.colors.primaryVariant)
                 )
             }
             Box(
@@ -216,7 +264,8 @@ fun DieselSectionItem(
             ) {
                 val deliveryInKiloText = rounding(deliveryInKilo, 2)?.str()
                 Text(
-                    text = maskInKilo(deliveryInKiloText) ?: "", style = Typography.body1
+                    text = maskInKilo(deliveryInKiloText) ?: "",
+                    style = Typography.body2.copy(color = MaterialTheme.colors.primaryVariant)
                 )
             }
         }
@@ -247,14 +296,14 @@ fun DieselSectionItem(
                 val resultInKiloText = maskInKilo(rounding(resultInKilo, 2)?.str())
                 Text(
                     text = "${resultInLiterText ?: ""} / ${resultInKiloText ?: ""}",
-                    style = Typography.body1
+                    style = Typography.body2.copy(color = MaterialTheme.colors.primaryVariant)
                 )
             }
         }
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun ElectricSectionItem(
     item: SectionType.ElectricSectionFormState,
@@ -277,18 +326,59 @@ fun ElectricSectionItem(
     val result = Calculation.getTotalEnergyConsumption(accepted, delivery)
     val resultRecovery = Calculation.getTotalEnergyConsumption(recoveryAccepted, recoveryDelivery)
 
+    val formValid = viewModel.electricSectionListState[index].formValid
+    val errorMessageText = viewModel.electricSectionListState[index].errorMessage
+
     var expandState by remember { mutableStateOf(false) }
 
     ConstraintLayout {
         val (
             sectionNum, energyAccepted, buttonVisible,
             energyDelivery, recoveryBlock,
-            infoBlock
+            infoBlock, errorMessage
         ) = createRefs()
+
+        AnimatedVisibility(
+            modifier = Modifier
+                .fillMaxWidth()
+                .constrainAs(errorMessage) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(parent.top)
+
+                },
+            visible = !formValid,
+            enter = slideInVertically(animationSpec = tween(durationMillis = 300))
+                    + fadeIn(animationSpec = tween(durationMillis = 300)),
+            exit = slideOutVertically(animationSpec = tween(durationMillis = 300))
+                    + fadeOut(animationSpec = tween(durationMillis = 150))
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, start = 16.dp),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_error_24),
+                    tint = Color.Red,
+                    contentDescription = null
+                )
+                Text(
+                    modifier = Modifier.padding(start = 8.dp),
+                    // TODO after update compose:ui:1.4.0
+                    //   .basicMarquee(animationMode = MarqueeAnimationMode.WhileFocused),
+                    text = errorMessageText,
+                    style = Typography.caption.copy(color = Color.Red),
+                    maxLines = 1,
+                    color = Color.Red
+                )
+            }
+        }
 
         Text(modifier = Modifier
             .constrainAs(sectionNum) {
-                top.linkTo(parent.top)
+                top.linkTo(errorMessage.bottom)
                 start.linkTo(parent.start)
             }
             .padding(start = 16.dp, top = 8.dp),
@@ -303,12 +393,17 @@ fun ElectricSectionItem(
                     top.linkTo(sectionNum.bottom)
                     width = Dimension.fillToConstraints
                 }
-                .padding(start = 16.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
+                .padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 4.dp),
             value = acceptedText,
             onValueChange = {
                 viewModel.createEventElectricSection(
                     ElectricSectionEvent.EnteredAccepted(
                         index = index, data = it
+                    )
+                )
+                viewModel.createEventElectricSection(
+                    ElectricSectionEvent.FocusChange(
+                        index = index, fieldName = ElectricSectionType.ACCEPTED
                     )
                 )
             },
@@ -331,12 +426,17 @@ fun ElectricSectionItem(
                     start.linkTo(energyAccepted.end)
                     width = Dimension.fillToConstraints
                 }
-                .padding(start = 8.dp, end = 16.dp, top = 4.dp, bottom = 4.dp),
+                .padding(start = 8.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
             value = deliveryText,
             onValueChange = {
                 viewModel.createEventElectricSection(
                     ElectricSectionEvent.EnteredDelivery(
                         index = index, data = it
+                    )
+                )
+                viewModel.createEventElectricSection(
+                    ElectricSectionEvent.FocusChange(
+                        index = index, fieldName = ElectricSectionType.DELIVERY
                     )
                 )
             },
@@ -367,13 +467,18 @@ fun ElectricSectionItem(
                 ) {
                     OutlinedTextFieldCustom(
                         modifier = Modifier
-                            .padding(
-                                horizontal = 8.dp, vertical = 4.dp
-                            )
-                            .weight(0.5f), value = recoveryAcceptedText, onValueChange = {
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .weight(0.5f),
+                        value = recoveryAcceptedText,
+                        onValueChange = {
                             viewModel.createEventElectricSection(
                                 ElectricSectionEvent.EnteredRecoveryAccepted(
                                     index = index, data = it
+                                )
+                            )
+                            viewModel.createEventElectricSection(
+                                ElectricSectionEvent.FocusChange(
+                                    index = index, fieldName = ElectricSectionType.RECOVERY_ACCEPTED
                                 )
                             )
                         }, placeholderText = "Принято", keyboardOptions = KeyboardOptions(
@@ -387,13 +492,18 @@ fun ElectricSectionItem(
 
                     OutlinedTextFieldCustom(
                         modifier = Modifier
-                            .padding(
-                                horizontal = 8.dp, vertical = 4.dp
-                            )
-                            .weight(0.5f), value = recoveryDeliveryText, onValueChange = {
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .weight(0.5f),
+                        value = recoveryDeliveryText,
+                        onValueChange = {
                             viewModel.createEventElectricSection(
                                 ElectricSectionEvent.EnteredRecoveryDelivery(
                                     index = index, data = it
+                                )
+                            )
+                            viewModel.createEventElectricSection(
+                                ElectricSectionEvent.FocusChange(
+                                    index = index, fieldName = ElectricSectionType.RECOVERY_DELIVERY
                                 )
                             )
                         }, placeholderText = "Сдано", keyboardOptions = KeyboardOptions(
@@ -450,8 +560,9 @@ fun ElectricSectionItem(
                     bottom.linkTo(parent.bottom)
                     end.linkTo(parent.end)
                     start.linkTo(parent.start)
-                    top.linkTo(infoBlock.bottom, goneMargin = 4.dp)
+                    top.linkTo(infoBlock.bottom)
                 }
+                .padding(top = 8.dp)
                 .clickable {
                     expandState = !expandState
                 }, verticalAlignment = Alignment.CenterVertically
