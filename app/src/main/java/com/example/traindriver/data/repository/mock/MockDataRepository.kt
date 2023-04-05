@@ -159,7 +159,7 @@ class MockDataRepository : DataRepository {
     override fun getListItineraryByMonth(month: Int): Flow<RouteListByMonthResponse> =
         callbackFlow {
             trySend(ResultState.Loading())
-            delay(2000)
+            delay(300)
             val list = listOf(one, two, three)
             trySend(ResultState.Success(list))
             awaitClose { close() }
@@ -168,9 +168,22 @@ class MockDataRepository : DataRepository {
     override fun getItineraryById(id: String): Flow<RouteResponse> =
         callbackFlow {
             trySend(ResultState.Loading())
-            delay(2000)
+            delay(300)
 //            trySend(ResultState.Failure(Throwable()))
             trySend(ResultState.Success(one))
             awaitClose { close() }
         }
+
+    override fun addLocomotiveInRoute(locomotive: Locomotive): Flow<ResultState<Boolean>> =
+        callbackFlow {
+            trySend(ResultState.Loading())
+            try {
+                one.locoList.add(locomotive)
+                trySend(ResultState.Success(true))
+            } catch (e: Exception) {
+                trySend(ResultState.Failure(e))
+            }
+            awaitClose { close() }
+        }
+
 }

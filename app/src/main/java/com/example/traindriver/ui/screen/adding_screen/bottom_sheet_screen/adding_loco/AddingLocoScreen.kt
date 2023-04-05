@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.Lifecycle
 import com.example.traindriver.R
 import com.example.traindriver.domain.entity.Locomotive
 import com.example.traindriver.domain.entity.SectionDiesel
@@ -62,6 +62,8 @@ import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.traindriver.ui.util.OnLifecycleEvent
 
 @OptIn(
     ExperimentalPagerApi::class, ExperimentalMaterialApi::class,
@@ -70,8 +72,22 @@ import java.util.*
 @Composable
 fun AddingLocoScreen(
     locomotive: Locomotive? = null,
-    viewModel: AddingViewModel
+    timeState: State<WorkTimeEditState>,
+    viewModel: AddingLocoViewModel = viewModel(),
+    closeAddingLocoScreen: () -> Unit
 ) {
+    OnLifecycleEvent { _, event ->
+        when (event) {
+            Lifecycle.Event.ON_CREATE -> {
+                viewModel.setData(
+                    locomotive = locomotive,
+                    timeState = timeState
+                )
+            }
+            else -> {}
+        }
+    }
+
     val bottomSheetState =
         rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val coefficientState: MutableState<Pair<Int, String>> = remember {
@@ -144,7 +160,8 @@ fun AddingLocoScreen(
                         end.linkTo(parent.end)
                     }
                     .clickable {
-                        viewModel.addLocomotive(Locomotive(series = "ВЛ15", number = "033"))
+                        viewModel.addLocomotiveInRoute()
+                        closeAddingLocoScreen.invoke()
                     }
                     .padding(end = 16.dp, top = 16.dp),
                 text = "Сохранить",
@@ -720,7 +737,7 @@ fun AddingLocoScreen(
 @Composable
 fun SheetLayoutLoco(
     sheet: BottomSheetLoco,
-    viewModel: AddingViewModel,
+    viewModel: AddingLocoViewModel,
     closeSheet: () -> Unit,
     bottomSheetState: ModalBottomSheetState,
     coefficientState: MutableState<Pair<Int, String>>,
@@ -753,7 +770,7 @@ fun SheetLayoutLoco(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BottomSheetRefuel(
-    viewModel: AddingViewModel,
+    viewModel: AddingLocoViewModel,
     refuelData: MutableState<Pair<Int, String>>,
     sheetState: ModalBottomSheetState
 ) {
@@ -824,7 +841,7 @@ fun BottomSheetRefuel(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun BottomSheetCoefficient(
-    viewModel: AddingViewModel,
+    viewModel: AddingLocoViewModel,
     coefficientData: MutableState<Pair<Int, String>>,
     sheetState: ModalBottomSheetState
 ) {
@@ -896,6 +913,6 @@ private fun BottomSheetCoefficient(
 @DarkLightPreviews
 private fun AddingLocoPreviews() {
     TrainDriverTheme {
-        AddingLocoScreen(viewModel = viewModel())
+//        AddingLocoScreen(viewModel = viewModel(), timeState = mutableStateOf<WorkTimeEditState>(WorkTimeEditState()))
     }
 }

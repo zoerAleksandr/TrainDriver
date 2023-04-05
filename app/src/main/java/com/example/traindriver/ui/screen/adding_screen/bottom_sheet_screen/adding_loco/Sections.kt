@@ -33,7 +33,6 @@ import androidx.constraintlayout.compose.Visibility
 import com.example.traindriver.R
 import com.example.traindriver.domain.entity.Calculation
 import com.example.traindriver.ui.element_screen.OutlinedTextFieldCustom
-import com.example.traindriver.ui.screen.adding_screen.AddingViewModel
 import com.example.traindriver.ui.screen.adding_screen.state_holder.*
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.Typography
@@ -47,7 +46,7 @@ import kotlin.math.roundToInt
 fun DieselSectionItem(
     index: Int,
     item: SectionType.DieselSectionFormState,
-    viewModel: AddingViewModel,
+    viewModel: AddingLocoViewModel,
     coefficientState: MutableState<Pair<Int, String>>,
     refuelState: MutableState<Pair<Int, String>>,
     openSheet: (BottomSheetLoco) -> Unit,
@@ -308,7 +307,7 @@ fun DieselSectionItem(
 fun ElectricSectionItem(
     item: SectionType.ElectricSectionFormState,
     index: Int,
-    viewModel: AddingViewModel,
+    viewModel: AddingLocoViewModel,
 ) {
     val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
@@ -648,7 +647,7 @@ fun DraggableElectricItem(
     onExpand: () -> Unit,
     onCollapse: () -> Unit,
     index: Int,
-    viewModel: AddingViewModel,
+    viewModel: AddingLocoViewModel,
 ) {
     DraggableItem(modifier = modifier,
         isRevealed = isRevealed,
@@ -670,7 +669,7 @@ fun DraggableDieselItem(
     onExpand: () -> Unit,
     onCollapse: () -> Unit,
     index: Int,
-    viewModel: AddingViewModel,
+    viewModel: AddingLocoViewModel,
     coefficientState: MutableState<Pair<Int, String>>,
     refuelState: MutableState<Pair<Int, String>>,
     openSheet: (BottomSheetLoco) -> Unit,

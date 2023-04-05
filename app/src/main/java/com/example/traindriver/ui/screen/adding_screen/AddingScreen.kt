@@ -509,9 +509,9 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                     Spacer(modifier = Modifier.height(24.dp))
                     ItemAddLoco(openSheet, viewModel.stateLocoList.value)
                     HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
-                    ItemAddLoco(openSheet, viewModel.stateLocoList.value)
+//                    ItemAddLoco(openSheet, viewModel.stateLocoList.value)
                     HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
-                    ItemAddLoco(openSheet, viewModel.stateLocoList.value)
+//                    ItemAddLoco(openSheet, viewModel.stateLocoList.value)
                 }
             }
         }
@@ -524,11 +524,13 @@ fun SheetLayout(sheet: BottomSheetScreen, closeSheet: () -> Unit, viewModel: Add
         modifier = Modifier.fillMaxHeight(0.96f), closeSheet = closeSheet
     ) {
         when (sheet) {
-            BottomSheetScreen.AddingLoco -> AddingLocoScreen(
-                viewModel = viewModel
+            is BottomSheetScreen.AddingLoco -> AddingLocoScreen(
+                timeState = viewModel.timeEditState,
+                locomotive = sheet.locomotive,
+                closeAddingLocoScreen = closeSheet
             )
-            BottomSheetScreen.AddingTrain -> AddingTrainScreen()
-            BottomSheetScreen.AddingPass -> AddingPassScreen()
+            is BottomSheetScreen.AddingTrain -> AddingTrainScreen()
+            is BottomSheetScreen.AddingPass -> AddingPassScreen()
         }
     }
 }
@@ -588,7 +590,9 @@ fun ItemAddLoco(openSheet: (BottomSheetScreen) -> Unit, locoList: List<Locomotiv
             modifier = Modifier
                 .clickable {
                     scope.launch {
-                        openSheet.invoke(BottomSheetScreen.AddingLoco)
+                        val locoScreen = BottomSheetScreen.AddingLoco
+                        locoScreen.locomotive = null
+                        openSheet.invoke(locoScreen)
                     }
                 }
                 .padding(vertical = 16.dp, horizontal = 24.dp)
@@ -620,7 +624,15 @@ fun ItemAddLoco(openSheet: (BottomSheetScreen) -> Unit, locoList: List<Locomotiv
             ) {
                 locoList.forEach {
                     Text(
-                        modifier = Modifier.padding(end = 16.dp),
+                        modifier = Modifier
+                            .padding(end = 16.dp)
+                            .clickable {
+                                scope.launch {
+                                    val locoScreen = BottomSheetScreen.AddingLoco
+                                    locoScreen.locomotive = it
+                                    openSheet.invoke(locoScreen)
+                                }
+                            },
                         text = "${it.series} №${it.number}",
                         style = Typography.body2.copy(color = MaterialTheme.colors.primaryVariant)
                     )
