@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -74,6 +75,7 @@ fun AddingLocoScreen(
     locomotive: Locomotive? = null,
     timeState: State<WorkTimeEditState>,
     viewModel: AddingLocoViewModel = viewModel(),
+    stateLocomotiveList: SnapshotStateList<Locomotive>,
     closeAddingLocoScreen: () -> Unit
 ) {
     OnLifecycleEvent { _, event ->
@@ -160,8 +162,8 @@ fun AddingLocoScreen(
                         end.linkTo(parent.end)
                     }
                     .clickable {
-                        viewModel.addLocomotiveInRoute()
                         closeAddingLocoScreen.invoke()
+                        viewModel.addLocomotiveInRoute(stateLocomotiveList)
                     }
                     .padding(end = 16.dp, top = 16.dp),
                 text = "Сохранить",

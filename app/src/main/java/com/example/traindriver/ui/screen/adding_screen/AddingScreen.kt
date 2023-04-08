@@ -507,7 +507,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                     )
                     HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
                     Spacer(modifier = Modifier.height(24.dp))
-                    ItemAddLoco(openSheet, viewModel.stateLocoList.value)
+                    ItemAddLoco(openSheet, viewModel.stateLocoList)
                     HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
 //                    ItemAddLoco(openSheet, viewModel.stateLocoList.value)
                     HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
@@ -527,7 +527,8 @@ fun SheetLayout(sheet: BottomSheetScreen, closeSheet: () -> Unit, viewModel: Add
             is BottomSheetScreen.AddingLoco -> AddingLocoScreen(
                 timeState = viewModel.timeEditState,
                 locomotive = sheet.locomotive,
-                closeAddingLocoScreen = closeSheet
+                closeAddingLocoScreen = closeSheet,
+                stateLocomotiveList = viewModel.stateLocoList
             )
             is BottomSheetScreen.AddingTrain -> AddingTrainScreen()
             is BottomSheetScreen.AddingPass -> AddingPassScreen()

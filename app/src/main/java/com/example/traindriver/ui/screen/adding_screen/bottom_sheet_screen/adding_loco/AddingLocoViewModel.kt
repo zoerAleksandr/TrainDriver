@@ -1,16 +1,16 @@
 package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.adding_loco
 
+import android.util.Log
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traindriver.data.repository.DataStoreRepository
-import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.Calculation
 import com.example.traindriver.domain.entity.Locomotive
 import com.example.traindriver.domain.entity.SectionDiesel
 import com.example.traindriver.domain.entity.SectionElectric
-import com.example.traindriver.domain.use_case.AddLocomotiveInRouteUseCase
 import com.example.traindriver.ui.screen.adding_screen.state_holder.*
 import com.example.traindriver.ui.util.DateAndTimeFormat
 import com.example.traindriver.ui.util.double_util.str
@@ -25,7 +25,6 @@ import kotlin.properties.Delegates
 
 class AddingLocoViewModel : ViewModel(), KoinComponent {
     private val dataStoreRepository: DataStoreRepository by inject()
-    private val addLocomotiveInRouteUseCase: AddLocomotiveInRouteUseCase by inject()
 
     fun setData(
         locomotive: Locomotive?,
@@ -47,18 +46,51 @@ class AddingLocoViewModel : ViewModel(), KoinComponent {
         electricSectionListState.clear()
     }
 
-    fun addLocomotiveInRoute() {
-        viewModelScope.launch {
-            addLocomotiveInRouteUseCase.execute(currentLoco).collect {
-                when (it) {
-                    ResultState.Loading() -> {}
-                    ResultState.Success(true) -> {
-                        clearField()
-                    }
-                    ResultState.Failure(msg = Throwable()) -> {}
-                    else -> {}
+    fun addLocomotiveInRoute(stateLocomotive: SnapshotStateList<Locomotive>) {
+        currentLoco.apply {
+            number = numberLocoState.text
+            series = seriesLocoState.text
+            type = pagerState == 1
+            timeStartOfAcceptance = acceptedTimeState.value.startAccepted.time
+            timeEndOfAcceptance = acceptedTimeState.value.endAccepted.time
+            timeStartOfDelivery = deliveryTimeState.value.startDelivered.time
+            timeEndOfDelivery = deliveryTimeState.value.endDelivered.time
+            sectionList = if (this.type) {
+                val list = mutableListOf<SectionElectric>()
+                electricSectionListState.forEach { state ->
+                    list.add(
+                        SectionElectric(
+                            id = state.sectionId,
+                            acceptedEnergy = state.accepted.data?.toDoubleOrNull(),
+                            deliveryEnergy = state.delivery.data?.toDoubleOrNull(),
+                            acceptedRecovery = state.recoveryAccepted.data?.toDoubleOrNull(),
+                            deliveryRecovery = state.recoveryDelivery.data?.toDoubleOrNull()
+                        )
+                    )
                 }
+                list
+            } else {
+                val list = mutableListOf<SectionDiesel>()
+                dieselSectionListState.forEach { state ->
+                    list.add(
+                        SectionDiesel(
+                            id = state.sectionId,
+                            acceptedEnergy = state.accepted.data?.toDoubleOrNull(),
+                            deliveryEnergy = state.delivery.data?.toDoubleOrNull(),
+                            coefficient = state.coefficient.data?.toDoubleOrNull(),
+                            fuelSupply = state.refuel.data?.toDoubleOrNull(),
+                        )
+                    )
+                }
+                list
             }
+        }
+
+        try {
+            stateLocomotive.add(currentLoco)
+            clearField()
+        } catch (e: Throwable) {
+            Log.e("ERROR_ADDING_LOCO", e.message.toString())
         }
     }
 

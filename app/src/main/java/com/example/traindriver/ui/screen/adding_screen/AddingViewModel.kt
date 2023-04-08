@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traindriver.data.repository.DataStoreRepository
 import com.example.traindriver.domain.entity.Locomotive
-import com.example.traindriver.domain.entity.SectionElectric
 import com.example.traindriver.ui.screen.adding_screen.state_holder.*
 import com.example.traindriver.ui.util.long_util.minus
 import kotlinx.coroutines.*
@@ -33,29 +32,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
         numberRouteState = newValue
     }
 
-    private val _stateLocoList = mutableStateOf(
-        listOf(
-            Locomotive(
-                series = "2эс4к",
-                number = "103",
-                sectionList = listOf(
-                    SectionElectric(acceptedEnergy = 9.0, deliveryEnergy = 14.5),
-                    SectionElectric(
-                        acceptedEnergy = 9.0,
-                        deliveryEnergy = 14.5,
-                        acceptedRecovery = 90.3,
-                        deliveryRecovery = 103.1
-                    )
-                ),
-                timeStartOfAcceptance = 119092091,
-                timeEndOfAcceptance = 119009209,
-                timeStartOfDelivery = 900983923,
-                timeEndOfDelivery = 909239823,
-            ),
-            Locomotive(series = "3эс4к", number = "078")
-        )
-    )
-    val stateLocoList: State<List<Locomotive>> = _stateLocoList
+    val stateLocoList = mutableStateListOf<Locomotive>()
 
     var minTimeRest by mutableStateOf(0L)
         private set
