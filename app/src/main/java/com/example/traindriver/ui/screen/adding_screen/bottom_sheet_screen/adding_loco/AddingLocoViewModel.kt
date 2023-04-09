@@ -39,7 +39,7 @@ class AddingLocoViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    private fun clearField() {
+    fun clearField() {
         currentLoco = Locomotive(
             type = defaultLocoType
         )

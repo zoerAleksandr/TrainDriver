@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -145,7 +146,7 @@ fun AddingLocoScreen(
                 .fillMaxWidth()
                 .padding(bottom = 56.dp),
         ) {
-            val (saveButton, title, divider, topShadow, lazyColumn) = createRefs()
+            val (saveButton, menu, title, divider, topShadow, lazyColumn) = createRefs()
             val number = viewModel.numberLocoState
             val series = viewModel.seriesLocoState
             val pagerState = rememberPagerState(pageCount = 2, initialPage = 0)
@@ -156,17 +157,55 @@ fun AddingLocoScreen(
                 }
             }
 
+            var dropDownExpanded by remember { mutableStateOf(false) }
+
+            IconButton(
+                modifier = Modifier
+                    .constrainAs(menu) {
+                        top.linkTo(parent.top)
+                        end.linkTo(parent.end)
+                    }
+                    .padding(end = 4.dp),
+                onClick = {
+                    dropDownExpanded = true
+                })
+            {
+                Icon(
+                    painter = painterResource(id = R.drawable.more_menu),
+                    contentDescription = null,
+                    tint = MaterialTheme.colors.primary
+                )
+                DropdownMenu(
+                    expanded = dropDownExpanded,
+                    onDismissRequest = { dropDownExpanded = false },
+                    offset = DpOffset(x = 4.dp, y = 8.dp)
+                ) {
+                    DropdownMenuItem(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        onClick = {
+                            viewModel.clearField()
+                            dropDownExpanded = false
+                        }
+                    ) {
+                        Text(
+                            text = "Очистить",
+                            style = Typography.body1.copy(color = MaterialTheme.colors.primary)
+                        )
+                    }
+                }
+            }
+
             Text(
                 modifier = Modifier
                     .constrainAs(saveButton) {
-                        top.linkTo(parent.top)
-                        end.linkTo(parent.end)
+                        top.linkTo(menu.top)
+                        bottom.linkTo(menu.bottom)
+                        end.linkTo(menu.start)
                     }
                     .clickable {
                         closeAddingLocoScreen.invoke()
                         viewModel.addLocomotiveInRoute(stateLocomotiveList)
-                    }
-                    .padding(end = 16.dp, top = 16.dp),
+                    },
                 text = "Сохранить",
                 style = Typography.button.copy(color = MaterialTheme.colors.secondaryVariant)
             )
