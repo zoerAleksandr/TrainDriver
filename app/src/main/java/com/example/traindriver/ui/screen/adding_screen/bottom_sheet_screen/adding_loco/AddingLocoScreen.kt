@@ -67,7 +67,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.traindriver.ui.util.OnLifecycleEvent
 
 @OptIn(
-    ExperimentalPagerApi::class, ExperimentalMaterialApi::class,
+    ExperimentalPagerApi::class,
+    ExperimentalMaterialApi::class,
     ExperimentalFoundationApi::class
 )
 @Composable

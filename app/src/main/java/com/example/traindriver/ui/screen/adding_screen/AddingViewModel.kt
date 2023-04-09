@@ -1,5 +1,6 @@
 package com.example.traindriver.ui.screen.adding_screen
 
+import android.util.Log
 import androidx.compose.runtime.*
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
@@ -33,6 +34,14 @@ class AddingViewModel : ViewModel(), KoinComponent {
     }
 
     val stateLocoList = mutableStateListOf<Locomotive>()
+    fun deleteLocomotiveInRoute(
+        locomotive: Locomotive
+    ) {
+        Log.d("ZZZ", "state in AddRouteViewModel = ${stateLocoList.hashCode()}")
+        if (stateLocoList.contains(locomotive)) {
+            stateLocoList.remove(locomotive)
+        }
+    }
 
     var minTimeRest by mutableStateOf(0L)
         private set

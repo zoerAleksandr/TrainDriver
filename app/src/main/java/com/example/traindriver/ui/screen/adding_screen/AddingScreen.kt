@@ -507,10 +507,14 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                     )
                     HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
                     Spacer(modifier = Modifier.height(24.dp))
-                    ItemAddLoco(openSheet, viewModel.stateLocoList)
+                    ItemAddLoco(
+                        openSheet,
+                        viewModel.stateLocoList,
+                        viewModel::deleteLocomotiveInRoute
+                    )
                     HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
 //                    ItemAddLoco(openSheet, viewModel.stateLocoList.value)
-                    HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
+//                    HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
 //                    ItemAddLoco(openSheet, viewModel.stateLocoList.value)
                 }
             }
@@ -580,8 +584,13 @@ fun NumberEditItem(
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun ItemAddLoco(openSheet: (BottomSheetScreen) -> Unit, locoList: List<Locomotive>) {
+fun ItemAddLoco(
+    openSheet: (BottomSheetScreen) -> Unit,
+    locoList: List<Locomotive>,
+    deleteLoco: (Locomotive) -> Unit
+) {
     val scope = rememberCoroutineScope()
     Card(
         backgroundColor = Color.Transparent,
@@ -619,24 +628,44 @@ fun ItemAddLoco(openSheet: (BottomSheetScreen) -> Unit, locoList: List<Locomotiv
                     .constrainAs(data) {
                         start.linkTo(parent.start)
                         bottom.linkTo(parent.bottom)
-                        end.linkTo(icon.start)
+                        end.linkTo(icon.start, 8.dp)
                         width = Dimension.fillToConstraints
                     },
             ) {
-                locoList.forEach {
-                    Text(
+                locoList.forEach { locomotive ->
+                    Chip(
                         modifier = Modifier
-                            .padding(end = 16.dp)
-                            .clickable {
-                                scope.launch {
-                                    val locoScreen = BottomSheetScreen.AddingLoco
-                                    locoScreen.locomotive = it
-                                    openSheet.invoke(locoScreen)
-                                }
-                            },
-                        text = "${it.series} №${it.number}",
-                        style = Typography.body2.copy(color = MaterialTheme.colors.primaryVariant)
-                    )
+                            .padding(end = 16.dp),
+                        onClick = {
+                            scope.launch {
+                                val locoScreen = BottomSheetScreen.AddingLoco
+                                locoScreen.locomotive = locomotive
+                                openSheet.invoke(locoScreen)
+                            }
+                        },
+                        shape = ShapeBackground.small
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "${locomotive.series} №${locomotive.number}",
+                                style = Typography.body2.copy(color = MaterialTheme.colors.primaryVariant)
+                            )
+
+                            Icon(
+                                modifier = Modifier
+                                    .padding(start = 4.dp)
+                                    .clickable {
+                                        deleteLoco.invoke(locomotive)
+                                    },
+                                painter = painterResource(id = R.drawable.ic_close_24),
+                                contentDescription = null
+                            )
+                        }
+
+                    }
                 }
             }
             Image(

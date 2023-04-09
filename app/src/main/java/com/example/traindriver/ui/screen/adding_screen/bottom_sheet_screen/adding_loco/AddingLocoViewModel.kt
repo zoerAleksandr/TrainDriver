@@ -13,6 +13,7 @@ import com.example.traindriver.domain.entity.SectionDiesel
 import com.example.traindriver.domain.entity.SectionElectric
 import com.example.traindriver.ui.screen.adding_screen.state_holder.*
 import com.example.traindriver.ui.util.DateAndTimeFormat
+import com.example.traindriver.ui.util.collection_util.extension.addOrReplace
 import com.example.traindriver.ui.util.double_util.str
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -87,7 +88,8 @@ class AddingLocoViewModel : ViewModel(), KoinComponent {
         }
 
         try {
-            stateLocomotive.add(currentLoco)
+            stateLocomotive.addOrReplace(currentLoco)
+            Log.d("ZZZ", "state in LocoViewModel = ${stateLocomotive.hashCode()}")
             clearField()
         } catch (e: Throwable) {
             Log.e("ERROR_ADDING_LOCO", e.message.toString())
