@@ -51,6 +51,7 @@ import com.example.traindriver.ui.util.double_util.plus
 import com.example.traindriver.ui.util.double_util.rounding
 import com.example.traindriver.ui.util.double_util.str
 import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun LocoScreen(response: RouteResponse, navController: NavController) {
@@ -181,11 +182,11 @@ fun ItemLocomotive(loco: Locomotive, navController: NavController) {
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     val timeStartAcceptance = loco.timeStartOfAcceptance?.let { millis ->
-                        SimpleDateFormat(TIME_FORMAT).format(millis)
+                        SimpleDateFormat(TIME_FORMAT, Locale.getDefault()).format(millis)
                     } ?: DEFAULT_TIME_TEXT
 
                     val timeEndAcceptance = loco.timeEndOfAcceptance?.let { millis ->
-                        SimpleDateFormat(TIME_FORMAT).format(millis)
+                        SimpleDateFormat(TIME_FORMAT, Locale.getDefault()).format(millis)
                     } ?: DEFAULT_TIME_TEXT
 
                     Text(
@@ -213,11 +214,11 @@ fun ItemLocomotive(loco: Locomotive, navController: NavController) {
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     val timeStartDelivery = loco.timeStartOfDelivery?.let { millis ->
-                        SimpleDateFormat(TIME_FORMAT).format(millis)
+                        SimpleDateFormat(TIME_FORMAT, Locale.getDefault()).format(millis)
                     } ?: DEFAULT_TIME_TEXT
 
                     val timeEndDelivery = loco.timeEndOfDelivery?.let { millis ->
-                        SimpleDateFormat(TIME_FORMAT).format(millis)
+                        SimpleDateFormat(TIME_FORMAT, Locale.getDefault()).format(millis)
                     } ?: DEFAULT_TIME_TEXT
 
                     Text(

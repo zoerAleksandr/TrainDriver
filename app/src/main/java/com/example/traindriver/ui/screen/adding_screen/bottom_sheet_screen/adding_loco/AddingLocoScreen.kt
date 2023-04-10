@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
@@ -65,7 +66,11 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.traindriver.domain.entity.Calculation
 import com.example.traindriver.ui.util.OnLifecycleEvent
+import com.example.traindriver.ui.util.double_util.plus
+import com.example.traindriver.ui.util.double_util.str
+import java.time.*
 
 @OptIn(
     ExperimentalPagerApi::class,
@@ -683,6 +688,8 @@ fun AddingLocoScreen(
                         ) { index, item ->
                             if (index == 0) {
                                 SecondarySpacer()
+                            } else {
+                                Spacer(modifier = Modifier.padding(dimensionResource(id = R.dimen.secondary_padding_between_view) / 2))
                             }
                             Box(
                                 modifier = Modifier
@@ -693,8 +700,7 @@ fun AddingLocoScreen(
                                             easing = FastOutLinearInEasing
                                         )
                                     )
-                                    .wrapContentSize()
-                                    .padding(bottom = 12.dp),
+                                    .wrapContentSize(),
                                 contentAlignment = Alignment.CenterEnd
                             ) {
                                 ActionsRow(
@@ -712,7 +718,24 @@ fun AddingLocoScreen(
                                     onExpand = { viewModel.onExpandedDieselSection(item.sectionId) },
                                 )
                             }
-
+                            if (index == list.lastIndex && index > 0) {
+                                var overResult: Double? = null
+                                viewModel.dieselSectionListState.forEach {
+                                    val accepted = it.accepted.data?.toDoubleOrNull()
+                                    val delivery = it.delivery.data?.toDoubleOrNull()
+                                    val refuel = it.refuel.data?.toDoubleOrNull()
+                                    val result = Calculation.getTotalFuelConsumption(
+                                        accepted, delivery, refuel
+                                    )
+                                    overResult += result
+                                }
+                                overResult?.let {
+                                    Text(
+                                        text = "Всего расход = ${maskInLiter(it.str())}",
+                                        style = Typography.body2.copy(color = MaterialTheme.colors.secondary),
+                                    )
+                                }
+                            }
                         }
                     }
                     1 -> {
@@ -724,6 +747,8 @@ fun AddingLocoScreen(
                         ) { index, item ->
                             if (index == 0) {
                                 SecondarySpacer()
+                            } else {
+                                Spacer(modifier = Modifier.padding(dimensionResource(id = R.dimen.secondary_padding_between_view) / 2))
                             }
                             Box(
                                 modifier = Modifier
@@ -750,12 +775,48 @@ fun AddingLocoScreen(
                                     viewModel = viewModel
                                 )
                             }
+                            if (index == list.lastIndex && index > 0) {
+                                var overResult: Double? = null
+                                var overRecovery: Double? = null
+
+                                viewModel.electricSectionListState.forEach {
+                                    val accepted = it.accepted.data?.toDoubleOrNull()
+                                    val delivery = it.delivery.data?.toDoubleOrNull()
+                                    val acceptedRecovery =
+                                        it.recoveryAccepted.data?.toDoubleOrNull()
+                                    val deliveryRecovery =
+                                        it.recoveryDelivery.data?.toDoubleOrNull()
+
+                                    val result = Calculation.getTotalEnergyConsumption(
+                                        accepted, delivery
+                                    )
+                                    val resultRecovery = Calculation.getTotalEnergyConsumption(
+                                        acceptedRecovery, deliveryRecovery
+                                    )
+                                    overResult += result
+                                    overRecovery += resultRecovery
+                                }
+                                Column(horizontalAlignment = Alignment.End) {
+                                    overResult?.let {
+                                        Text(
+                                            text = "Всего расход = ${it.str()}",
+                                            style = Typography.body2.copy(color = MaterialTheme.colors.secondary),
+                                        )
+                                    }
+                                    overRecovery?.let {
+                                        Text(
+                                            text = "Всего рекуперация = ${it.str()}",
+                                            style = Typography.body2.copy(color = MaterialTheme.colors.secondary),
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
                 item {
                     ClickableTextTrainDriver(
-                        modifier = Modifier.padding(top = 12.dp),
+                        modifier = Modifier.padding(top = 24.dp),
                         text = AnnotatedString("Добавить секцию")
                     ) {
                         when (pagerState.currentPage) {

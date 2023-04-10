@@ -42,6 +42,18 @@ import com.example.traindriver.ui.util.float_util.dp
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
+fun maskInKilo(string: String?): String? {
+    return string?.let {
+        "$it кг"
+    }
+}
+
+fun maskInLiter(string: String?): String? {
+    return string?.let {
+        "$it л"
+    }
+}
+
 @Composable
 fun DieselSectionItem(
     index: Int,
@@ -67,18 +79,6 @@ fun DieselSectionItem(
     val formValid = viewModel.dieselSectionListState[index].formValid
     val errorMessageText = viewModel.dieselSectionListState[index].errorMessage
     ConstraintLayout {
-        fun maskInKilo(string: String?): String? {
-            return string?.let {
-                "$it кг"
-            }
-        }
-
-        fun maskInLiter(string: String?): String? {
-            return string?.let {
-                "$it л"
-            }
-        }
-
         val (sectionNum, refuelButton,
             energyAccepted, energyDelivery,
             inKiloBlock, infoBlock, errorMessage) = createRefs()
