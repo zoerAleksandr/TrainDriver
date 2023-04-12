@@ -1,10 +1,9 @@
 package com.example.traindriver.ui.screen.main_screen.elements
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Card
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
+import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,18 +22,15 @@ import com.example.traindriver.ui.util.getDay
 import com.example.traindriver.ui.util.getMonth
 import com.example.traindriver.ui.util.long_util.getTimeInStringFormat
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ItemMainScreen(route: Route, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 2.dp)
-            .height(80.dp),
-        backgroundColor = MaterialTheme.colors.background,
+            .height(80.dp)
+            .clickable { onClick.invoke() },
         shape = ShapeBackground.medium,
-        elevation = 2.dp,
-        onClick = onClick
     ) {
         ConstraintLayout {
             val (date, verticalDividerFirst, station, verticalDividerSecond, workTime) = createRefs()
@@ -92,7 +88,7 @@ fun WorkTimeElementItem(
     val workTime = route.getWorkTime()
 
     val textTime = workTime.getTimeInStringFormat()
-    Text(modifier = modifier, text = textTime, style = Typography.body2)
+    Text(modifier = modifier, text = textTime, style = Typography.bodyMedium)
 }
 
 @Composable
@@ -141,13 +137,13 @@ fun StationElementItem(
             text = textStation,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
-            style = Typography.body2
+            style = Typography.bodyMedium
         )
         Text(
             text = textLoco,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
-            style = Typography.body2
+            style = Typography.bodyMedium
         )
     }
 }
@@ -166,8 +162,8 @@ fun DateElementItem(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = day, style = Typography.body2)
-        Text(text = month, style = Typography.body2)
+        Text(text = day, style = Typography.bodyMedium)
+        Text(text = month, style = Typography.bodyMedium)
     }
 }
 

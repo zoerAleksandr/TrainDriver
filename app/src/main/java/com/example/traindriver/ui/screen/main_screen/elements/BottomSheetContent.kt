@@ -3,10 +3,10 @@ package com.example.traindriver.ui.screen.main_screen.elements
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -42,7 +42,7 @@ fun BottomSheetContent(
                     item {
                         CircularProgressIndicator(
                             modifier = Modifier.size(70.dp),
-                            color = MaterialTheme.colors.primary,
+                            color = MaterialTheme.colorScheme.primary,
                             strokeWidth = 3.dp
                         )
                     }
@@ -52,7 +52,7 @@ fun BottomSheetContent(
                         item {
                             Text(
                                 text = stringResource(id = R.string.empty_route_list),
-                                color = MaterialTheme.colors.primaryVariant
+                                color = MaterialTheme.colorScheme.onPrimary
                             )
                         }
                     } else {

@@ -3,9 +3,9 @@ package com.example.traindriver.ui.screen.signin_screen.elements
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,20 +27,20 @@ fun DividerSignInScreen() {
             modifier = Modifier
                 .weight(1f)
                 .padding(end = dimensionResource(id = R.dimen.padding_divider)),
-            color = MaterialTheme.colors.secondary
+            color = MaterialTheme.colorScheme.secondary
         )
         Text(
             modifier = Modifier.wrapContentWidth(),
             textAlign = TextAlign.Justify,
             text = stringResource(id = R.string.divider_text),
-            style = Typography.body2,
-            color = MaterialTheme.colors.secondary
+            style = Typography.bodyMedium,
+            color = MaterialTheme.colorScheme.secondary
         )
         Divider(
             modifier = Modifier
                 .weight(1f)
                 .padding(start = dimensionResource(id = R.dimen.padding_divider)),
-            color = MaterialTheme.colors.secondary
+            color = MaterialTheme.colorScheme.secondary
         )
 
     }

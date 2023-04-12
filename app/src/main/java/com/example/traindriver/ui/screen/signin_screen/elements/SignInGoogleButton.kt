@@ -2,7 +2,7 @@ package com.example.traindriver.ui.screen.signin_screen.elements
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,7 +22,7 @@ fun SignInGoogleButton(
         modifier = Modifier.fillMaxWidth(),
         shape = ShapeButton.medium,
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = MaterialTheme.colors.surface
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         enabled = !isLoading,
         onClick = onClick
@@ -37,8 +37,8 @@ fun SignInGoogleButton(
         } else {
             Text(
                 text = stringResource(id = R.string.text_entrance_with_google),
-                color = MaterialTheme.colors.primary,
-                style = Typography.button
+                color = MaterialTheme.colorScheme.primary,
+                style = Typography.bodyMedium
             )
         }
     }

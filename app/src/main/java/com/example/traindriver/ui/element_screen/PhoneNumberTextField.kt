@@ -9,10 +9,9 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,18 +20,14 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.traindriver.R
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
-import com.example.traindriver.ui.theme.overpassFontFamily
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.FieldIsFilled
 import com.example.traindriver.ui.util.FontScalePreviews
@@ -40,13 +35,13 @@ import com.example.traindriver.domain.entity.LocaleUser
 import com.example.traindriver.domain.entity.LocaleUser.OTHER
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NumberPhoneTextField(
     numberState: MutableState<String>,
     localeUser: MutableState<LocaleUser>,
     isFilledCallback: FieldIsFilled? = null,
-    sheetState: ModalBottomSheetState,
+    sheetState: SheetState,
     action: (KeyboardActionScope.() -> Unit)?
 ) {
     val scope = rememberCoroutineScope()
@@ -59,7 +54,7 @@ fun NumberPhoneTextField(
                 color = Color.Transparent,
             )
             .border(
-                color = MaterialTheme.colors.onBackground,
+                color = MaterialTheme.colorScheme.onBackground,
                 width = dimensionResource(id = R.dimen.width_border_input_field),
                 shape = ShapeBackground.medium
             )
@@ -99,8 +94,8 @@ fun NumberPhoneTextField(
                 isFilledCallback?.isFilled(it.length >= localeUser.value.maxLength())
             },
             visualTransformation = localeUser.value.transformedNumber,
-            textStyle = Typography.body2.copy(color = MaterialTheme.colors.primary),
-            cursorBrush = SolidColor(MaterialTheme.colors.onSurface),
+            textStyle = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.primary),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
             decorationBox = { innerTextField ->
                 Box(
                     modifier = Modifier
@@ -110,8 +105,8 @@ fun NumberPhoneTextField(
                     if (numberState.value.isEmpty()) {
                         Text(
                             text = stringResource(id = R.string.placeholder_input_number),
-                            style = Typography.caption,
-                            color = MaterialTheme.colors.primaryVariant
+                            style = Typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                     innerTextField()
@@ -144,16 +139,16 @@ inline fun <reified LocaleState> getAllLocaleExcept(except: LocaleState): List<L
     return list
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @DarkLightPreviews
 @FontScalePreviews
 private fun StartScreenPrev() {
     TrainDriverTheme {
-        NumberPhoneTextField(
-            mutableStateOf("+7"),
-            mutableStateOf(LocaleUser.RU),
-            sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded)
-        ) {}
+//        NumberPhoneTextField(
+//            mutableStateOf("+7"),
+//            mutableStateOf(LocaleUser.RU),
+//            sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded)
+//        ) {}
     }
 }

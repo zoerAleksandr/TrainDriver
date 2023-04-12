@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +30,7 @@ import com.example.traindriver.ui.util.Constants.DURATION_CROSSFADE
 import com.example.traindriver.ui.util.DateAndTimeFormat
 import com.example.traindriver.ui.util.EmptyDataText.DEFAULT_STATION_NAME
 import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun PassengerScreen(response: RouteResponse) {
@@ -94,10 +95,10 @@ fun PassengerItem(passenger: Passenger) {
     val stArrivalText = passenger.stationArrival ?: DEFAULT_STATION_NAME
     val stDepartureText = passenger.stationDeparture ?: DEFAULT_STATION_NAME
     val timeArrivalText = passenger.timeArrival?.let { millis ->
-        SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT).format(millis)
+        SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT, Locale.getDefault()).format(millis)
     } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
     val timeDepartureText = passenger.timeDeparture?.let { millis ->
-        SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT).format(millis)
+        SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT, Locale.getDefault()).format(millis)
     } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
     Column(
         modifier = Modifier
@@ -106,7 +107,7 @@ fun PassengerItem(passenger: Passenger) {
     ) {
         Text(
             text = trainNumberText,
-            style = Typography.subtitle2.copy(color = setTextColor(passenger.trainNumber))
+            style = Typography.titleMedium.copy(color = setTextColor(passenger.trainNumber))
         )
         Column(
             modifier = Modifier
@@ -121,13 +122,13 @@ fun PassengerItem(passenger: Passenger) {
             ) {
                 Text(
                     text = stDepartureText,
-                    style = Typography.body1.copy(
+                    style = Typography.bodyLarge.copy(
                         color = setTextColor(passenger.stationDeparture)
                     )
                 )
                 Text(
                     text = timeDepartureText,
-                    style = Typography.body1.copy(
+                    style = Typography.bodyLarge.copy(
                         color = setTextColor(passenger.timeDeparture)
                     )
                 )
@@ -141,13 +142,13 @@ fun PassengerItem(passenger: Passenger) {
             ) {
                 Text(
                     text = stArrivalText,
-                    style = Typography.body1.copy(
+                    style = Typography.bodyLarge.copy(
                         color = setTextColor(passenger.stationArrival)
                     )
                 )
                 Text(
                     text = timeArrivalText,
-                    style = Typography.body1.copy(
+                    style = Typography.bodyLarge.copy(
                         color = setTextColor(passenger.timeArrival)
                     )
                 )
@@ -159,7 +160,7 @@ fun PassengerItem(passenger: Passenger) {
                     .padding(top = 12.dp),
                 text = text,
                 textAlign = TextAlign.Start,
-                style = Typography.body2.copy(color = MaterialTheme.colors.primary)
+                style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.primary)
             )
         }
     }
@@ -168,6 +169,6 @@ fun PassengerItem(passenger: Passenger) {
 @Composable
 private fun FailureScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = stringResource(id = R.string.route_opening_error), style = Typography.h3)
+        Text(text = stringResource(id = R.string.route_opening_error), style = Typography.displaySmall)
     }
 }

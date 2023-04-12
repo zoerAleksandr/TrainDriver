@@ -1,16 +1,18 @@
 package com.example.traindriver.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.darkColorScheme
 
-private val DarkColorPalette = darkColors(
+private val DarkColorPalette = darkColorScheme(
     primary = Color(0xFFDADADA),
-    primaryVariant = Color(0xFFB9B9B9),
+    onPrimary = Color(0xFFB9B9B9),
     secondary = Color(0xFFC5C5C5),
-    secondaryVariant = Color(0xFF86B0F3),
+    tertiary = Color(0xFF86B0F3),
     onSecondary = Color(0xFFFAFAFA),
     surface = Color(0xFFB9B9B9),
     onSurface = Color(0xFF383838),
@@ -18,11 +20,11 @@ private val DarkColorPalette = darkColors(
     onBackground = Color(0xFFC5C5C5),
 )
 
-private val LightColorPalette = lightColors(
+private val LightColorPalette = lightColorScheme(
     primary = Color(0xFF434343),
-    primaryVariant = Color(0xFFA8A8A8),
+    onPrimary = Color(0xFFA8A8A8),
     secondary = Color(0xFF9E9E9E),
-    secondaryVariant = Color(0xFF1971E3),
+    tertiary = Color(0xFF1971E3),
     onSecondary = Color(0xFFFAFAFA),
     surface = Color(0xFFECECEC),
     onSurface = Color(0xFF979797),
@@ -37,22 +39,9 @@ var BackgroundFirst = Color(0xFF9E9E9E)
 var BackgroundSecond = Color(0xFFEEEEEE)
 var ColorClickableText = Color(0xFF0000FF)
 
-//var SwitchColors = SwitchDefaults.colors(
-//    checkedThumbColor = Color(0xFF1971E3), //secondaryVariant
-//    checkedTrackColor = Color(0xFFC4DBF9),
-//    uncheckedThumbColor = Color(0xFFECECEC), //surface
-//    uncheckedTrackColor = Color(0xFF979797) // onSurface
-//)
-//val switchColorDark = SwitchDefaults.colors(
-//    checkedThumbColor = Color(0xFF86B0F3),
-//    checkedTrackColor = Color(0xFF29364B),
-//    uncheckedThumbColor = Color(0xFFB9B9B9),
-//    uncheckedTrackColor = Color(0xFF383838)
-//)
-
 @Composable
 fun TrainDriverTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
-    val colors: Colors
+    val colors: ColorScheme
     if (darkTheme) {
         colors = DarkColorPalette
         BackgroundIcon = BackgroundIconDark
@@ -81,7 +70,7 @@ fun TrainDriverTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Compo
     )
 
     MaterialTheme(
-        colors = colors,
+        colorScheme = colors,
         typography = Typography,
         shapes = ShapeBackground,
         content = content

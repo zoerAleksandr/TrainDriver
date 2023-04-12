@@ -19,7 +19,7 @@ fun ClickableTextTrainDriver(
     text: AnnotatedString,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    style: TextStyle = Typography.button,
+    style: TextStyle = Typography.bodyMedium,
     softWrap: Boolean = true,
     overflow: TextOverflow = TextOverflow.Clip,
     maxLines: Int = Int.MAX_VALUE,

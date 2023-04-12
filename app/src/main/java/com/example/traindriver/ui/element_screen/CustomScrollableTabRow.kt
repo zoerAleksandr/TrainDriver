@@ -63,7 +63,7 @@ fun CustomScrollableTabRow(
                 text = {
                     Text(
                         text = tab,
-                        style = Typography.subtitle1,
+                        style = Typography.titleLarge,
                         onTextLayout = { textLayoutResult ->
                             tabWidths[tabIndex] =
                                 with(density) { textLayoutResult.size.width.toDp() }

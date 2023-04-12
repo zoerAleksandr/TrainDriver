@@ -11,10 +11,11 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.Chip
+import androidx.compose.material3.*
+import androidx.compose.material3.AssistChip
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -67,8 +68,10 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Calendar.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.ExperimentalComposeUiApi
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavController) {
@@ -149,29 +152,29 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
     }
 
     val scaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = rememberBottomSheetState(
-            initialValue = BottomSheetValue.Collapsed,
-            confirmStateChange = {
+        bottomSheetState = SheetState(
+            skipPartiallyExpanded = false,
+            confirmValueChange = {
                 confirmStateChange
             }
-        )
+        ),
     )
 
     /**
      * Изменятся параметр bottomSheetState в зависимости от положения шторки
      */
-    val screenHeight = LocalConfiguration.current.screenHeightDp
-    val offset = scaffoldState.bottomSheetState.offset.value
-    confirmStateChange = offset > screenHeight.times(1.4)
+//    val screenHeight = LocalConfiguration.current.screenHeightDp
+//    val offset = scaffoldState.bottomSheetState.offset.value
+//    confirmStateChange = offset > screenHeight.times(1.4)
 
     var currentBottomSheet: BottomSheetScreen? by remember {
         mutableStateOf(null)
     }
-    if (scaffoldState.bottomSheetState.isCollapsed) currentBottomSheet = null
+    if (!scaffoldState.bottomSheetState.isVisible) currentBottomSheet = null
 
     val closeSheet: () -> Unit = {
         scope.launch {
-            scaffoldState.bottomSheetState.collapse()
+            scaffoldState.bottomSheetState.hide()
         }
     }
 
@@ -193,8 +196,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
         }
     ) {
         Scaffold(
-            backgroundColor = MaterialTheme.colors.background,
-            topBar = { AddingAppBar(navController = navController, enabled = timeValue.formValid) }
+//            topBar = { AddingAppBar(navController = navController, enabled = timeValue.formValid) }
         ) {
             ConstraintLayout(
                 modifier = Modifier
@@ -223,13 +225,13 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                         Text(
                             modifier = Modifier.padding(start = 8.dp),
                             text = timeValue.errorMessage,
-                            style = Typography.caption.copy(color = Color.Red),
+                            style = Typography.bodySmall.copy(color = Color.Red),
                             color = Color.Red
                         )
                     } else {
                         Text(
                             text = timeResult.getTimeInStringFormat(),
-                            style = Typography.h1.copy(color = MaterialTheme.colors.primary)
+                            style = Typography.headlineLarge.copy(color = MaterialTheme.colorScheme.primary)
                         )
                     }
                 }
@@ -252,7 +254,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                             .border(
                                 width = 0.5.dp,
                                 shape = ShapeBackground.small,
-                                color = MaterialTheme.colors.secondary
+                                color = MaterialTheme.colorScheme.secondary
                             )
                             .padding(18.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -268,7 +270,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
 
                         Text(
                             text = dateStartText,
-                            style = Typography.body1,
+                            style = Typography.bodyLarge,
                             color = setTextColor(dateStart)
                         )
                         dateStart?.let { millis ->
@@ -279,7 +281,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                                 ).format(millis)
                             Text(
                                 text = time,
-                                style = Typography.body1,
+                                style = Typography.bodyLarge,
                                 color = setTextColor(dateStart)
                             )
                         }
@@ -290,7 +292,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                             .border(
                                 width = 0.5.dp,
                                 shape = ShapeBackground.small,
-                                color = MaterialTheme.colors.secondary
+                                color = MaterialTheme.colorScheme.secondary
                             )
                             .padding(18.dp)
                             .clickable {
@@ -309,7 +311,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
 
                         Text(
                             text = dateStartText,
-                            style = Typography.body1,
+                            style = Typography.bodyLarge,
                             color = setTextColor(dateEnd)
                         )
                         dateEnd?.let { millis ->
@@ -320,7 +322,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                                 ).format(millis)
                             Text(
                                 text = time,
-                                style = Typography.body1,
+                                style = Typography.bodyLarge,
                                 color = setTextColor(dateEnd)
                             )
                         }
@@ -341,11 +343,11 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                         modifier = Modifier
                             .padding(end = 8.dp),
                         text = "Отдых в ПО",
-                        style = Typography.body2.copy(
+                        style = Typography.bodyMedium.copy(
                             color = if (viewModel.restState) {
-                                MaterialTheme.colors.primary
+                                MaterialTheme.colorScheme.primary
                             } else {
-                                MaterialTheme.colors.primaryVariant
+                                MaterialTheme.colorScheme.onPrimary
                             }
                         )
                     )
@@ -385,7 +387,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                     append(text)
                     addStyle(
                         style = SpanStyle(
-                            color = MaterialTheme.colors.secondaryVariant,
+                            color = MaterialTheme.colorScheme.tertiary,
                             textDecoration = TextDecoration.Underline
                         ), start = startIndex, end = endIndex
                     )
@@ -416,7 +418,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(MaterialTheme.colors.secondaryVariant.copy(alpha = 0.1f)),
+                                .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f)),
                             horizontalAlignment = Alignment.Start
                         ) {
                             Icon(
@@ -426,7 +428,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                                     bottom = 8.dp
                                 ),
                                 painter = painterResource(id = R.drawable.ic_info_24),
-                                tint = MaterialTheme.colors.secondaryVariant,
+                                tint = MaterialTheme.colorScheme.tertiary,
                                 contentDescription = null
                             )
                             minRest?.let {
@@ -441,7 +443,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                                     Text(
                                         modifier = Modifier.padding(horizontal = 16.dp),
                                         text = stringResource(id = R.string.min_time_rest_text, it),
-                                        style = Typography.body2,
+                                        style = Typography.bodyMedium,
                                         textAlign = TextAlign.End
                                     )
                                 }
@@ -461,7 +463,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                                             id = R.string.complete_time_rest_text,
                                             it
                                         ),
-                                        style = Typography.body2,
+                                        style = Typography.bodyMedium,
                                         textAlign = TextAlign.End
                                     )
                                 }
@@ -474,10 +476,10 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                                     top = 12.dp
                                 ),
                                 text = link,
-                                style = Typography.caption
+                                style = Typography.bodySmall
                                     .copy(
                                         fontStyle = FontStyle.Italic,
-                                        color = MaterialTheme.colors.onBackground
+                                        color = MaterialTheme.colorScheme.onBackground
                                     )
                             ) {
                                 link.getStringAnnotations(LINK_TO_SETTING, it, it)
@@ -554,7 +556,7 @@ fun NumberEditItem(
         modifier = modifier,
         value = value,
         onValueChange = onValueChange,
-        textStyle = Typography.subtitle2.copy(color = MaterialTheme.colors.primary),
+        textStyle = Typography.titleMedium.copy(color = MaterialTheme.colorScheme.primary),
         decorationBox = { innerTextField ->
             Box(
                 contentAlignment = Alignment.CenterStart
@@ -563,8 +565,8 @@ fun NumberEditItem(
                     hint?.let {
                         Text(
                             text = it,
-                            style = Typography.subtitle2,
-                            color = MaterialTheme.colors.primaryVariant
+                            style = Typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }
@@ -584,7 +586,7 @@ fun NumberEditItem(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemAddLoco(
     openSheet: (BottomSheetScreen) -> Unit,
@@ -592,10 +594,7 @@ fun ItemAddLoco(
     deleteLoco: (Locomotive) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    Card(
-        backgroundColor = Color.Transparent,
-        elevation = 0.dp
-    ) {
+    Card {
         ConstraintLayout(
             modifier = Modifier
                 .clickable {
@@ -619,7 +618,7 @@ fun ItemAddLoco(
                     }
                     .padding(bottom = 8.dp),
                 text = "Локомотив",
-                style = Typography.subtitle2.copy(color = MaterialTheme.colors.primary)
+                style = Typography.titleMedium.copy(color = MaterialTheme.colorScheme.primary)
             )
             Row(
                 modifier = Modifier
@@ -633,7 +632,7 @@ fun ItemAddLoco(
                     },
             ) {
                 locoList.forEach { locomotive ->
-                    Chip(
+                    AssistChip(
                         modifier = Modifier
                             .padding(end = 16.dp),
                         onClick = {
@@ -643,17 +642,14 @@ fun ItemAddLoco(
                                 openSheet.invoke(locoScreen)
                             }
                         },
-                        shape = ShapeBackground.small
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                        shape = ShapeBackground.small,
+                        label = {
                             Text(
                                 text = "${locomotive.series} №${locomotive.number}",
-                                style = Typography.body2.copy(color = MaterialTheme.colors.primaryVariant)
+                                style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onPrimary)
                             )
-
+                        },
+                        trailingIcon = {
                             Icon(
                                 modifier = Modifier
                                     .padding(start = 4.dp)
@@ -664,88 +660,87 @@ fun ItemAddLoco(
                                 contentDescription = null
                             )
                         }
-
-                    }
+                    )
                 }
-            }
-            Image(
-                modifier = Modifier
-                    .size(20.dp)
-                    .constrainAs(icon) {
-                        end.linkTo(parent.end)
-                        bottom.linkTo(parent.bottom)
-                        top.linkTo(parent.top)
-                    },
-                painter = painterResource(id = R.drawable.ic_forward_24),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary)
-            )
-        }
-    }
-}
-
-@Composable
-private fun AddingAppBar(navController: NavController, enabled: Boolean) {
-    TopAppBar(
-        modifier = Modifier
-            .fillMaxHeight(0.12f),
-        backgroundColor = MaterialTheme.colors.background
-    ) {
-        ConstraintLayout(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 12.dp, end = 16.dp, bottom = 6.dp)
-        ) {
-            val (icon, button) = createRefs()
-            IconButton(
-                modifier = Modifier
-                    .size(dimensionResource(id = R.dimen.min_size_view))
-                    .constrainAs(icon) {
-                        start.linkTo(parent.start)
-                        bottom.linkTo(parent.bottom)
-                    },
-                onClick = {
-                    navController.navigateUp()
-                }
-            ) {
                 Image(
-                    modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size)),
-                    painter = painterResource(id = R.drawable.ic_back_24),
+                    modifier = Modifier
+                        .size(20.dp),
+//                        .constrainAs(icon) {
+//                            end.linkTo(parent.end)
+//                            bottom.linkTo(parent.bottom)
+//                            top.linkTo(parent.top)
+//                        },
+                    painter = painterResource(id = R.drawable.ic_forward_24),
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)
                 )
-            }
-
-            val linkText = buildAnnotatedString {
-                val text = "Сохранить"
-                val start = 0
-                val end = text.length
-                append(text)
-
-                addStringAnnotation(
-                    tag = LINK_TO_HOME,
-                    annotation = Screen.Home.route,
-                    start = start,
-                    end = end
-                )
-            }
-
-            ClickableTextTrainDriver(
-                modifier = Modifier.constrainAs(button) {
-                    end.linkTo(parent.end)
-                    top.linkTo(icon.top)
-                    bottom.linkTo(icon.bottom)
-                },
-                enabled = enabled,
-                text = linkText,
-                style = Typography.button
-            ) {
-                // TODO SAVE TO REPOSITORY
-                linkText.getStringAnnotations(LINK_TO_HOME, it, it)
-                    .firstOrNull()?.let { stringAnnotation ->
-                        navController.navigate(stringAnnotation.item)
-                    }
             }
         }
     }
 }
+//
+//    @ExperimentalMaterial3Api
+//    @Composable
+//    private fun AddingAppBar(navController: NavController, enabled: Boolean) {
+//        TopAppBar(
+//            modifier = Modifier
+//                .fillMaxHeight(0.12f),
+//        ) {
+//            ConstraintLayout(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(start = 12.dp, end = 16.dp, bottom = 6.dp)
+//            ) {
+//                val (icon, button) = createRefs()
+//                IconButton(
+//                    modifier = Modifier
+//                        .size(dimensionResource(id = R.dimen.min_size_view))
+//                        .constrainAs(icon) {
+//                            start.linkTo(parent.start)
+//                            bottom.linkTo(parent.bottom)
+//                        },
+//                    onClick = {
+//                        navController.navigateUp()
+//                    }
+//                ) {
+//                    Image(
+//                        modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size)),
+//                        painter = painterResource(id = R.drawable.ic_back_24),
+//                        contentDescription = null,
+//                        colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
+//                    )
+//                }
+//
+//                val linkText = buildAnnotatedString {
+//                    val text = "Сохранить"
+//                    val start = 0
+//                    val end = text.length
+//                    append(text)
+//
+//                    addStringAnnotation(
+//                        tag = LINK_TO_HOME,
+//                        annotation = Screen.Home.route,
+//                        start = start,
+//                        end = end
+//                    )
+//                }
+//
+//                ClickableTextTrainDriver(
+//                    modifier = Modifier.constrainAs(button) {
+//                        end.linkTo(parent.end)
+//                        top.linkTo(icon.top)
+//                        bottom.linkTo(icon.bottom)
+//                    },
+//                    enabled = enabled,
+//                    text = linkText,
+//                    style = Typography.button
+//                ) {
+//                    // TODO SAVE TO REPOSITORY
+//                    linkText.getStringAnnotations(LINK_TO_HOME, it, it)
+//                        .firstOrNull()?.let { stringAnnotation ->
+//                            navController.navigate(stringAnnotation.item)
+//                        }
+//                }
+//            }
+//        }
+//    }

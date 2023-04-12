@@ -9,9 +9,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -112,7 +112,7 @@ fun DieselSectionItem(
                 Text(
                     modifier = Modifier.padding(start = 8.dp),
                     text = errorMessageText,
-                    style = Typography.caption.copy(color = Color.Red),
+                    style = Typography.bodySmall.copy(color = Color.Red),
                     color = Color.Red
                 )
             }
@@ -126,7 +126,7 @@ fun DieselSectionItem(
                 }
                 .padding(top = 8.dp, start = 16.dp),
             text = "${index + 1} секция",
-            style = Typography.body1.copy(color = MaterialTheme.colors.primaryVariant)
+            style = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onPrimary)
         )
 
         Row(modifier = Modifier
@@ -152,12 +152,12 @@ fun DieselSectionItem(
                     .padding(end = 8.dp),
                 painter = painterResource(id = R.drawable.refuel_icon),
                 contentDescription = null,
-                colorFilter = ColorFilter.tint(MaterialTheme.colors.secondaryVariant)
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary)
             )
             refuel?.let {
                 Text(
                     text = maskInLiter(it.str()) ?: "",
-                    style = Typography.body1.copy(color = MaterialTheme.colors.primary),
+                    style = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
                 )
             }
         }
@@ -252,7 +252,7 @@ fun DieselSectionItem(
                 val acceptedInKiloText = rounding(acceptedInKilo, 2)?.str()
                 Text(
                     text = maskInKilo(acceptedInKiloText) ?: "",
-                    style = Typography.body2.copy(color = MaterialTheme.colors.primaryVariant)
+                    style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onPrimary)
                 )
             }
             Box(
@@ -264,7 +264,7 @@ fun DieselSectionItem(
                 val deliveryInKiloText = rounding(deliveryInKilo, 2)?.str()
                 Text(
                     text = maskInKilo(deliveryInKiloText) ?: "",
-                    style = Typography.body2.copy(color = MaterialTheme.colors.primaryVariant)
+                    style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onPrimary)
                 )
             }
         }
@@ -295,7 +295,7 @@ fun DieselSectionItem(
                 val resultInKiloText = maskInKilo(rounding(resultInKilo, 2)?.str())
                 Text(
                     text = "${resultInLiterText ?: ""} / ${resultInKiloText ?: ""}",
-                    style = Typography.body2.copy(color = MaterialTheme.colors.primaryVariant)
+                    style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onPrimary)
                 )
             }
         }
@@ -364,11 +364,11 @@ fun ElectricSectionItem(
                     contentDescription = null
                 )
                 Text(
-                    modifier = Modifier.padding(start = 8.dp),
-                    // TODO after update compose:ui:1.4.0
-                    //   .basicMarquee(animationMode = MarqueeAnimationMode.WhileFocused),
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .basicMarquee(animationMode = MarqueeAnimationMode.WhileFocused),
                     text = errorMessageText,
-                    style = Typography.caption.copy(color = Color.Red),
+                    style = Typography.bodySmall.copy(color = Color.Red),
                     maxLines = 1,
                     color = Color.Red
                 )
@@ -382,7 +382,7 @@ fun ElectricSectionItem(
             }
             .padding(start = 16.dp, top = 8.dp),
             text = "${index + 1} секция",
-            style = Typography.body1.copy(color = MaterialTheme.colors.primaryVariant))
+            style = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onPrimary))
 
         OutlinedTextFieldCustom(
             modifier = Modifier
@@ -543,10 +543,10 @@ fun ElectricSectionItem(
                     horizontalArrangement = Arrangement.End
                 ) {
                     result?.let {
-                        Text(text = it.str(), style = Typography.body1)
+                        Text(text = it.str(), style = Typography.bodyLarge)
                     }
                     resultRecovery?.let {
-                        Text(text = " / ${it.str()}", style = Typography.body1)
+                        Text(text = " / ${it.str()}", style = Typography.bodyLarge)
                     }
 
                 }
@@ -572,7 +572,7 @@ fun ElectricSectionItem(
                 } else {
                     painterResource(R.drawable.down_arrow)
                 },
-                tint = MaterialTheme.colors.primaryVariant,
+                tint = MaterialTheme.colorScheme.onPrimary,
                 contentDescription = null
             )
         }
@@ -590,10 +590,10 @@ fun DraggableItem(
     isRevealed: Boolean,
     onExpand: () -> Unit,
     onCollapse: () -> Unit,
-    content: @Composable () -> Unit
+    content: @Composable ColumnScope.() -> Unit
 ) {
-    val cardCollapsedBackgroundColor = MaterialTheme.colors.background
-    val cardExpandedBackgroundColor = MaterialTheme.colors.background
+    val cardCollapsedBackgroundColor = MaterialTheme.colorScheme.background
+    val cardExpandedBackgroundColor = MaterialTheme.colorScheme.background
 
     val transitionState = remember {
         MutableTransitionState(isRevealed).apply {
@@ -629,12 +629,11 @@ fun DraggableItem(
             }
         },
         border = BorderStroke(
-            width = 1.dp, color = MaterialTheme.colors.primaryVariant
+            width = 1.dp, color = MaterialTheme.colorScheme.onPrimary
         ),
-        backgroundColor = backgroundColor,
         shape = ShapeBackground.small,
-        elevation = cardElevation,
-        content = content
+        elevation = CardDefaults.cardElevation(cardElevation),
+        content =  content
     )
 }
 
@@ -701,7 +700,7 @@ fun ActionsRow(
             modifier = Modifier
                 .size(dimensionResource(id = R.dimen.min_size_view))
                 .background(
-                    color = MaterialTheme.colors.surface, shape = CircleShape
+                    color = MaterialTheme.colorScheme.surface, shape = CircleShape
                 ), onClick = onDelete
         ) {
             Image(

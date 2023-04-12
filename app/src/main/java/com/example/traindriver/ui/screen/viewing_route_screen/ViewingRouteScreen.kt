@@ -2,7 +2,7 @@ package com.example.traindriver.ui.screen.viewing_route_screen
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -36,7 +36,7 @@ fun ViewingRouteScreen(
     navController: NavController,
     viewModel: ViewingRouteViewModel = viewModel()
 ) {
-    val scaffoldState = rememberScaffoldState()
+//    val scaffoldState = rememberScaffoldState()
     val uid = navController.currentBackStackEntry?.arguments?.getString(ROUTE)
     OnLifecycleEvent { _, event ->
         when (event) {
@@ -49,14 +49,13 @@ fun ViewingRouteScreen(
         }
     }
 
-    Scaffold(scaffoldState = scaffoldState, snackbarHost = {
-        SnackbarHost(
-            hostState = it
-        ) { snackBarData ->
+    val snackbarHostState = remember { SnackbarHostState()}
+    Scaffold(snackbarHost = {
+        SnackbarHost(hostState = snackbarHostState) { snackBarData ->
             TopSnackbar(snackBarData)
         }
     }) {
-        TabScreen(navController, scaffoldState.snackbarHostState, viewModel)
+        TabScreen(navController, snackbarHostState, viewModel)
     }
 }
 
@@ -118,11 +117,11 @@ private fun DataHeader(route: Route) {
     ) {
         Text(
             text = dateStartWorkText,
-            style = Typography.subtitle2.copy(color = setTextColor(route.timeStartWork))
+            style = Typography.titleMedium.copy(color = setTextColor(route.timeStartWork))
         )
         Text(
             text = "№ $routeNumberText",
-            style = Typography.subtitle2.copy(color = setTextColor(route.number))
+            style = Typography.titleMedium.copy(color = setTextColor(route.number))
         )
     }
 }

@@ -1,7 +1,7 @@
 package com.example.traindriver.ui.screen.signin_screen.elements
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,8 +25,8 @@ fun LoginButton(
             .height(dimensionResource(id = R.dimen.min_size_view)),
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = SpecialColor,
-            disabledBackgroundColor = SpecialDisableColor
+            containerColor = SpecialColor,
+            disabledContainerColor = SpecialDisableColor
         ),
         shape = ShapeButton.medium,
         enabled = enabled
@@ -41,8 +41,8 @@ fun LoginButton(
         } else {
             Text(
                 text = stringResource(id = R.string.text_entrance_button),
-                color = MaterialTheme.colors.onSecondary,
-                style = Typography.button
+                color = MaterialTheme.colorScheme.onSecondary,
+                style = Typography.bodyMedium
             )
         }
     }

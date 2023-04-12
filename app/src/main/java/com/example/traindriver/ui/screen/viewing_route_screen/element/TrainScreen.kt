@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
@@ -101,7 +101,7 @@ private fun DataScreen(route: Route) {
 @Composable
 private fun FailureScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = stringResource(id = R.string.route_opening_error), style = Typography.h3)
+        Text(text = stringResource(id = R.string.route_opening_error), style = Typography.labelLarge)
     }
 }
 
@@ -123,7 +123,7 @@ fun TrainItem(train: Train) {
                     top.linkTo(parent.top)
                 },
             text = "№" + " ${train.number ?: "0000"}",
-            style = Typography.subtitle2.copy(color = setTextColor(any = train.number))
+            style = Typography.titleSmall.copy(color = setTextColor(any = train.number))
         )
         Text(
             modifier = Modifier
@@ -133,7 +133,7 @@ fun TrainItem(train: Train) {
                     top.linkTo(parent.top)
                 },
             text = "${train.locomotive?.series ?: ""} - ${train.locomotive?.number ?: ""}",
-            style = Typography.subtitle2.copy(color = setTextColor(any = train.number))
+            style = Typography.titleSmall.copy(color = setTextColor(any = train.number))
         )
         Column(modifier = Modifier
             .constrainAs(weight) {
@@ -144,11 +144,11 @@ fun TrainItem(train: Train) {
             horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "вес",
-                style = Typography.caption.copy(color = MaterialTheme.colors.primaryVariant)
+                style = Typography.bodySmall.copy(color = MaterialTheme.colorScheme.onPrimary)
             )
             Text(
                 text = "${train.weight ?: " - "}",
-                style = Typography.body1.copy(color = setTextColor(any = train.weight))
+                style = Typography.bodyLarge.copy(color = setTextColor(any = train.weight))
             )
         }
         Column(modifier = Modifier
@@ -159,11 +159,11 @@ fun TrainItem(train: Train) {
             horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "оси",
-                style = Typography.caption.copy(color = MaterialTheme.colors.primaryVariant)
+                style = Typography.bodySmall.copy(color = MaterialTheme.colorScheme.onPrimary)
             )
             Text(
                 text = "${train.axle ?: " - "}",
-                style = Typography.body1.copy(color = setTextColor(any = train.weight))
+                style = Typography.bodyLarge.copy(color = setTextColor(any = train.weight))
             )
         }
         Column(modifier = Modifier
@@ -174,11 +174,11 @@ fun TrainItem(train: Train) {
             horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "у.д.",
-                style = Typography.caption.copy(color = MaterialTheme.colors.primaryVariant)
+                style = Typography.bodySmall.copy(color = MaterialTheme.colorScheme.onPrimary)
             )
             Text(
                 text = "${train.conditionalLength ?: " - "}",
-                style = Typography.body1.copy(color = setTextColor(any = train.weight))
+                style = Typography.bodyLarge.copy(color = setTextColor(any = train.weight))
             )
         }
         Column(modifier = Modifier
@@ -192,7 +192,7 @@ fun TrainItem(train: Train) {
                 if (index.rem(2) != 0) {
                     ItemStation(item, Color.Transparent)
                 } else {
-                    ItemStation(item, MaterialTheme.colors.secondary.copy(alpha = 0.2f))
+                    ItemStation(item, MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))
                 }
             }
         }
@@ -204,7 +204,7 @@ fun TrainItem(train: Train) {
 fun textColorOrTransparent(any: Any?): Color = if (any == null) {
     Color.Transparent
 } else {
-    MaterialTheme.colors.primary
+    MaterialTheme.colorScheme.primary
 }
 
 @Composable
@@ -240,7 +240,7 @@ fun ItemStation(station: Station, backgroundColor: Color) {
                 .padding(end = 4.dp),
             textAlign = TextAlign.Start,
             text = nameText,
-            style = Typography.body1.copy(color = setTextColor(station.stationName)),
+            style = Typography.bodyLarge.copy(color = setTextColor(station.stationName)),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -258,7 +258,7 @@ fun ItemStation(station: Station, backgroundColor: Color) {
 
             Text(
                 text = arrival,
-                style = Typography.body1.copy(color = textColorOrTransparent(station.timeArrival))
+                style = Typography.bodyLarge.copy(color = textColorOrTransparent(station.timeArrival))
             )
 
             Text(
@@ -266,13 +266,13 @@ fun ItemStation(station: Station, backgroundColor: Color) {
                 color = if (station.timeArrival == null || station.timeDeparture == null) {
                     Color.Transparent
                 } else {
-                    MaterialTheme.colors.primary
+                    MaterialTheme.colorScheme.primary
                 },
-                style = Typography.body1
+                style = Typography.bodyLarge
             )
             Text(
                 text = departure,
-                style = Typography.body1.copy(color = textColorOrTransparent(station.timeDeparture))
+                style = Typography.bodyLarge.copy(color = textColorOrTransparent(station.timeDeparture))
             )
 
         }

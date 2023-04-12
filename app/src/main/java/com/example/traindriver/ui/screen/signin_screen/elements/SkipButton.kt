@@ -1,7 +1,7 @@
 package com.example.traindriver.ui.screen.signin_screen.elements
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -17,8 +17,8 @@ fun SkipButton(modifier: Modifier) {
     Text(
         modifier = modifier,
         text = stringResource(id = R.string.text_skip_button),
-        style = Typography.body2.copy(fontSize = 18.sp),
-        color = MaterialTheme.colors.onBackground
+        style = Typography.bodyMedium.copy(fontSize = 18.sp),
+        color = MaterialTheme.colorScheme.onBackground
     )
 }
 @Composable

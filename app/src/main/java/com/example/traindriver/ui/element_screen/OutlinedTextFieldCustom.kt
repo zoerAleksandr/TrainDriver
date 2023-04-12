@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,16 +22,11 @@ fun OutlinedTextFieldCustom(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions(),
 ) {
-    val colors = TextFieldDefaults.outlinedTextFieldColors(
-        textColor = MaterialTheme.colors.primary,
-        unfocusedBorderColor = MaterialTheme.colors.secondary
-    )
 
     OutlinedTextField(
         modifier = modifier,
         value = value,
         onValueChange = onValueChange,
-        colors = colors,
         placeholder = {
             Box(
                 modifier = Modifier.fillMaxWidth(),
@@ -40,7 +35,7 @@ fun OutlinedTextFieldCustom(
                 Text(placeholderText ?: "")
             }
         },
-        textStyle = Typography.subtitle1.copy(textAlign = TextAlign.Center),
+        textStyle = Typography.titleLarge.copy(textAlign = TextAlign.Center),
         singleLine = singleLine,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
@@ -57,17 +52,12 @@ fun OutlinedTextFieldCustom(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions()
 ) {
-    val colors = TextFieldDefaults.outlinedTextFieldColors(
-        textColor = MaterialTheme.colors.primary,
-        unfocusedBorderColor = MaterialTheme.colors.secondary
-    )
 
     OutlinedTextField(
         modifier = modifier,
         value = value,
         onValueChange = onValueChange,
-        colors = colors,
-        label = { Text(text = labelText ?: "", style = Typography.body1) },
+        label = { Text(text = labelText ?: "", style = Typography.bodyLarge) },
         singleLine = singleLine,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions

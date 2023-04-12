@@ -194,7 +194,7 @@ fun AddingLocoScreen(
                     ) {
                         Text(
                             text = "Очистить",
-                            style = Typography.body1.copy(color = MaterialTheme.colors.primary)
+                            style = Typography.bodyLarge.copy(color = MaterialTheme.colors.primary)
                         )
                     }
                 }
@@ -212,7 +212,7 @@ fun AddingLocoScreen(
                         viewModel.addLocomotiveInRoute(stateLocomotiveList)
                     },
                 text = "Сохранить",
-                style = Typography.button.copy(color = MaterialTheme.colors.secondaryVariant)
+                style = Typography.labelLarge.copy(color = MaterialTheme.colors.secondaryVariant)
             )
 
             Text(
@@ -224,7 +224,7 @@ fun AddingLocoScreen(
                     }
                     .padding(top = 12.dp),
                 text = "Локомотив",
-                style = Typography.subtitle1.copy(color = MaterialTheme.colors.primary)
+                style = Typography.titleLarge.copy(color = MaterialTheme.colors.primary)
             )
 
             Divider(modifier = Modifier
@@ -431,7 +431,7 @@ fun AddingLocoScreen(
                                 Text(
                                     modifier = Modifier.padding(start = 8.dp),
                                     text = stateAccepted.errorMessage,
-                                    style = Typography.caption.copy(color = Color.Red),
+                                    style = Typography.bodySmall.copy(color = Color.Red),
                                     color = Color.Red
                                 )
                             }
@@ -444,7 +444,7 @@ fun AddingLocoScreen(
                             Text(
                                 modifier = Modifier.padding(start = 16.dp),
                                 text = "Приемка",
-                                style = Typography.body1
+                                style = Typography.bodyLarge
                             )
 
                             Row(
@@ -471,7 +471,7 @@ fun AddingLocoScreen(
 
                                     Text(
                                         text = timeStartText,
-                                        style = Typography.body1,
+                                        style = Typography.bodyLarge,
                                         color = setTextColor(startAcceptedTime)
                                     )
                                 }
@@ -495,7 +495,7 @@ fun AddingLocoScreen(
 
                                     Text(
                                         text = timeStartText,
-                                        style = Typography.body1,
+                                        style = Typography.bodyLarge,
                                         color = setTextColor(endAcceptedTime)
                                     )
                                 }
@@ -606,7 +606,7 @@ fun AddingLocoScreen(
                                 Text(
                                     modifier = Modifier.padding(start = 8.dp),
                                     text = stateDelivery.errorMessage,
-                                    style = Typography.caption.copy(color = Color.Red),
+                                    style = Typography.bodySmall.copy(color = Color.Red),
                                     color = Color.Red
                                 )
                             }
@@ -619,7 +619,7 @@ fun AddingLocoScreen(
                             Text(
                                 modifier = Modifier.padding(start = 16.dp),
                                 text = "Сдача",
-                                style = Typography.body1
+                                style = Typography.bodyLarge
                             )
 
                             Row(
@@ -646,7 +646,7 @@ fun AddingLocoScreen(
 
                                     Text(
                                         text = timeStartText,
-                                        style = Typography.body1,
+                                        style = Typography.bodyLarge,
                                         color = setTextColor(startDeliveryTime)
                                     )
                                 }
@@ -670,7 +670,7 @@ fun AddingLocoScreen(
 
                                     Text(
                                         text = timeEndText,
-                                        style = Typography.body1,
+                                        style = Typography.bodyLarge,
                                         color = setTextColor(endDeliveryTime)
                                     )
                                 }
@@ -732,7 +732,7 @@ fun AddingLocoScreen(
                                 overResult?.let {
                                     Text(
                                         text = "Всего расход = ${maskInLiter(it.str())}",
-                                        style = Typography.body2.copy(color = MaterialTheme.colors.secondary),
+                                        style = Typography.bodyMedium.copy(color = MaterialTheme.colors.secondary),
                                     )
                                 }
                             }
@@ -800,13 +800,13 @@ fun AddingLocoScreen(
                                     overResult?.let {
                                         Text(
                                             text = "Всего расход = ${it.str()}",
-                                            style = Typography.body2.copy(color = MaterialTheme.colors.secondary),
+                                            style = Typography.bodyMedium.copy(color = MaterialTheme.colors.secondary),
                                         )
                                     }
                                     overRecovery?.let {
                                         Text(
                                             text = "Всего рекуперация = ${it.str()}",
-                                            style = Typography.body2.copy(color = MaterialTheme.colors.secondary),
+                                            style = Typography.bodyMedium.copy(color = MaterialTheme.colors.secondary),
                                         )
                                     }
                                 }
@@ -893,7 +893,7 @@ fun BottomSheetRefuel(
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Экипировка", style = Typography.subtitle1,
+            text = "Экипировка", style = Typography.titleLarge,
             textAlign = TextAlign.Center
         )
         OutlinedTextFieldCustom(
@@ -963,7 +963,7 @@ private fun BottomSheetCoefficient(
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "Коэффициент", style = Typography.subtitle1,
+            text = "Коэффициент", style = Typography.titleLarge,
             textAlign = TextAlign.Center
         )
         OutlinedTextFieldCustom(

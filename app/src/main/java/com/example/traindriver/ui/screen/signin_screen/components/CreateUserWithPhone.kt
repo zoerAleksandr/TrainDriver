@@ -1,6 +1,6 @@
 package com.example.traindriver.ui.screen.signin_screen.components
 
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -25,8 +25,10 @@ fun CreateUserWithPhone(
     when (createUserWithPhone) {
         is ResultState.Loading -> {
             loadingState.value = true
-            scope.launch {
-                snackbarHostState.showSnackbar(SnackbarMessage.CONNECTING_TO_SERVER_MSG)
+            LaunchedEffect(createUserWithPhone) {
+                scope.launch {
+                    snackbarHostState.showSnackbar(SnackbarMessage.CONNECTING_TO_SERVER_MSG)
+                }
             }
         }
         is ResultState.Success -> createUserWithPhone.data?.let { result ->
@@ -44,8 +46,10 @@ fun CreateUserWithPhone(
         }
         is ResultState.Failure -> {
             loadingState.value = false
-            scope.launch {
-                snackbarHostState.showSnackbar(SnackbarMessage.ERROR_TRY_AGAIN_MSG)
+            LaunchedEffect(createUserWithPhone.msg) {
+                scope.launch {
+                    snackbarHostState.showSnackbar(SnackbarMessage.ERROR_TRY_AGAIN_MSG)
+                }
             }
         }
     }

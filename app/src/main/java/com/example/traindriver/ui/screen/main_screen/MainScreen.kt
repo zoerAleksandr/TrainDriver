@@ -4,8 +4,9 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -25,37 +26,38 @@ import com.example.traindriver.ui.util.changeAlphaWithScroll
 import com.example.traindriver.ui.util.long_util.getHour
 import com.example.traindriver.ui.util.long_util.getRemainingMinuteFromHour
 
-
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 fun MainScreen(
     navController: NavController, mainViewModel: MainViewModel = viewModel()
 ) {
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
-    val scaffoldState = rememberScaffoldState()
-    val offset = bottomSheetScaffoldState.bottomSheetState.offset
+    val snackbarHostState = remember { SnackbarHostState() }
+    val offset = bottomSheetScaffoldState.bottomSheetState
     val totalTime = mainViewModel.totalTime
+    val dd = rememberStandardBottomSheetState()
 
-    BottomSheetScaffold(sheetBackgroundColor = changeAlphaWithScroll(
-        offset = offset.value, initColor = MaterialTheme.colors.surface
-    ),
+    BottomSheetScaffold(
+//        sheetContainerColor = changeAlphaWithScroll(
+//            offset = offset.value,
+//            initColor = MaterialTheme.colorScheme.surface
+//        ),
         scaffoldState = bottomSheetScaffoldState,
-        sheetElevation = 0.dp,
         sheetPeekHeight = 260.dp,
         sheetShape = ShapeSurface.medium,
         sheetContent = {
             BottomSheetContent(
                 mainViewModel.listRoute,
-                scaffoldState.snackbarHostState,
+                snackbarHostState,
                 navController
             )
         }) {
-        Scaffold(backgroundColor = MaterialTheme.colors.background,
-            scaffoldState = scaffoldState,
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
             snackbarHost = {
                 SnackbarHost(
-                    hostState = it
+                    hostState = bottomSheetScaffoldState.snackbarHostState
                 ) { snackBarData ->
                     TopSnackbar(snackBarData)
                 }
@@ -78,9 +80,9 @@ fun MainScreen(
                     modifier = Modifier
                         .fillMaxWidth(0.75f),
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = SpecialColor,
-                        disabledBackgroundColor = SpecialDisableColor,
-                        contentColor = MaterialTheme.colors.onSecondary
+                        containerColor = SpecialColor,
+                        disabledContainerColor = SpecialDisableColor,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
                     ),
                     shape = ShapeButton.medium,
                     onClick = {
@@ -89,7 +91,7 @@ fun MainScreen(
                 ) {
                     Text(
                         text = stringResource(id = R.string.add_itinerary),
-                        style = Typography.button
+                        style = Typography.bodyMedium
                     )
                 }
             }

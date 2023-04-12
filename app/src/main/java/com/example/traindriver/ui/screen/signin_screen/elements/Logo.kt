@@ -1,8 +1,8 @@
 package com.example.traindriver.ui.screen.signin_screen.elements
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.traindriver.ui.theme.TrainDriverTheme
@@ -15,8 +15,8 @@ fun Logo(modifier: Modifier) {
     Text(
         modifier = modifier,
         text = "Машинистам",
-        style = Typography.h1,
-        color = MaterialTheme.colors.onSecondary
+        style = Typography.displayMedium,
+        color = MaterialTheme.colorScheme.onSecondary
     )
 }
 

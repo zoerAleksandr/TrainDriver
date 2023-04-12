@@ -12,8 +12,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
@@ -119,7 +119,7 @@ private fun DataScreen(route: Route, navController: NavController) {
 @Composable
 private fun FailureScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = stringResource(id = R.string.route_opening_error), style = Typography.h3)
+        Text(text = stringResource(id = R.string.route_opening_error), style = Typography.displaySmall)
     }
 }
 
@@ -144,17 +144,17 @@ fun ItemLocomotive(loco: Locomotive, navController: NavController) {
                 Text(
                     text = seriesText,
                     color = setTextColor(loco.series),
-                    style = Typography.subtitle2
+                    style = Typography.titleMedium
                 )
                 Text(
                     text = " - ",
                     color = setTextColor(loco.number),
-                    style = Typography.subtitle2
+                    style = Typography.titleMedium
                 )
                 Text(
                     text = numberText,
                     color = setTextColor(loco.number),
-                    style = Typography.subtitle2
+                    style = Typography.titleMedium
                 )
             }
         }
@@ -173,7 +173,7 @@ fun ItemLocomotive(loco: Locomotive, navController: NavController) {
             Box(
                 modifier = Modifier.border(
                     width = 0.5.dp,
-                    color = MaterialTheme.colors.secondary,
+                    color = MaterialTheme.colorScheme.secondary,
                     shape = ShapeBackground.small
                 )
             ) {
@@ -205,7 +205,7 @@ fun ItemLocomotive(loco: Locomotive, navController: NavController) {
             Box(
                 modifier = Modifier.border(
                     width = 0.5.dp,
-                    color = MaterialTheme.colors.secondary,
+                    color = MaterialTheme.colorScheme.secondary,
                     shape = ShapeBackground.small
                 )
             ) {
@@ -284,8 +284,8 @@ fun GeneralResult(modifier: Modifier, loco: Locomotive) {
                 if (totalConsumption != 0.0) {
                     Text(
                         text = "${totalConsumption.str()} / ${totalRecovery.str()}",
-                        style = Typography.body2,
-                        color = MaterialTheme.colors.primary
+                        style = Typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -309,8 +309,8 @@ fun GeneralResult(modifier: Modifier, loco: Locomotive) {
                 if (totalConsumption != 0.0) {
                     Text(
                         text = "${totalConsumption.str()}л / ${totalConsumptionInKilo.str()}кг",
-                        style = Typography.body2,
-                        color = MaterialTheme.colors.primary
+                        style = Typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -328,7 +328,7 @@ fun ItemSection(section: Section, navController: NavController) {
                     .padding(top = 8.dp)
                     .border(
                         width = 0.5.dp,
-                        color = MaterialTheme.colors.secondary,
+                        color = MaterialTheme.colorScheme.secondary,
                         shape = ShapeBackground.small
                     )
             ) {
@@ -365,24 +365,24 @@ fun ItemSection(section: Section, navController: NavController) {
                             section.acceptedRecovery?.let { value ->
                                 Text(
                                     text = value.str(),
-                                    style = Typography.body1.copy(color = setTextColor(value))
+                                    style = Typography.bodyLarge.copy(color = setTextColor(value))
                                 )
                             }
                             section.deliveryRecovery?.let { value ->
                                 Text(
                                     text = " - ",
-                                    style = Typography.body1.copy(color = setTextColor(value))
+                                    style = Typography.bodyLarge.copy(color = setTextColor(value))
                                 )
                                 Text(
                                     text = value.str(),
-                                    style = Typography.body1.copy(color = setTextColor(value))
+                                    style = Typography.bodyLarge.copy(color = setTextColor(value))
                                 )
                             }
                         }
                         section.getRecoveryResult()?.let { value ->
                             Text(
                                 text = value.str(),
-                                style = Typography.body1.copy(color = setTextColor(value))
+                                style = Typography.bodyLarge.copy(color = setTextColor(value))
                             )
                         }
                     }
@@ -396,7 +396,7 @@ fun ItemSection(section: Section, navController: NavController) {
                     .padding(top = 8.dp)
                     .border(
                         width = 0.5.dp,
-                        color = MaterialTheme.colors.secondary,
+                        color = MaterialTheme.colorScheme.secondary,
                         shape = ShapeBackground.small
                     )
             ) {
@@ -418,24 +418,24 @@ fun ItemSection(section: Section, navController: NavController) {
                             Text(
                                 text = acceptedText,
                                 color = setTextColor(section.acceptedEnergy),
-                                style = Typography.body1
+                                style = Typography.bodyLarge
                             )
                             Text(
                                 text = " - ",
                                 color = setTextColor(section.deliveryEnergy),
-                                style = Typography.body1
+                                style = Typography.bodyLarge
                             )
                             Text(
                                 text = deliveryText,
                                 color = setTextColor(section.deliveryEnergy),
-                                style = Typography.body1
+                                style = Typography.bodyLarge
                             )
                         }
                         val resultText = "${section.getConsumption()?.str() ?: RESULT_ENERGY} л"
                         Text(
                             text = resultText,
                             color = setTextColor(section.getConsumption()),
-                            style = Typography.body1
+                            style = Typography.bodyLarge
                         )
                     }
 
@@ -455,17 +455,17 @@ fun ItemSection(section: Section, navController: NavController) {
                                     Text(
                                         text = acceptedText,
                                         color = setTextColor(section.acceptedInKilo),
-                                        style = Typography.body1
+                                        style = Typography.bodyLarge
                                     )
                                     Text(
                                         text = " - ",
                                         color = setTextColor(section.deliveryInKilo),
-                                        style = Typography.body1
+                                        style = Typography.bodyLarge
                                     )
                                     Text(
                                         text = deliveryText,
                                         color = setTextColor(section.deliveryInKilo),
-                                        style = Typography.body1
+                                        style = Typography.bodyLarge
                                     )
                                 }
                                 val r = section.getConsumptionInKilo()?.let { rounding(it, 2) }
@@ -474,7 +474,7 @@ fun ItemSection(section: Section, navController: NavController) {
                                 Text(
                                     text = resultText,
                                     color = setTextColor(section.getConsumptionInKilo()),
-                                    style = Typography.body1
+                                    style = Typography.bodyLarge
                                 )
                             }
                             Box(
@@ -505,7 +505,7 @@ fun ItemSection(section: Section, navController: NavController) {
                                 }
                                 ClickableText(
                                     text = linkText,
-                                    style = Typography.body2
+                                    style = Typography.bodyMedium
                                         .copy(color = setTextColor(section.coefficient))
                                 ) {
                                     linkText.getStringAnnotations(LINK_TO_SETTING, it, it)
@@ -528,12 +528,12 @@ fun ItemSection(section: Section, navController: NavController) {
                                     .padding(end = 8.dp),
                                 painter = painterResource(id = R.drawable.refuel_icon),
                                 contentDescription = null,
-                                colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary)
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)
                             )
                             Text(
                                 text = "${fuel.str()}л",
-                                style = Typography.body2,
-                                color = MaterialTheme.colors.primary
+                                style = Typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
@@ -546,9 +546,9 @@ fun ItemSection(section: Section, navController: NavController) {
 @Composable
 @ReadOnlyComposable
 fun setTextColor(any: Any?): Color = if (any == null) {
-    MaterialTheme.colors.primaryVariant
+    MaterialTheme.colorScheme.onPrimary
 } else {
-    MaterialTheme.colors.primary
+    MaterialTheme.colorScheme.primary
 }
 
 @Composable

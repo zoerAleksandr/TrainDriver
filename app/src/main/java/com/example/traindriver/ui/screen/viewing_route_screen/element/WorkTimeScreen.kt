@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,7 +29,6 @@ import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.ui.element_screen.LoadingElement
 import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
-import com.example.traindriver.ui.theme.ColorClickableText
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
@@ -43,6 +42,7 @@ import com.example.traindriver.ui.util.long_util.div
 import com.example.traindriver.ui.util.long_util.getTimeInStringFormat
 import com.example.traindriver.ui.util.long_util.plus
 import java.text.SimpleDateFormat
+import java.util.*
 
 const val LINK_TO_SETTING = "LINK_TO_SETTING"
 
@@ -76,7 +76,7 @@ fun WorkTimeScreen(navController: NavController, routeResponse: RouteResponse, m
 @Composable
 private fun FailureScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = stringResource(id = R.string.route_opening_error), style = Typography.h3)
+        Text(text = stringResource(id = R.string.route_opening_error), style = Typography.displaySmall)
     }
 }
 
@@ -111,7 +111,7 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
             append(text)
             addStyle(
                 style = SpanStyle(
-                    color = MaterialTheme.colors.secondaryVariant,
+                    color = MaterialTheme.colorScheme.tertiary,
                     textDecoration = TextDecoration.Underline
                 ), start = startIndex, end = endIndex
             )
@@ -143,34 +143,34 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
                 .border(
                     width = 0.5.dp,
                     shape = ShapeBackground.small,
-                    color = MaterialTheme.colors.secondary
+                    color = MaterialTheme.colorScheme.secondary
                 )
                 .padding(18.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             val dateStartText = route.timeStartWork?.let { millis ->
-                SimpleDateFormat(DATE_FORMAT).format(millis)
+                SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(millis)
             } ?: DEFAULT_DATE_TEXT
             val timeStartText = route.timeStartWork?.let { millis ->
-                SimpleDateFormat(TIME_FORMAT).format(millis)
+                SimpleDateFormat(TIME_FORMAT, Locale.getDefault()).format(millis)
             } ?: DEFAULT_TIME_TEXT
 
             Text(
                 text = dateStartText,
-                style = Typography.body1,
+                style = Typography.bodyLarge,
                 color = if (isDeterminateStartTime) {
-                    MaterialTheme.colors.primary
+                    MaterialTheme.colorScheme.primary
                 } else {
-                    MaterialTheme.colors.primaryVariant
+                    MaterialTheme.colorScheme.onPrimary
                 }
             )
             Text(
                 text = timeStartText,
-                style = Typography.body1,
+                style = Typography.bodyLarge,
                 color = if (isDeterminateStartTime) {
-                    MaterialTheme.colors.primary
+                    MaterialTheme.colorScheme.primary
                 } else {
-                    MaterialTheme.colors.primaryVariant
+                    MaterialTheme.colorScheme.onPrimary
                 }
             )
         }
@@ -185,35 +185,35 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
                 .border(
                     width = 0.5.dp,
                     shape = ShapeBackground.small,
-                    color = MaterialTheme.colors.secondary
+                    color = MaterialTheme.colorScheme.secondary
                 )
                 .padding(18.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             val dateEndText = route.timeEndWork?.let { millis ->
-                SimpleDateFormat(DATE_FORMAT).format(millis)
+                SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(millis)
             } ?: DEFAULT_DATE_TEXT
 
             val timeEndText = route.timeEndWork?.let { millis ->
-                SimpleDateFormat(TIME_FORMAT).format(millis)
+                SimpleDateFormat(TIME_FORMAT, Locale.getDefault()).format(millis)
             } ?: DEFAULT_TIME_TEXT
 
             Text(
                 text = dateEndText,
-                style = Typography.body1,
+                style = Typography.bodyLarge,
                 color = if (isDeterminateEndTime) {
-                    MaterialTheme.colors.primary
+                    MaterialTheme.colorScheme.primary
                 } else {
-                    MaterialTheme.colors.primaryVariant
+                    MaterialTheme.colorScheme.onPrimary
                 }
             )
             Text(
                 text = timeEndText,
-                style = Typography.body1,
+                style = Typography.bodyLarge,
                 color = if (isDeterminateEndTime) {
-                    MaterialTheme.colors.primary
+                    MaterialTheme.colorScheme.primary
                 } else {
-                    MaterialTheme.colors.primaryVariant
+                    MaterialTheme.colorScheme.onPrimary
                 }
             )
         }
@@ -227,27 +227,27 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
                 .padding(start = 32.dp, bottom = 64.dp),
             horizontalAlignment = Alignment.Start) {
 
-            minRest?.let { SimpleDateFormat("$DATE_FORMAT $TIME_FORMAT").format(it) }
+            minRest?.let { SimpleDateFormat("$DATE_FORMAT $TIME_FORMAT", Locale.getDefault()).format(it) }
                 ?.also {
                     Text(
                         text = stringResource(id = R.string.min_time_rest_text, it),
-                        style = Typography.body2
+                        style = Typography.bodyMedium
                     )
                 }
 
-            completeRest?.let { SimpleDateFormat("$DATE_FORMAT $TIME_FORMAT").format(it) }
+            completeRest?.let { SimpleDateFormat("$DATE_FORMAT $TIME_FORMAT", Locale.getDefault()).format(it) }
                 ?.also {
                     Text(
                         text = stringResource(id = R.string.complete_time_rest_text, it),
-                        style = Typography.body2
+                        style = Typography.bodyMedium
                     )
                 }
 
             ClickableText(
                 modifier = Modifier.padding(top = 12.dp),
                 text = link,
-                style = Typography.caption
-                    .copy(fontStyle = FontStyle.Italic, color = MaterialTheme.colors.onBackground)
+                style = Typography.bodySmall
+                    .copy(fontStyle = FontStyle.Italic, color = MaterialTheme.colorScheme.onBackground)
             ) {
                 link.getStringAnnotations(LINK_TO_SETTING, it, it)
                     .firstOrNull()?.let { stringAnnotation ->
@@ -266,7 +266,7 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
                 .padding(top = 32.dp)
         ) {
             val millis = route.getWorkTime()
-            Text(text = millis.getTimeInStringFormat(), style = Typography.h1)
+            Text(text = millis.getTimeInStringFormat(), style = Typography.displayLarge)
         }
     }
 }

@@ -13,7 +13,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
 import androidx.compose.foundation.text.selection.TextSelectionColors
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -56,7 +56,6 @@ import com.example.traindriver.ui.util.SnackbarMessage.SMS_SEND_MSG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
 @Composable
 @OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -68,7 +67,7 @@ fun PasswordConfScreen(
     val number by signInViewModel.number
     val countdown by signInViewModel.timer
     val resentTextEnable by signInViewModel.resetButtonEnable
-    val scaffoldState = rememberScaffoldState()
+    val snackBarState = remember { SnackbarHostState() }
 
     signInViewModel.countDownTimer.start()
     signInViewModel.resetPhoneAuthState()
@@ -86,9 +85,8 @@ fun PasswordConfScreen(
 
     TrainDriverTheme {
         Scaffold(
-            scaffoldState = scaffoldState,
             snackbarHost = {
-                SnackbarHost(hostState = it)
+                SnackbarHost(hostState = snackBarState)
                 { snackBarData ->
                     TopSnackbar(snackBarData)
                 }
@@ -100,7 +98,7 @@ fun PasswordConfScreen(
                         .collect { state ->
                             when (state) {
                                 is ResultState.Loading -> {
-                                    scaffoldState.snackbarHostState.showSnackbar(CHECKING_CODE_MSG)
+                                    snackBarState.showSnackbar(CHECKING_CODE_MSG)
                                 }
                                 is ResultState.Success -> {
                                     navController.apply {
@@ -109,7 +107,7 @@ fun PasswordConfScreen(
                                     }
                                 }
                                 is ResultState.Failure -> {
-                                    scaffoldState.snackbarHostState.showSnackbar(state.msg.message.toString())
+                                    snackBarState.showSnackbar(state.msg.message.toString())
                                 }
                             }
                         }
@@ -119,7 +117,7 @@ fun PasswordConfScreen(
             ConstraintLayout(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colors.background)
+                    .background(MaterialTheme.colorScheme.background)
             ) {
                 val (titleText, editText, secondaryText, closeButton, resentText) = createRefs()
                 val topGuideLine = createGuidelineFromTop(0.17f)
@@ -137,7 +135,7 @@ fun PasswordConfScreen(
                     shape = CircleShape,
                     elevation = null,
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = BackgroundIcon
+                        containerColor = BackgroundIcon
                     ),
                     onClick = {
                         navController.apply {
@@ -159,8 +157,8 @@ fun PasswordConfScreen(
                         end.linkTo(parent.end)
                         top.linkTo(topGuideLine)
                     },
-                    style = Typography.h3,
-                    color = MaterialTheme.colors.primary,
+                    style = Typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
                     text = stringResource(id = R.string.title_passwordConfScreen)
                 )
                 Row(
@@ -197,7 +195,7 @@ fun PasswordConfScreen(
                                 .width(widthBox)
                                 .height(heightBox)
                                 .border(
-                                    color = MaterialTheme.colors.onBackground,
+                                    color = MaterialTheme.colorScheme.onBackground,
                                     width = dimensionResource(id = R.dimen.width_border_input_field),
                                     shape = ShapeBackground.small
                                 )
@@ -220,7 +218,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
+                                textStyle = Typography.displayMedium.copy(color = MaterialTheme.colorScheme.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -233,7 +231,7 @@ fun PasswordConfScreen(
                                 .width(widthBox)
                                 .height(heightBox)
                                 .border(
-                                    color = MaterialTheme.colors.onBackground,
+                                    color = MaterialTheme.colorScheme.onBackground,
                                     width = dimensionResource(id = R.dimen.width_border_input_field),
                                     shape = ShapeBackground.small
                                 )
@@ -269,7 +267,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
+                                textStyle = Typography.displayMedium.copy(color = MaterialTheme.colorScheme.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -282,7 +280,7 @@ fun PasswordConfScreen(
                                 .width(widthBox)
                                 .height(heightBox)
                                 .border(
-                                    color = MaterialTheme.colors.onBackground,
+                                    color = MaterialTheme.colorScheme.onBackground,
                                     width = dimensionResource(id = R.dimen.width_border_input_field),
                                     shape = ShapeBackground.small
                                 )
@@ -318,7 +316,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
+                                textStyle = Typography.displayMedium.copy(color = MaterialTheme.colorScheme.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -331,7 +329,7 @@ fun PasswordConfScreen(
                                 .width(widthBox)
                                 .height(heightBox)
                                 .border(
-                                    color = MaterialTheme.colors.onBackground,
+                                    color = MaterialTheme.colorScheme.onBackground,
                                     width = dimensionResource(id = R.dimen.width_border_input_field),
                                     shape = ShapeBackground.small
                                 )
@@ -367,7 +365,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
+                                textStyle = Typography.displayMedium.copy(color = MaterialTheme.colorScheme.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -380,7 +378,7 @@ fun PasswordConfScreen(
                                 .width(widthBox)
                                 .height(heightBox)
                                 .border(
-                                    color = MaterialTheme.colors.onBackground,
+                                    color = MaterialTheme.colorScheme.onBackground,
                                     width = dimensionResource(id = R.dimen.width_border_input_field),
                                     shape = ShapeBackground.small
                                 )
@@ -416,7 +414,7 @@ fun PasswordConfScreen(
                                         focusManager.moveFocus(FocusDirection.Next)
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
+                                textStyle = Typography.displayMedium.copy(color = MaterialTheme.colorScheme.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -428,7 +426,7 @@ fun PasswordConfScreen(
                                 .width(widthBox)
                                 .height(heightBox)
                                 .border(
-                                    color = MaterialTheme.colors.onBackground,
+                                    color = MaterialTheme.colorScheme.onBackground,
                                     width = dimensionResource(id = R.dimen.width_border_input_field),
                                     shape = ShapeBackground.small
                                 )
@@ -448,7 +446,7 @@ fun PasswordConfScreen(
                                         v6.value = it
                                     }
                                 },
-                                textStyle = Typography.h2.copy(color = MaterialTheme.colors.primary),
+                                textStyle = Typography.displayMedium.copy(color = MaterialTheme.colorScheme.primary),
                                 cursorBrush = SolidColor(Color.Unspecified),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number
@@ -468,8 +466,8 @@ fun PasswordConfScreen(
                         .padding(top = dimensionResource(id = R.dimen.medium_padding))
                         .wrapContentHeight(),
                     text = stringResource(id = R.string.info_text_passwordConfScreen, number),
-                    style = Typography.body2,
-                    color = MaterialTheme.colors.onBackground,
+                    style = Typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center
                 )
 
@@ -495,14 +493,14 @@ fun PasswordConfScreen(
                             stringResource(id = R.string.resent_text_passwordConfScreen, countdown)
                         },
                         style = if (resentTextEnable) {
-                            Typography.body1
+                            Typography.bodyLarge
                         } else {
-                            Typography.body2
+                            Typography.bodyMedium
                         },
                         color = if (resentTextEnable) {
                             ClicableTextColor
                         } else {
-                            MaterialTheme.colors.primary
+                            MaterialTheme.colorScheme.primary
                         },
                         textAlign = TextAlign.Center
                     )
@@ -513,7 +511,7 @@ fun PasswordConfScreen(
 
     ResendCode(
         resendCode = signInViewModel.resendSmsCodeResponse,
-        snackbarHostState = scaffoldState.snackbarHostState
+        snackbarHostState = snackBarState
     )
 }
 
