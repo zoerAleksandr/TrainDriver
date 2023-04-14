@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +29,7 @@ import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.*
 import com.example.traindriver.ui.element_screen.LoadingElement
+import com.example.traindriver.ui.element_screen.SuperDivider
 import com.example.traindriver.ui.screen.signin_screen.elements.SecondarySpacer
 import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
 import com.example.traindriver.ui.theme.ShapeBackground
@@ -104,10 +104,7 @@ private fun DataScreen(route: Route) {
                 if (index == 0) {
                     SecondarySpacer()
                 } else {
-                    Divider(
-                        thickness = 12.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
+                    SuperDivider()
                 }
                 ItemLocomotive(item)
                 if (index == route.locoList.lastIndex) {

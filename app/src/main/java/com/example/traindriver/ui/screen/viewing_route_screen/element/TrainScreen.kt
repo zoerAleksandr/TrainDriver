@@ -31,12 +31,15 @@ import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.domain.entity.Station
 import com.example.traindriver.domain.entity.Train
 import com.example.traindriver.ui.element_screen.LoadingElement
+import com.example.traindriver.ui.element_screen.SuperDivider
+import com.example.traindriver.ui.screen.signin_screen.elements.SecondarySpacer
 import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.Constants.DURATION_CROSSFADE
 import com.example.traindriver.ui.util.DateAndTimeFormat
 import com.example.traindriver.ui.util.EmptyDataText.DEFAULT_STATION_NAME
 import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun TrainScreen(response: RouteResponse) {
@@ -89,6 +92,11 @@ private fun DataScreen(route: Route) {
             state = scrollState
         ) {
             itemsIndexed(route.trainList) { index, item ->
+                if(index == 0){
+                    SecondarySpacer()
+                } else {
+                    SuperDivider()
+                }
                 TrainItem(item)
                 if (index == route.trainList.lastIndex) {
                     Spacer(modifier = Modifier.height(60.dp))
@@ -123,7 +131,7 @@ fun TrainItem(train: Train) {
                     top.linkTo(parent.top)
                 },
             text = "№" + " ${train.number ?: "0000"}",
-            style = Typography.titleSmall.copy(color = setTextColor(any = train.number))
+            style = Typography.titleLarge.copy(color = setTextColor(any = train.number))
         )
         Text(
             modifier = Modifier
@@ -133,7 +141,7 @@ fun TrainItem(train: Train) {
                     top.linkTo(parent.top)
                 },
             text = "${train.locomotive?.series ?: ""} - ${train.locomotive?.number ?: ""}",
-            style = Typography.titleSmall.copy(color = setTextColor(any = train.number))
+            style = Typography.titleLarge.copy(color = setTextColor(any = train.number))
         )
         Column(modifier = Modifier
             .constrainAs(weight) {
@@ -144,7 +152,7 @@ fun TrainItem(train: Train) {
             horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "вес",
-                style = Typography.bodySmall.copy(color = MaterialTheme.colorScheme.onPrimary)
+                style = Typography.bodySmall.copy(color = MaterialTheme.colorScheme.secondary)
             )
             Text(
                 text = "${train.weight ?: " - "}",
@@ -159,7 +167,7 @@ fun TrainItem(train: Train) {
             horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "оси",
-                style = Typography.bodySmall.copy(color = MaterialTheme.colorScheme.onPrimary)
+                style = Typography.bodySmall.copy(color = MaterialTheme.colorScheme.secondary)
             )
             Text(
                 text = "${train.axle ?: " - "}",
@@ -174,7 +182,7 @@ fun TrainItem(train: Train) {
             horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "у.д.",
-                style = Typography.bodySmall.copy(color = MaterialTheme.colorScheme.onPrimary)
+                style = Typography.bodySmall.copy(color = MaterialTheme.colorScheme.secondary)
             )
             Text(
                 text = "${train.conditionalLength ?: " - "}",
@@ -220,11 +228,11 @@ fun ItemStation(station: Station, backgroundColor: Color) {
         val verticalGuideLine = createGuidelineFromStart(0.6f)
 
         val arrival = station.timeArrival?.let { millis ->
-            SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT).format(millis)
+            SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT, Locale.getDefault()).format(millis)
         } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
 
         val departure = station.timeDeparture?.let { millis ->
-            SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT).format(millis)
+            SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT, Locale.getDefault()).format(millis)
         } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
 
         val nameText = station.stationName ?: DEFAULT_STATION_NAME
