@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,21 +23,15 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.*
 import com.example.traindriver.ui.element_screen.LoadingElement
-import com.example.traindriver.ui.screen.Screen
+import com.example.traindriver.ui.screen.signin_screen.elements.SecondarySpacer
 import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
-import com.example.traindriver.ui.theme.ColorClickableText
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
@@ -54,7 +48,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun LocoScreen(response: RouteResponse, navController: NavController) {
+fun LocoScreen(response: RouteResponse) {
     Crossfade(
         targetState = response,
         animationSpec = tween(durationMillis = DURATION_CROSSFADE)
@@ -64,7 +58,7 @@ fun LocoScreen(response: RouteResponse, navController: NavController) {
                 LoadingScreen()
             }
             is ResultState.Success -> state.data?.let { route ->
-                DataScreen(route, navController)
+                DataScreen(route)
             }
             is ResultState.Failure -> {
                 FailureScreen()
@@ -79,7 +73,7 @@ private fun LoadingScreen() {
 }
 
 @Composable
-private fun DataScreen(route: Route, navController: NavController) {
+private fun DataScreen(route: Route) {
     val scrollState = rememberLazyListState()
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
         val (shadow, data) = createRefs()
@@ -107,7 +101,15 @@ private fun DataScreen(route: Route, navController: NavController) {
             state = scrollState
         ) {
             itemsIndexed(route.locoList) { index, item ->
-                ItemLocomotive(item, navController)
+                if (index == 0) {
+                    SecondarySpacer()
+                } else {
+                    Divider(
+                        thickness = 12.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+                ItemLocomotive(item)
                 if (index == route.locoList.lastIndex) {
                     Spacer(modifier = Modifier.height(60.dp))
                 }
@@ -119,12 +121,15 @@ private fun DataScreen(route: Route, navController: NavController) {
 @Composable
 private fun FailureScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = stringResource(id = R.string.route_opening_error), style = Typography.displaySmall)
+        Text(
+            text = stringResource(id = R.string.route_opening_error),
+            style = Typography.displaySmall
+        )
     }
 }
 
 @Composable
-fun ItemLocomotive(loco: Locomotive, navController: NavController) {
+fun ItemLocomotive(loco: Locomotive) {
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
@@ -133,7 +138,7 @@ fun ItemLocomotive(loco: Locomotive, navController: NavController) {
         val (seriesAndNumber, time, sections) = createRefs()
 
         Box(modifier = Modifier
-            .padding(start = 16.dp)
+            .padding(start = 8.dp)
             .constrainAs(seriesAndNumber) {
                 top.linkTo(parent.top)
                 start.linkTo(parent.start)
@@ -144,17 +149,17 @@ fun ItemLocomotive(loco: Locomotive, navController: NavController) {
                 Text(
                     text = seriesText,
                     color = setTextColor(loco.series),
-                    style = Typography.titleMedium
+                    style = Typography.titleLarge
                 )
                 Text(
                     text = " - ",
                     color = setTextColor(loco.number),
-                    style = Typography.titleMedium
+                    style = Typography.titleLarge
                 )
                 Text(
                     text = numberText,
                     color = setTextColor(loco.number),
-                    style = Typography.titleMedium
+                    style = Typography.titleLarge
                 )
             }
         }
@@ -241,18 +246,10 @@ fun ItemLocomotive(loco: Locomotive, navController: NavController) {
                 top.linkTo(time.bottom)
             }
             .padding(top = 16.dp)) {
-            loco.sectionList.forEachIndexed { index, item ->
-                if (index.rem(2) != 0) {
-                    ItemSection(
-                        section = item,
-                        navController = navController,
-                    )
-                } else {
-                    ItemSection(
-                        section = item,
-                        navController = navController,
-                    )
-                }
+            loco.sectionList.forEach { item ->
+                ItemSection(
+                    section = item
+                )
             }
             GeneralResult(
                 modifier = Modifier.padding(top = 8.dp, end = 16.dp, start = 16.dp),
@@ -319,7 +316,7 @@ fun GeneralResult(modifier: Modifier, loco: Locomotive) {
 }
 
 @Composable
-fun ItemSection(section: Section, navController: NavController) {
+fun ItemSection(section: Section) {
     when (section) {
         is SectionElectric -> {
             Box(
@@ -439,7 +436,7 @@ fun ItemSection(section: Section, navController: NavController) {
                         )
                     }
 
-                    if (section.acceptedEnergy != null || section.deliveryEnergy != null) {
+                    if (section.acceptedInKilo != null || section.deliveryInKilo != null) {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -477,43 +474,15 @@ fun ItemSection(section: Section, navController: NavController) {
                                     style = Typography.bodyLarge
                                 )
                             }
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                val linkText = buildAnnotatedString {
-                                    val value = section.coefficient?.toString() ?: "0.00"
-                                    val text = "k = $value"
 
-                                    val startIndex = startIndexLastWord(text)
-                                    val endIndex = text.length
-
-                                    append(text)
-                                    addStyle(
-                                        SpanStyle(
-                                            color = ColorClickableText,
-                                            textDecoration = TextDecoration.Underline
-                                        ), start = startIndex, end = endIndex
-                                    )
-
-                                    addStringAnnotation(
-                                        tag = LINK_TO_SETTING,
-                                        annotation = Screen.Setting.route,
-                                        start = startIndex,
-                                        end = endIndex
-                                    )
-                                }
-                                ClickableText(
-                                    text = linkText,
-                                    style = Typography.bodyMedium
-                                        .copy(color = setTextColor(section.coefficient))
-                                ) {
-                                    linkText.getStringAnnotations(LINK_TO_SETTING, it, it)
-                                        .firstOrNull()?.let { annotation ->
-                                            navController.navigate(annotation.item)
-                                        }
-                                }
-                            }
+                            val value = section.coefficient?.toString() ?: "0.00"
+                            val text = "k = $value"
+                            Text(
+                                text = text,
+                                style = Typography.bodyMedium
+                                    .copy(color = setTextColor(section.coefficient))
+                            )
+//
                         }
                     }
                     section.fuelSupply?.let { fuel ->
@@ -546,7 +515,7 @@ fun ItemSection(section: Section, navController: NavController) {
 @Composable
 @ReadOnlyComposable
 fun setTextColor(any: Any?): Color = if (any == null) {
-    MaterialTheme.colorScheme.onPrimary
+    MaterialTheme.colorScheme.secondary
 } else {
     MaterialTheme.colorScheme.primary
 }
@@ -577,7 +546,6 @@ private fun ItemSectionPrev() {
                     ),
                 )
             ),
-            navController = rememberNavController(),
         )
     }
 }

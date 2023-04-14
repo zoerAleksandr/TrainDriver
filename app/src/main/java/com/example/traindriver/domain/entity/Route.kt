@@ -1,8 +1,5 @@
 package com.example.traindriver.domain.entity
 
-import com.example.traindriver.ui.util.double_util.differenceBetweenDouble
-import com.example.traindriver.ui.util.double_util.plusNullableValue
-import com.example.traindriver.ui.util.double_util.reverseDifferenceBetweenDouble
 import com.example.traindriver.ui.util.double_util.times
 import java.util.*
 

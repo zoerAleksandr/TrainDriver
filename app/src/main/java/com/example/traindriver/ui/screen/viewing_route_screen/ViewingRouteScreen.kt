@@ -182,7 +182,7 @@ private fun TabContent(
     HorizontalPager(state = pagerState) { page ->
         when (page) {
             0 -> WorkTimeScreen(navController, viewModel.routeState, viewModel.minTimeRest)
-            1 -> LocoScreen(viewModel.routeState, navController)
+            1 -> LocoScreen(viewModel.routeState)
             2 -> TrainScreen(viewModel.routeState)
             3 -> PassengerScreen(viewModel.routeState)
         }

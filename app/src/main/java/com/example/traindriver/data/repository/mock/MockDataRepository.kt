@@ -66,7 +66,7 @@ class MockDataRepository : DataRepository {
                         acceptedEnergy = 3000.0,
                         deliveryEnergy = 4000.0,
 //                        coefficient = 0.83,
-                        fuelSupply = 2000.0,
+//                        fuelSupply = 2000.0,
 //                        coefficientSupply = 0.85
                     ),
                 )
@@ -168,7 +168,7 @@ class MockDataRepository : DataRepository {
     override fun getItineraryById(id: String): Flow<RouteResponse> =
         callbackFlow {
             trySend(ResultState.Loading())
-            delay(3000)
+            delay(300)
 //            trySend(ResultState.Failure(Throwable()))
             trySend(ResultState.Success(one))
             awaitClose { close() }
