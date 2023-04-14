@@ -119,6 +119,14 @@ class MockDataRepository : DataRepository {
                 timeArrival = 1_675_789_800_000,
                 timeDeparture = 1_675_790_000_000,
                 notes = "Приказ №91 ДЦУП Александров"
+            ),
+            Passenger(
+                trainNumber = "8902",
+                stationArrival = "Веймарн",
+                stationDeparture = "Лужская",
+                timeArrival = 1_675_789_800_000,
+                timeDeparture = 1_675_790_000_000,
+                notes = "Приказ №91 ДЦУП Александров"
             )
         )
     )
@@ -160,7 +168,7 @@ class MockDataRepository : DataRepository {
         callbackFlow {
             trySend(ResultState.Loading())
             delay(300)
-            val list = listOf(one, two, three, one, two, three, one, two, three,)
+            val list = listOf(one, two, three, one, two, three, one, two, three)
             trySend(ResultState.Success(list))
             awaitClose { close() }
         }

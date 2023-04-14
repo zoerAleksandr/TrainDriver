@@ -24,6 +24,8 @@ import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.Passenger
 import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.ui.element_screen.LoadingElement
+import com.example.traindriver.ui.element_screen.SuperDivider
+import com.example.traindriver.ui.screen.signin_screen.elements.SecondarySpacer
 import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.Constants.DURATION_CROSSFADE
@@ -80,6 +82,11 @@ private fun DataScreen(route: Route) {
                 }, state = scrollState
         ) {
             itemsIndexed(route.passengerList) { index, item ->
+                if (index == 0){
+                    SecondarySpacer()
+                } else {
+                    SuperDivider()
+                }
                 PassengerItem(item)
                 if (index == route.passengerList.lastIndex) {
                     Spacer(modifier = Modifier.height(60.dp))
@@ -107,7 +114,7 @@ fun PassengerItem(passenger: Passenger) {
     ) {
         Text(
             text = trainNumberText,
-            style = Typography.titleMedium.copy(color = setTextColor(passenger.trainNumber))
+            style = Typography.titleLarge.copy(color = setTextColor(passenger.trainNumber))
         )
         Column(
             modifier = Modifier
