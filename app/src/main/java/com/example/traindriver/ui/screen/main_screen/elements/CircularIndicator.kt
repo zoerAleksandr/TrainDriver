@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.example.traindriver.ui.theme.SpecialColor
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.DarkLightPreviews
@@ -34,7 +33,7 @@ fun CircularIndicator(
     maxIndicatorValue: Int = 180,
     backgroundIndicatorColor: Color = MaterialTheme.colorScheme.surface,
     backgroundIndicatorStrokeWidth: Float = 50f,
-    foregroundIndicatorColor: Color = SpecialColor,
+    foregroundIndicatorColor: Color = MaterialTheme.colorScheme.onBackground,
     foregroundIndicatorStrokeWidth: Float = 70f,
 ) {
     var allowedIndicatorValue by remember {
@@ -110,7 +109,7 @@ fun CircularIndicator(
                 }
                 .padding(bottom = canvasSize / 5),
             text = "$maxIndicatorValue",
-            style = MaterialTheme.typography.displaySmall
+            style = MaterialTheme.typography.headlineSmall
         )
     }
 
@@ -182,7 +181,7 @@ fun EmbeddedText(
     Text(
         modifier = modifier,
         text = "$hour : $minute",
-        style = Typography.displayLarge
+        style = Typography.displaySmall
     )
 }
 

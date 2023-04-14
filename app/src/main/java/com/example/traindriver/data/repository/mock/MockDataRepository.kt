@@ -160,7 +160,7 @@ class MockDataRepository : DataRepository {
         callbackFlow {
             trySend(ResultState.Loading())
             delay(300)
-            val list = listOf(one, two, three)
+            val list = listOf(one, two, three, one, two, three, one, two, three,)
             trySend(ResultState.Success(list))
             awaitClose { close() }
         }

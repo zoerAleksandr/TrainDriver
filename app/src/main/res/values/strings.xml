@@ -18,7 +18,7 @@
     <string name="resent_text_passwordConfScreen_enabled">Отправить повторно</string>
 
     // Main Screen
-    <string name="add_itinerary">Добавить</string>
+    <string name="add_itinerary">ДОБАВИТЬ</string>
     <string name="january">ЯНВ</string>
     <string name="february">ФЕВ</string>
     <string name="march">МАР</string>

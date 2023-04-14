@@ -7,7 +7,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.traindriver.ui.screen.adding_screen.AddingScreen
-import com.example.traindriver.ui.screen.main_screen.MainScreen
+import com.example.traindriver.ui.screen.main_screen.HomeScreen
 import com.example.traindriver.ui.screen.password_conf_screen.PasswordConfScreen
 import com.example.traindriver.ui.screen.setting_screen.SettingScreen
 import com.example.traindriver.ui.screen.signin_screen.SignInScreen
@@ -35,7 +35,7 @@ fun SetupNavGraph(
             SignInScreen(navController, activity, signInViewModel)
         }
         composable(Screen.Home.route) {
-            MainScreen(navController)
+            HomeScreen(navController)
         }
         composable(Screen.PasswordConfirmation.route) {
             PasswordConfScreen(navController, signInViewModel, activity)

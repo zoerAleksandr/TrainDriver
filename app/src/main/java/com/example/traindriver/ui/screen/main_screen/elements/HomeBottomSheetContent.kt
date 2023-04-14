@@ -2,41 +2,44 @@ package com.example.traindriver.ui.screen.main_screen.elements
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.Route
-import com.example.traindriver.ui.element_screen.HandleBottomSheet
 import com.example.traindriver.ui.screen.Screen
+import com.example.traindriver.ui.screen.signin_screen.elements.PrimarySpacer
 import com.example.traindriver.ui.util.SnackbarMessage.DATA_LOADING_ERROR
+import com.example.traindriver.ui.util.changeDpWithScroll
 import kotlinx.coroutines.launch
 
 @Composable
-fun BottomSheetContent(
+fun HomeBottomSheetContent(
     listRoute: ResultState<List<Route>>,
     snackbarHostState: SnackbarHostState,
-    navController: NavController
+    navController: NavController,
+    contentHeight: Dp,
+    offset: Float
 ) {
     val scope = rememberCoroutineScope()
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.88f),
+            .height(contentHeight),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        HandleBottomSheet()
-        LazyColumn(modifier = Modifier.padding(top = 32.dp)) {
+        val paddingTop = changeDpWithScroll(offset, 32, 0)
+        LazyColumn(
+            modifier = Modifier.padding(top = paddingTop)
+        ) {
             when (listRoute) {
                 is ResultState.Loading -> {
                     item {
@@ -52,14 +55,17 @@ fun BottomSheetContent(
                         item {
                             Text(
                                 text = stringResource(id = R.string.empty_route_list),
-                                color = MaterialTheme.colorScheme.onPrimary
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     } else {
-                        items(list) { route ->
+                        itemsIndexed(list) {index, route ->
                             ItemMainScreen(route = route) {
                                 navController
                                     .navigate(Screen.ViewingRoute.passId(route.id))
+                            }
+                            if (index == list.lastIndex){
+                                PrimarySpacer()
                             }
                         }
                     }
