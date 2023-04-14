@@ -2,6 +2,9 @@ package com.example.traindriver.ui.screen.viewing_route_screen
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,6 +19,8 @@ import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.ui.element_screen.CustomScrollableTabRow
 import com.example.traindriver.ui.element_screen.TopSnackbar
+import com.example.traindriver.ui.screen.Screen
+import com.example.traindriver.ui.screen.signin_screen.elements.SecondarySpacer
 import com.example.traindriver.ui.screen.viewing_route_screen.element.*
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
@@ -30,13 +35,13 @@ import com.google.accompanist.pager.rememberPagerState
 import java.text.SimpleDateFormat
 import java.util.*
 
+@OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @Composable
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 fun ViewingRouteScreen(
     navController: NavController,
     viewModel: ViewingRouteViewModel = viewModel()
 ) {
-//    val scaffoldState = rememberScaffoldState()
     val uid = navController.currentBackStackEntry?.arguments?.getString(ROUTE)
     OnLifecycleEvent { _, event ->
         when (event) {
@@ -49,36 +54,59 @@ fun ViewingRouteScreen(
         }
     }
 
-    val snackbarHostState = remember { SnackbarHostState()}
-    Scaffold(snackbarHost = {
-        SnackbarHost(hostState = snackbarHostState) { snackBarData ->
-            TopSnackbar(snackBarData)
-        }
-    }) {
-        TabScreen(navController, snackbarHostState, viewModel)
-    }
-}
+    val snackbarHostState = remember { SnackbarHostState() }
 
-@Composable
-@OptIn(ExperimentalPagerApi::class)
-fun TabScreen(
-    navController: NavController,
-    snackbarHostState: SnackbarHostState,
-    viewModel: ViewingRouteViewModel
-) {
     val pagerState = rememberPagerState(
         pageCount = 4,
         initialPage = 0
     )
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 38.dp)
-    ) {
-        Header(response = viewModel.routeState, snackbarHostState = snackbarHostState)
-        Tabs(pagerState)
-        TabContent(pagerState, navController, viewModel)
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { snackBarData ->
+                TopSnackbar(snackBarData)
+            }
+        },
+        topBar = {
+            TopAppBar(
+                title = {
+                    Header(response = viewModel.routeState, snackbarHostState = snackbarHostState)
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navController.navigateUp() }
+                    ) {
+                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Назад")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        navController.navigate(
+                            Screen.Adding.setId(
+                                uid ?: ""
+                            )
+                        )
+                    }) {
+                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Изменить")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.primary,
+                    actionIconContentColor = MaterialTheme.colorScheme.primary
+                ),
+                scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+            )
+        },
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            Tabs(pagerState)
+            TabContent(pagerState, navController, viewModel)
+        }
     }
 }
 
@@ -108,20 +136,22 @@ private fun DataHeader(route: Route) {
         SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(millis)
     } ?: ""
 
-    val routeNumberText = route.number ?: "0000"
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(start = 16.dp, end = 32.dp),
+        horizontalArrangement = Arrangement.Start
     ) {
+        route.number?.let { number ->
+            Text(
+                text = "№ $number",
+                style = Typography.titleLarge
+            )
+        }
+        SecondarySpacer()
         Text(
             text = dateStartWorkText,
-            style = Typography.titleMedium.copy(color = setTextColor(route.timeStartWork))
-        )
-        Text(
-            text = "№ $routeNumberText",
-            style = Typography.titleMedium.copy(color = setTextColor(route.number))
+            style = Typography.titleLarge
         )
     }
 }

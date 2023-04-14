@@ -14,5 +14,9 @@ sealed class Screen(val route: String) {
     object Profile: Screen(route = "profile_screen")
     object SearchRoute: Screen(route = "search_route_screen")
     object Setting: Screen(route = "setting_screen")
-    object Adding: Screen(route = "adding_screen")
+    object Adding: Screen(route = "adding_screen/{$ROUTE}"){
+        fun setId(id: String): String{
+            return this.route.replace(oldValue = "{$ROUTE}", newValue = id)
+        }
+    }
 }

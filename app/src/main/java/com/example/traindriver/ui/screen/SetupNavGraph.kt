@@ -42,7 +42,7 @@ fun SetupNavGraph(
         }
         composable(
             route = Screen.ViewingRoute.route,
-            arguments = listOf(navArgument(ROUTE){
+            arguments = listOf(navArgument(ROUTE) {
                 type = NavType.StringType
             })
         ) {
@@ -51,7 +51,12 @@ fun SetupNavGraph(
         composable(Screen.Setting.route) {
             SettingScreen()
         }
-        composable(Screen.Adding.route){
+        composable(
+            route = Screen.Adding.route,
+            arguments = listOf(navArgument(ROUTE) {
+                type = NavType.StringType
+            })
+        ) {
             AddingScreen(navController = navController)
         }
     }

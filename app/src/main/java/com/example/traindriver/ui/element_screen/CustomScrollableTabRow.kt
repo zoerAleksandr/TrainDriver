@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +20,6 @@ import com.example.traindriver.ui.theme.Typography
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.PagerState
 import kotlinx.coroutines.launch
-
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -40,8 +39,8 @@ fun CustomScrollableTabRow(
     }
     ScrollableTabRow(
         selectedTabIndex = selectedTabIndex,
-        contentColor = MaterialTheme.colors.primary,
-        backgroundColor = MaterialTheme.colors.background,
+        contentColor = MaterialTheme.colorScheme.primary,
+        containerColor = MaterialTheme.colorScheme.background,
         edgePadding = 0.dp,
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(

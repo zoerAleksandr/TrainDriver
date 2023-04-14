@@ -27,6 +27,7 @@ import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.ui.element_screen.LoadingElement
+import com.example.traindriver.ui.element_screen.TextBodyLarge
 import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
 import com.example.traindriver.ui.theme.ShapeBackground
@@ -45,13 +46,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 const val LINK_TO_SETTING = "LINK_TO_SETTING"
-
-operator fun Long?.plus(other: Long?): Long? =
-    if (this != null && other != null) {
-        this + other
-    } else {
-        null
-    }
 
 @Composable
 fun WorkTimeScreen(navController: NavController, routeResponse: RouteResponse, minTimeRest: Long) {
@@ -155,18 +149,16 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
                 SimpleDateFormat(TIME_FORMAT, Locale.getDefault()).format(millis)
             } ?: DEFAULT_TIME_TEXT
 
-            Text(
+            TextBodyLarge(
                 text = dateStartText,
-                style = Typography.bodyLarge,
                 color = if (isDeterminateStartTime) {
                     MaterialTheme.colorScheme.primary
                 } else {
                     MaterialTheme.colorScheme.onPrimary
                 }
             )
-            Text(
+            TextBodyLarge(
                 text = timeStartText,
-                style = Typography.bodyLarge,
                 color = if (isDeterminateStartTime) {
                     MaterialTheme.colorScheme.primary
                 } else {
@@ -198,18 +190,16 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
                 SimpleDateFormat(TIME_FORMAT, Locale.getDefault()).format(millis)
             } ?: DEFAULT_TIME_TEXT
 
-            Text(
+            TextBodyLarge(
                 text = dateEndText,
-                style = Typography.bodyLarge,
                 color = if (isDeterminateEndTime) {
                     MaterialTheme.colorScheme.primary
                 } else {
                     MaterialTheme.colorScheme.onPrimary
                 }
             )
-            Text(
+            TextBodyLarge(
                 text = timeEndText,
-                style = Typography.bodyLarge,
                 color = if (isDeterminateEndTime) {
                     MaterialTheme.colorScheme.primary
                 } else {
@@ -224,29 +214,27 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
                     start.linkTo(parent.start)
                     bottom.linkTo(parent.bottom)
                 }
-                .padding(start = 32.dp, bottom = 64.dp),
+                .padding(start = 32.dp, end  = 32.dp, bottom = 64.dp),
             horizontalAlignment = Alignment.Start) {
 
             minRest?.let { SimpleDateFormat("$DATE_FORMAT $TIME_FORMAT", Locale.getDefault()).format(it) }
                 ?.also {
-                    Text(
+                    TextBodyLarge(
                         text = stringResource(id = R.string.min_time_rest_text, it),
-                        style = Typography.bodyMedium
                     )
                 }
 
             completeRest?.let { SimpleDateFormat("$DATE_FORMAT $TIME_FORMAT", Locale.getDefault()).format(it) }
                 ?.also {
-                    Text(
+                    TextBodyLarge(
                         text = stringResource(id = R.string.complete_time_rest_text, it),
-                        style = Typography.bodyMedium
                     )
                 }
 
             ClickableText(
                 modifier = Modifier.padding(top = 12.dp),
                 text = link,
-                style = Typography.bodySmall
+                style = Typography.bodyMedium
                     .copy(fontStyle = FontStyle.Italic, color = MaterialTheme.colorScheme.onBackground)
             ) {
                 link.getStringAnnotations(LINK_TO_SETTING, it, it)
@@ -263,10 +251,10 @@ private fun DataScreen(route: Route, navController: NavController, minTimeRest: 
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
-                .padding(top = 32.dp)
+                .padding(top = 52.dp)
         ) {
             val millis = route.getWorkTime()
-            Text(text = millis.getTimeInStringFormat(), style = Typography.displayLarge)
+            Text(text = millis.getTimeInStringFormat(), style = Typography.displaySmall)
         }
     }
 }

@@ -11,7 +11,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Chip
 import androidx.compose.material3.*
 import androidx.compose.material3.AssistChip
 import androidx.compose.runtime.*
@@ -19,11 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -55,11 +52,9 @@ import com.example.traindriver.ui.screen.viewing_route_screen.element.startIndex
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.ShapeSurface
 import com.example.traindriver.ui.theme.Typography
-import com.example.traindriver.ui.util.ClickableTextTrainDriver
 import com.example.traindriver.ui.util.DateAndTimeFormat
 import com.example.traindriver.ui.util.DateAndTimeFormat.DEFAULT_DATE_TEXT
 import com.example.traindriver.ui.util.OnLifecycleEvent
-import com.example.traindriver.ui.util.Tags.LINK_TO_HOME
 import com.example.traindriver.ui.util.long_util.div
 import com.example.traindriver.ui.util.long_util.getTimeInStringFormat
 import com.example.traindriver.ui.util.long_util.minus
@@ -70,11 +65,14 @@ import java.util.*
 import java.util.Calendar.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.ExperimentalComposeUiApi
+import com.example.traindriver.ui.util.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavController) {
+
+    val uid = navController.currentBackStackEntry?.arguments?.getString(Constants.ROUTE)
 
     OnLifecycleEvent { _, event ->
         when (event) {

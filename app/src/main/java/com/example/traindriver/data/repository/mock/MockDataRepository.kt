@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.callbackFlow
 
 class MockDataRepository : DataRepository {
     private val one = Route(
-        number = 139,
+        number = 3856,
         timeStartWork = 1_675_789_800_000,
         timeEndWork = 1_675_876_200_000,
         stationList = mutableListOf(
@@ -168,7 +168,7 @@ class MockDataRepository : DataRepository {
     override fun getItineraryById(id: String): Flow<RouteResponse> =
         callbackFlow {
             trySend(ResultState.Loading())
-            delay(300)
+            delay(3000)
 //            trySend(ResultState.Failure(Throwable()))
             trySend(ResultState.Success(one))
             awaitClose { close() }
