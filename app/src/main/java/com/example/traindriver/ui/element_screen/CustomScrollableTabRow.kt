@@ -40,7 +40,6 @@ fun CustomScrollableTabRow(
     ScrollableTabRow(
         selectedTabIndex = selectedTabIndex,
         contentColor = MaterialTheme.colorScheme.primary,
-        containerColor = MaterialTheme.colorScheme.background,
         edgePadding = 0.dp,
         indicator = { tabPositions ->
             TabRowDefaults.Indicator(
@@ -62,7 +61,7 @@ fun CustomScrollableTabRow(
                 text = {
                     Text(
                         text = tab,
-                        style = Typography.titleLarge,
+                        style = Typography.titleMedium,
                         onTextLayout = { textLayoutResult ->
                             tabWidths[tabIndex] =
                                 with(density) { textLayoutResult.size.width.toDp() }

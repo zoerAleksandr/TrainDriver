@@ -1,24 +1,25 @@
 package com.example.traindriver.ui.screen.adding_screen
 
 import android.annotation.SuppressLint
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.material3.AssistChip
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -65,8 +66,20 @@ import java.util.*
 import java.util.Calendar.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.AnnotatedString
 import com.example.traindriver.ui.util.Constants
+import com.maxkeppeker.sheets.core.models.base.Header
+import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
+import com.maxkeppeler.sheets.calendar.CalendarDialog
+import com.maxkeppeler.sheets.calendar.models.CalendarConfig
+import com.maxkeppeler.sheets.calendar.models.CalendarSelection
+import com.maxkeppeler.sheets.clock.ClockDialog
+import com.maxkeppeler.sheets.clock.models.ClockConfig
+import com.maxkeppeler.sheets.clock.models.ClockSelection
+import java.time.*
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -92,59 +105,112 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
 
     val timeResult = dateEnd - dateStart
 
-    val startCalendar = getInstance()
+    val calendarStartState = rememberUseCaseState()
+    val timeStartState = rememberUseCaseState()
 
-    dateStart?.let {
-        startCalendar.timeInMillis = it
+    val dateStartLocalDateTime: LocalDateTime? =
+        dateStart?.let {
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault())
+        }
+
+    var localDateStart by remember {
+        mutableStateOf<LocalDate?>(null)
+    }
+    var localTimeStart by remember {
+        mutableStateOf<LocalTime?>(null)
+    }
+    var dateAndTimeStartWork by remember {
+        mutableStateOf<LocalDateTime?>(null)
     }
 
-    val startTimePicker = TimePickerDialog(
-        LocalContext.current, { _, h: Int, m: Int ->
-            startCalendar[HOUR_OF_DAY] = h
-            startCalendar[MINUTE] = m
-            startCalendar[SECOND] = 0
-            startCalendar[MILLISECOND] = 0
-            viewModel.createEvent(WorkTimeEvent.EnteredStartTime(startCalendar.timeInMillis))
+    CalendarDialog(
+        state = calendarStartState,
+        selection = CalendarSelection.Date(
+            selectedDate = dateStartLocalDateTime?.toLocalDate()
+        ) { date ->
+            localDateStart = LocalDate.of(date.year, date.month, date.dayOfMonth)
+            timeStartState.show()
+        },
+        header = Header.Default(
+            title = "Начало приемки"
+        ),
+        config = CalendarConfig(
+            monthSelection = true,
+            yearSelection = true,
+        ),
+    )
+
+    ClockDialog(
+        state = timeStartState,
+        selection = ClockSelection.HoursMinutes { hours, minutes ->
+            localTimeStart = LocalTime.of(hours, minutes)
+            dateAndTimeStartWork = LocalDateTime.of(localDateStart, localTimeStart)
+            val dateInLong = dateAndTimeStartWork!!.toLong()
+            viewModel.createEvent(WorkTimeEvent.EnteredStartTime(dateInLong))
             viewModel.createEvent(WorkTimeEvent.FocusChange(WorkTimeType.START))
-        }, startCalendar[HOUR_OF_DAY], startCalendar[MINUTE], true
+        },
+        header = Header.Default(
+            title = "Начало работы"
+        ),
+        config = ClockConfig(
+            is24HourFormat = true,
+        )
     )
 
-    val startDatePicker = DatePickerDialog(
-        LocalContext.current,
-        { _, y: Int, m: Int, d: Int ->
-            startCalendar[YEAR] = y
-            startCalendar[MONTH] = m
-            startCalendar[DAY_OF_MONTH] = d
-            startTimePicker.show()
-        }, startCalendar[YEAR], startCalendar[MONTH], startCalendar[DAY_OF_MONTH]
-    )
+    val calendarEndState = rememberUseCaseState()
+    val timeEndState = rememberUseCaseState()
 
-    val endCalendar = getInstance()
-    dateEnd?.let {
-        endCalendar.timeInMillis = it
+    val dateEndLocalDateTime: LocalDateTime? =
+        dateStart?.let {
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault())
+        }
+
+    var localDateEnd by remember {
+        mutableStateOf<LocalDate?>(null)
+    }
+    var localTimeEnd by remember {
+        mutableStateOf<LocalTime?>(null)
+    }
+    var dateAndTimeEndWork by remember {
+        mutableStateOf<LocalDateTime?>(null)
     }
 
-    val endTimePicker = TimePickerDialog(
-        LocalContext.current, { _, h: Int, m: Int ->
-            endCalendar[HOUR_OF_DAY] = h
-            endCalendar[MINUTE] = m
-            endCalendar[SECOND] = 0
-            endCalendar[MILLISECOND] = 0
-            viewModel.createEvent(WorkTimeEvent.EnteredEndTime(endCalendar.timeInMillis))
-            viewModel.createEvent(WorkTimeEvent.FocusChange(WorkTimeType.END))
-        }, endCalendar[HOUR_OF_DAY], endCalendar[MINUTE], true
+    CalendarDialog(
+        state = calendarEndState,
+        selection = CalendarSelection.Date(
+            selectedDate = dateEndLocalDateTime?.toLocalDate()
+        ) { date ->
+            localDateEnd = LocalDate.of(date.year, date.month, date.dayOfMonth)
+            timeEndState.show()
+        },
+        header = Header.Default(
+            title = "Окончание работы"
+        ),
+        config = CalendarConfig(
+            monthSelection = true,
+            yearSelection = true,
+        ),
     )
 
-    val endDatePicker = DatePickerDialog(
-        LocalContext.current,
-        { _, y: Int, m: Int, d: Int ->
-            endCalendar[YEAR] = y
-            endCalendar[MONTH] = m
-            endCalendar[DAY_OF_MONTH] = d
-            endTimePicker.show()
-        }, endCalendar[YEAR], endCalendar[MONTH], endCalendar[DAY_OF_MONTH]
+    ClockDialog(
+        state = timeEndState,
+        selection = ClockSelection.HoursMinutes { hours, minutes ->
+            localTimeEnd = LocalTime.of(hours, minutes)
+            dateAndTimeEndWork = LocalDateTime.of(localDateEnd, localTimeEnd)
+            val dateInLong = dateAndTimeEndWork!!.toLong()
+            viewModel.createEvent(WorkTimeEvent.EnteredEndTime(dateInLong))
+            viewModel.createEvent(WorkTimeEvent.FocusChange(WorkTimeType.END))
+        },
+        header = Header.Default(
+            title = "Окончание работы"
+        ),
+        config = ClockConfig(
+            is24HourFormat = true,
+        )
     )
+
     val scope = rememberCoroutineScope()
+
     var confirmStateChange by remember {
         mutableStateOf(false)
     }
@@ -161,9 +227,14 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
     /**
      * Изменятся параметр bottomSheetState в зависимости от положения шторки
      */
-//    val screenHeight = LocalConfiguration.current.screenHeightDp
-//    val offset = scaffoldState.bottomSheetState.offset.value
-//    confirmStateChange = offset > screenHeight.times(1.4)
+    val screenHeight = LocalConfiguration.current.screenHeightDp
+    val offset = try {
+        scaffoldState.bottomSheetState.requireOffset()
+    } catch (e: Throwable) {
+        200f
+    }
+
+    confirmStateChange = offset > screenHeight.times(1.4)
 
     var currentBottomSheet: BottomSheetScreen? by remember {
         mutableStateOf(null)
@@ -194,11 +265,48 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
         }
     ) {
         Scaffold(
-//            topBar = { AddingAppBar(navController = navController, enabled = timeValue.formValid) }
-        ) {
+            topBar = {
+                TopAppBar(
+                    title = {},
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            navController.navigateUp()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Назад"
+                            )
+                        }
+                    },
+                    actions = {
+                        ClickableText(
+                            text = AnnotatedString(text = "Сохранить"),
+                            style = Typography.titleMedium,
+                            onClick = {
+                                /*TODO*/
+                            }
+                        )
+                        IconButton(
+                            onClick = {
+                                /*TODO*/
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "Меню"
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        navigationIconContentColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+            }
+        ) { paddingValues ->
             ConstraintLayout(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(paddingValues)
                     .verticalScroll(rememberScrollState())
             ) {
                 val (times, list, resultTime, restSwitch, info) = createRefs()
@@ -216,15 +324,14 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                 ) {
                     if (!timeValue.formValid) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_error_24),
-                            tint = Color.Red,
-                            contentDescription = null
+                            imageVector = Icons.Default.ErrorOutline,
+                            tint = MaterialTheme.colorScheme.error,
+                            contentDescription = "Ошибка"
                         )
                         Text(
                             modifier = Modifier.padding(start = 8.dp),
                             text = timeValue.errorMessage,
-                            style = Typography.bodySmall.copy(color = Color.Red),
-                            color = Color.Red
+                            style = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.error),
                         )
                     } else {
                         Text(
@@ -247,7 +354,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                     Column(
                         modifier = Modifier
                             .clickable {
-                                startDatePicker.show()
+                                calendarStartState.show()
                             }
                             .border(
                                 width = 0.5.dp,
@@ -294,7 +401,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                             )
                             .padding(18.dp)
                             .clickable {
-                                endDatePicker.show()
+                                calendarEndState.show()
                             },
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -345,7 +452,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                             color = if (viewModel.restState) {
                                 MaterialTheme.colorScheme.primary
                             } else {
-                                MaterialTheme.colorScheme.onPrimary
+                                MaterialTheme.colorScheme.secondary
                             }
                         )
                     )
@@ -359,14 +466,22 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                 }
 
                 val halfRest = timeResult / 2
-                val minRest: Long? = halfRest?.let { half ->
-                    if (half > viewModel.minTimeRest) {
-                        dateEnd + half
-                    } else {
-                        dateEnd + viewModel.minTimeRest
+                val minRest: Long? = if (viewModel.timeEditState.value.formValid) {
+                    halfRest?.let { half ->
+                        if (half > viewModel.minTimeRest) {
+                            dateEnd + half
+                        } else {
+                            dateEnd + viewModel.minTimeRest
+                        }
                     }
+                } else {
+                    null
                 }
-                val completeRest: Long? = dateEnd + timeResult
+                val completeRest: Long? = if (viewModel.timeEditState.value.formValid) {
+                    dateEnd + timeResult
+                } else {
+                    null
+                }
                 val minTimeRestText = (viewModel.minTimeRest / 3_600_000f).let { time ->
                     if (time % 1 == 0f) {
                         time.toInt()
@@ -500,8 +615,9 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
                     NumberEditItem(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 12.dp, horizontal = 24.dp),
-                        hint = "№ маршрута",
+                            .padding(vertical = 12.dp, horizontal = 16.dp),
+                        prefix = "№",
+                        placeholder = "маршрута",
                         value = number,
                         onValueChange = { viewModel.setNumber(it) }
                     )
@@ -545,32 +661,28 @@ fun SheetLayout(sheet: BottomSheetScreen, closeSheet: () -> Unit, viewModel: Add
 fun NumberEditItem(
     modifier: Modifier = Modifier,
     value: TextFieldValue,
-    hint: String? = null,
+    placeholder: String? = null,
+    prefix: String? = null,
     onValueChange: (TextFieldValue) -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
-    BasicTextField(
+    OutlinedTextField(
         modifier = modifier,
         value = value,
         onValueChange = onValueChange,
-        textStyle = Typography.titleMedium.copy(color = MaterialTheme.colorScheme.primary),
-        decorationBox = { innerTextField ->
-            Box(
-                contentAlignment = Alignment.CenterStart
-            ) {
-                if (value.text.isEmpty()) {
-                    hint?.let {
-                        Text(
-                            text = it,
-                            style = Typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
-                }
-                innerTextField()
+        placeholder = {
+            placeholder?.let {
+                Text(text = it)
             }
         },
+        prefix = {
+            prefix?.let {
+                Text(text = prefix)
+            }
+        },
+        textStyle = Typography.titleMedium.copy(color = MaterialTheme.colorScheme.primary),
+
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number,
             imeAction = ImeAction.Done
@@ -584,7 +696,6 @@ fun NumberEditItem(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemAddLoco(
     openSheet: (BottomSheetScreen) -> Unit,
@@ -592,7 +703,7 @@ fun ItemAddLoco(
     deleteLoco: (Locomotive) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    Card {
+    Card(modifier = Modifier.padding(horizontal = 16.dp)) {
         ConstraintLayout(
             modifier = Modifier
                 .clickable {
@@ -660,85 +771,19 @@ fun ItemAddLoco(
                         }
                     )
                 }
-                Image(
-                    modifier = Modifier
-                        .size(20.dp),
-//                        .constrainAs(icon) {
-//                            end.linkTo(parent.end)
-//                            bottom.linkTo(parent.bottom)
-//                            top.linkTo(parent.top)
-//                        },
-                    painter = painterResource(id = R.drawable.ic_forward_24),
-                    contentDescription = null,
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)
-                )
             }
+            Image(
+                modifier = Modifier
+                    .size(20.dp)
+                    .constrainAs(icon) {
+                        end.linkTo(parent.end)
+                        bottom.linkTo(parent.bottom)
+                        top.linkTo(parent.top)
+                    },
+                painter = painterResource(id = R.drawable.ic_forward_24),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)
+            )
         }
     }
 }
-//
-//    @ExperimentalMaterial3Api
-//    @Composable
-//    private fun AddingAppBar(navController: NavController, enabled: Boolean) {
-//        TopAppBar(
-//            modifier = Modifier
-//                .fillMaxHeight(0.12f),
-//        ) {
-//            ConstraintLayout(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(start = 12.dp, end = 16.dp, bottom = 6.dp)
-//            ) {
-//                val (icon, button) = createRefs()
-//                IconButton(
-//                    modifier = Modifier
-//                        .size(dimensionResource(id = R.dimen.min_size_view))
-//                        .constrainAs(icon) {
-//                            start.linkTo(parent.start)
-//                            bottom.linkTo(parent.bottom)
-//                        },
-//                    onClick = {
-//                        navController.navigateUp()
-//                    }
-//                ) {
-//                    Image(
-//                        modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size)),
-//                        painter = painterResource(id = R.drawable.ic_back_24),
-//                        contentDescription = null,
-//                        colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
-//                    )
-//                }
-//
-//                val linkText = buildAnnotatedString {
-//                    val text = "Сохранить"
-//                    val start = 0
-//                    val end = text.length
-//                    append(text)
-//
-//                    addStringAnnotation(
-//                        tag = LINK_TO_HOME,
-//                        annotation = Screen.Home.route,
-//                        start = start,
-//                        end = end
-//                    )
-//                }
-//
-//                ClickableTextTrainDriver(
-//                    modifier = Modifier.constrainAs(button) {
-//                        end.linkTo(parent.end)
-//                        top.linkTo(icon.top)
-//                        bottom.linkTo(icon.bottom)
-//                    },
-//                    enabled = enabled,
-//                    text = linkText,
-//                    style = Typography.button
-//                ) {
-//                    // TODO SAVE TO REPOSITORY
-//                    linkText.getStringAnnotations(LINK_TO_HOME, it, it)
-//                        .firstOrNull()?.let { stringAnnotation ->
-//                            navController.navigate(stringAnnotation.item)
-//                        }
-//                }
-//            }
-//        }
-//    }
