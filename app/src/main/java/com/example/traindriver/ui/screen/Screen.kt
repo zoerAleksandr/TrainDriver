@@ -1,6 +1,8 @@
 package com.example.traindriver.ui.screen
 
-import com.example.traindriver.ui.util.Constants.ROUTE
+
+const val ROUTE = "route"
+const val LOCO_ID = "loco_id"
 
 sealed class Screen(val route: String) {
     object SignIn: Screen(route = "sign_in_screen")
@@ -17,6 +19,11 @@ sealed class Screen(val route: String) {
     object Adding: Screen(route = "adding_screen/{$ROUTE}"){
         fun setId(id: String): String{
             return this.route.replace(oldValue = "{$ROUTE}", newValue = id)
+        }
+    }
+    object AddingLoco: Screen(route = "adding_loco_screen/{$LOCO_ID}"){
+        fun setId(id: String): String{
+            return this.route.replace(oldValue = "{$LOCO_ID}", newValue = id)
         }
     }
 }

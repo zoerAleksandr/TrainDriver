@@ -1,5 +1,6 @@
 package com.example.traindriver.ui.screen.adding_screen.custom_tab
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
@@ -8,8 +9,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -57,15 +58,15 @@ private fun MyTabItem(
 ) {
     val tabTextColor: Color by animateColorAsState(
         targetValue = if (isSelected) {
-            MaterialTheme.colors.onPrimary
+            MaterialTheme.colorScheme.onPrimary
         } else {
-            MaterialTheme.colors.primaryVariant
+            MaterialTheme.colorScheme.secondary
         },
         animationSpec = tween(durationMillis = 100),
     )
     Text(
         modifier = Modifier
-            .clip(ShapeBackground.small)
+            .clip(ShapeBackground.extraSmall)
             .clickable {
                 onClick()
             }
@@ -89,6 +90,7 @@ fun CustomTab(
     tabWidth: Dp,
     pagerState: PagerState,
 ) {
+    Log.d("ZZZ", "tabWidth = $tabWidth")
     val indicatorOffset: Dp by animateDpAsState(
         targetValue = tabWidth * selectedItemIndex,
         animationSpec = tween(durationMillis = 300, easing = LinearEasing),
@@ -99,16 +101,16 @@ fun CustomTab(
             .clip(ShapeBackground.small)
             .border(
                 width = 1.dp,
-                color = MaterialTheme.colors.secondary,
-                shape = ShapeBackground.small
+                color = MaterialTheme.colorScheme.outline,
+                shape = ShapeBackground.extraSmall
             )
-            .background(MaterialTheme.colors.background)
+            .background(MaterialTheme.colorScheme.background)
             .height(intrinsicSize = IntrinsicSize.Min),
     ) {
         MyTabIndicator(
             indicatorWidth = tabWidth,
             indicatorOffset = indicatorOffset,
-            indicatorColor = MaterialTheme.colors.primary,
+            indicatorColor = MaterialTheme.colorScheme.primary,
         )
         Row(
             horizontalArrangement = Arrangement.Center,

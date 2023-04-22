@@ -7,6 +7,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -32,11 +33,9 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.Visibility
 import com.example.traindriver.R
 import com.example.traindriver.domain.entity.Calculation
-import com.example.traindriver.ui.element_screen.OutlinedTextFieldCustom
 import com.example.traindriver.ui.screen.adding_screen.state_holder.*
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.Typography
-import com.example.traindriver.ui.util.ClickableTextTrainDriver
 import com.example.traindriver.ui.util.double_util.*
 import com.example.traindriver.ui.util.float_util.dp
 import kotlinx.coroutines.launch
@@ -124,9 +123,9 @@ fun DieselSectionItem(
                     top.linkTo(errorMessage.bottom)
                     start.linkTo(parent.start)
                 }
-                .padding(top = 8.dp, start = 16.dp),
+                .padding(top = 16.dp, start = 16.dp),
             text = "${index + 1} секция",
-            style = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onPrimary)
+            style = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.secondary)
         )
 
         Row(modifier = Modifier
@@ -142,27 +141,27 @@ fun DieselSectionItem(
                     openSheet.invoke(BottomSheetLoco.RefuelSheet)
                 }
             }
-            .padding(top = 8.dp, end = 16.dp),
+            .padding(top = 16.dp, end = 16.dp),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically)
         {
-            Image(
-                modifier = Modifier
-                    .size(dimensionResource(id = R.dimen.icon_size))
-                    .padding(end = 8.dp),
-                painter = painterResource(id = R.drawable.refuel_icon),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary)
-            )
             refuel?.let {
                 Text(
                     text = maskInLiter(it.str()) ?: "",
                     style = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
                 )
             }
+            Image(
+                modifier = Modifier
+                    .size(dimensionResource(id = R.dimen.icon_size))
+                    .padding(8.dp),
+                painter = painterResource(id = R.drawable.refuel_icon),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.tertiary)
+            )
         }
 
-        OutlinedTextFieldCustom(
+        OutlinedTextField(
             modifier = Modifier
                 .constrainAs(energyAccepted) {
                     start.linkTo(parent.start, 16.dp)
@@ -184,7 +183,11 @@ fun DieselSectionItem(
                     )
                 )
             },
-            placeholderText = "Принято",
+            placeholder = {
+                Text(text = "Принято", color = MaterialTheme.colorScheme.secondary)
+            },
+            textStyle = Typography.bodyLarge
+                .copy(color = MaterialTheme.colorScheme.primary),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number, imeAction = ImeAction.Next
             ),
@@ -195,7 +198,7 @@ fun DieselSectionItem(
             })
         )
 
-        OutlinedTextFieldCustom(
+        OutlinedTextField(
             modifier = Modifier
                 .constrainAs(energyDelivery) {
                     start.linkTo(energyAccepted.end, 8.dp)
@@ -217,7 +220,11 @@ fun DieselSectionItem(
                     )
                 )
             },
-            placeholderText = "Сдано",
+            placeholder = {
+                Text(text = "Сдано", color = MaterialTheme.colorScheme.secondary)
+            },
+            textStyle = Typography.bodyLarge
+                .copy(color = MaterialTheme.colorScheme.primary),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number, imeAction = ImeAction.Done
             ),
@@ -252,7 +259,7 @@ fun DieselSectionItem(
                 val acceptedInKiloText = rounding(acceptedInKilo, 2)?.str()
                 Text(
                     text = maskInKilo(acceptedInKiloText) ?: "",
-                    style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onPrimary)
+                    style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.secondary)
                 )
             }
             Box(
@@ -264,7 +271,7 @@ fun DieselSectionItem(
                 val deliveryInKiloText = rounding(deliveryInKilo, 2)?.str()
                 Text(
                     text = maskInKilo(deliveryInKiloText) ?: "",
-                    style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onPrimary)
+                    style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.secondary)
                 )
             }
         }
@@ -280,7 +287,9 @@ fun DieselSectionItem(
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            ClickableTextTrainDriver(text = AnnotatedString("k = ${coefficient ?: 0.0}"),
+            ClickableText(
+                text = AnnotatedString("k = ${coefficient ?: 0.0}"),
+                style = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.tertiary),
                 onClick = {
                     coefficientState.value = coefficientState.value.copy(
                         first = index, second = coefficient?.str() ?: ""
@@ -295,7 +304,7 @@ fun DieselSectionItem(
                 val resultInKiloText = maskInKilo(rounding(resultInKilo, 2)?.str())
                 Text(
                     text = "${resultInLiterText ?: ""} / ${resultInKiloText ?: ""}",
-                    style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onPrimary)
+                    style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.secondary)
                 )
             }
         }
@@ -380,11 +389,11 @@ fun ElectricSectionItem(
                 top.linkTo(errorMessage.bottom)
                 start.linkTo(parent.start)
             }
-            .padding(start = 16.dp, top = 8.dp),
+            .padding(top = 16.dp, start = 16.dp),
             text = "${index + 1} секция",
-            style = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onPrimary))
+            style = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.secondary))
 
-        OutlinedTextFieldCustom(
+        OutlinedTextField(
             modifier = Modifier
                 .constrainAs(energyAccepted) {
                     start.linkTo(parent.start)
@@ -406,7 +415,11 @@ fun ElectricSectionItem(
                     )
                 )
             },
-            placeholderText = "Принято",
+            textStyle = Typography.bodyLarge
+                .copy(color = MaterialTheme.colorScheme.primary),
+            placeholder = {
+                Text(text = "Принято", color = MaterialTheme.colorScheme.secondary)
+            },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number, imeAction = ImeAction.Next
             ),
@@ -417,7 +430,7 @@ fun ElectricSectionItem(
             })
         )
 
-        OutlinedTextFieldCustom(
+        OutlinedTextField(
             modifier = Modifier
                 .constrainAs(energyDelivery) {
                     end.linkTo(parent.end)
@@ -427,6 +440,8 @@ fun ElectricSectionItem(
                 }
                 .padding(start = 8.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
             value = deliveryText,
+            textStyle = Typography.bodyLarge
+                .copy(color = MaterialTheme.colorScheme.primary),
             onValueChange = {
                 viewModel.createEventElectricSection(
                     ElectricSectionEvent.EnteredDelivery(
@@ -439,7 +454,9 @@ fun ElectricSectionItem(
                     )
                 )
             },
-            placeholderText = "Сдано",
+            placeholder = {
+                Text(text = "Сдано", color = MaterialTheme.colorScheme.secondary)
+            },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number, imeAction = ImeAction.Done
             ),
@@ -464,7 +481,7 @@ fun ElectricSectionItem(
                         .padding(horizontal = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    OutlinedTextFieldCustom(
+                    OutlinedTextField(
                         modifier = Modifier
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                             .weight(0.5f),
@@ -477,11 +494,22 @@ fun ElectricSectionItem(
                             )
                             viewModel.createEventElectricSection(
                                 ElectricSectionEvent.FocusChange(
-                                    index = index, fieldName = ElectricSectionType.RECOVERY_ACCEPTED
+                                    index = index,
+                                    fieldName = ElectricSectionType.RECOVERY_ACCEPTED
                                 )
                             )
-                        }, placeholderText = "Принято", keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number, imeAction = ImeAction.Next
+                        },
+                        textStyle = Typography.bodyLarge
+                            .copy(color = MaterialTheme.colorScheme.primary),
+                        placeholder = {
+                            Text(
+                                text = "Принято",
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Next
                         ), keyboardActions = KeyboardActions(onNext = {
                             scope.launch {
                                 focusManager.moveFocus(FocusDirection.Right)
@@ -489,7 +517,7 @@ fun ElectricSectionItem(
                         })
                     )
 
-                    OutlinedTextFieldCustom(
+                    OutlinedTextField(
                         modifier = Modifier
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                             .weight(0.5f),
@@ -502,12 +530,21 @@ fun ElectricSectionItem(
                             )
                             viewModel.createEventElectricSection(
                                 ElectricSectionEvent.FocusChange(
-                                    index = index, fieldName = ElectricSectionType.RECOVERY_DELIVERY
+                                    index = index,
+                                    fieldName = ElectricSectionType.RECOVERY_DELIVERY
                                 )
                             )
-                        }, placeholderText = "Сдано", keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number, imeAction = ImeAction.Done
-                        ), keyboardActions = KeyboardActions(onDone = {
+                        },
+                        textStyle = Typography.bodyLarge
+                            .copy(color = MaterialTheme.colorScheme.primary),
+                        placeholder = {
+                            Text(text = "Сдано", color = MaterialTheme.colorScheme.secondary)
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(onDone = {
                             scope.launch {
                                 focusManager.clearFocus()
                             }
@@ -572,11 +609,12 @@ fun ElectricSectionItem(
                 } else {
                     painterResource(R.drawable.down_arrow)
                 },
-                tint = MaterialTheme.colorScheme.onPrimary,
+                tint = MaterialTheme.colorScheme.secondary,
                 contentDescription = null
             )
         }
     }
+
 }
 
 const val ANIMATION_DURATION = 300
@@ -593,7 +631,7 @@ fun DraggableItem(
     content: @Composable ColumnScope.() -> Unit
 ) {
     val cardCollapsedBackgroundColor = MaterialTheme.colorScheme.background
-    val cardExpandedBackgroundColor = MaterialTheme.colorScheme.background
+    val cardExpandedBackgroundColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
 
     val transitionState = remember {
         MutableTransitionState(isRevealed).apply {
@@ -612,9 +650,6 @@ fun DraggableItem(
         transitionSpec = { tween(durationMillis = ANIMATION_DURATION) },
         targetValueByState = { if (isRevealed) -CARD_OFFSET.dp() else 0f },
     )
-    val cardElevation by transition.animateDp(label = "cardElevation",
-        transitionSpec = { tween(durationMillis = ANIMATION_DURATION) },
-        targetValueByState = { if (isRevealed) 30.dp else 0.dp })
 
     Card(modifier = modifier
         .fillMaxWidth()
@@ -629,11 +664,13 @@ fun DraggableItem(
             }
         },
         border = BorderStroke(
-            width = 1.dp, color = MaterialTheme.colorScheme.onPrimary
+            width = 1.dp, color = MaterialTheme.colorScheme.outline
         ),
-        shape = ShapeBackground.small,
-        elevation = CardDefaults.cardElevation(cardElevation),
-        content =  content
+        shape = ShapeBackground.extraSmall,
+        colors =  CardDefaults.cardColors(
+            containerColor = backgroundColor
+        ),
+        content = content
     )
 }
 

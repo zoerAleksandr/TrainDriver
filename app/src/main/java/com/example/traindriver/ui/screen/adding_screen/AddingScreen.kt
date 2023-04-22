@@ -1,8 +1,6 @@
 package com.example.traindriver.ui.screen.adding_screen
 
 import android.annotation.SuppressLint
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
@@ -44,14 +42,12 @@ import com.example.traindriver.domain.entity.Locomotive
 import com.example.traindriver.ui.element_screen.HorizontalDividerTrainDriver
 import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.*
-import com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.adding_loco.AddingLocoScreen
 import com.example.traindriver.ui.screen.adding_screen.state_holder.WorkTimeEvent
 import com.example.traindriver.ui.screen.adding_screen.state_holder.WorkTimeType
 import com.example.traindriver.ui.screen.viewing_route_screen.element.LINK_TO_SETTING
 import com.example.traindriver.ui.screen.viewing_route_screen.element.setTextColor
 import com.example.traindriver.ui.screen.viewing_route_screen.element.startIndexLastWord
 import com.example.traindriver.ui.theme.ShapeBackground
-import com.example.traindriver.ui.theme.ShapeSurface
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.DateAndTimeFormat
 import com.example.traindriver.ui.util.DateAndTimeFormat.DEFAULT_DATE_TEXT
@@ -66,9 +62,7 @@ import java.util.*
 import java.util.Calendar.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.AnnotatedString
-import com.example.traindriver.ui.util.Constants
 import com.maxkeppeker.sheets.core.models.base.Header
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
@@ -79,14 +73,14 @@ import com.maxkeppeler.sheets.clock.models.ClockConfig
 import com.maxkeppeler.sheets.clock.models.ClockSelection
 import java.time.*
 
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavController) {
-
-    val uid = navController.currentBackStackEntry?.arguments?.getString(Constants.ROUTE)
-
+fun AddingScreen(
+    navController: NavController,
+    uid: String? = null,
+    viewModel: AddingViewModel = viewModel()
+) {
     OnLifecycleEvent { _, event ->
         when (event) {
             Lifecycle.Event.ON_RESUME -> {
@@ -132,7 +126,7 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
             timeStartState.show()
         },
         header = Header.Default(
-            title = "Начало приемки"
+            title = "Начало работы"
         ),
         config = CalendarConfig(
             monthSelection = true,
@@ -208,450 +202,381 @@ fun AddingScreen(viewModel: AddingViewModel = viewModel(), navController: NavCon
             is24HourFormat = true,
         )
     )
-
-    val scope = rememberCoroutineScope()
-
-    var confirmStateChange by remember {
-        mutableStateOf(false)
-    }
-
-    val scaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = SheetState(
-            skipPartiallyExpanded = false,
-            confirmValueChange = {
-                confirmStateChange
-            }
-        ),
-    )
-
-    /**
-     * Изменятся параметр bottomSheetState в зависимости от положения шторки
-     */
-    val screenHeight = LocalConfiguration.current.screenHeightDp
-    val offset = try {
-        scaffoldState.bottomSheetState.requireOffset()
-    } catch (e: Throwable) {
-        200f
-    }
-
-    confirmStateChange = offset > screenHeight.times(1.4)
-
-    var currentBottomSheet: BottomSheetScreen? by remember {
-        mutableStateOf(null)
-    }
-    if (!scaffoldState.bottomSheetState.isVisible) currentBottomSheet = null
-
-    val closeSheet: () -> Unit = {
-        scope.launch {
-            scaffoldState.bottomSheetState.hide()
-        }
-    }
-
-    val openSheet: (BottomSheetScreen) -> Unit = { screen ->
-        scope.launch {
-            currentBottomSheet = screen
-            scaffoldState.bottomSheetState.expand()
-        }
-    }
-
-    BottomSheetScaffold(
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = 0.dp,
-        sheetShape = ShapeSurface.medium,
-        sheetContent = {
-            currentBottomSheet?.let { sheet ->
-                SheetLayout(sheet, closeSheet, viewModel)
-            }
-        }
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {},
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            navController.navigateUp()
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "Назад"
-                            )
-                        }
-                    },
-                    actions = {
-                        ClickableText(
-                            text = AnnotatedString(text = "Сохранить"),
-                            style = Typography.titleMedium,
-                            onClick = {
-                                /*TODO*/
-                            }
-                        )
-                        IconButton(
-                            onClick = {
-                                /*TODO*/
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = "Меню"
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        navigationIconContentColor = MaterialTheme.colorScheme.primary
+    Scaffold(
+        topBar = {
+            MediumTopAppBar(
+                title = {
+                    Text(
+                        text = "Маршрут",
+                        style = Typography.headlineSmall
+                            .copy(color = MaterialTheme.colorScheme.primary)
                     )
-                )
-            }
-        ) { paddingValues ->
-            ConstraintLayout(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                val (times, list, resultTime, restSwitch, info) = createRefs()
-
-                Row(
-                    modifier = Modifier
-                        .padding(24.dp)
-                        .constrainAs(resultTime) {
-                            top.linkTo(parent.top)
-                            bottom.linkTo(times.top)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (!timeValue.formValid) {
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.navigateUp()
+                    }) {
                         Icon(
-                            imageVector = Icons.Default.ErrorOutline,
-                            tint = MaterialTheme.colorScheme.error,
-                            contentDescription = "Ошибка"
-                        )
-                        Text(
-                            modifier = Modifier.padding(start = 8.dp),
-                            text = timeValue.errorMessage,
-                            style = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.error),
-                        )
-                    } else {
-                        Text(
-                            text = timeResult.getTimeInStringFormat(),
-                            style = Typography.headlineLarge.copy(color = MaterialTheme.colorScheme.primary)
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Назад"
                         )
                     }
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .constrainAs(times) {
-                            top.linkTo(resultTime.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        },
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .clickable {
-                                calendarStartState.show()
-                            }
-                            .border(
-                                width = 0.5.dp,
-                                shape = ShapeBackground.small,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                            .padding(18.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                },
+                actions = {
+                    ClickableText(
+                        text = AnnotatedString(text = "Сохранить"),
+                        style = Typography.titleMedium,
+                        onClick = {
+                            /*TODO*/
+                        }
+                    )
+                    IconButton(
+                        onClick = {
+                            /*TODO*/
+                        }
                     ) {
-                        val dateStartText = dateStart?.let { millis ->
-                            SimpleDateFormat(
-                                DateAndTimeFormat.DATE_FORMAT,
-                                Locale.getDefault()
-                            ).format(
-                                millis
-                            )
-                        } ?: DEFAULT_DATE_TEXT
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "Меню"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    navigationIconContentColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
+    ) { paddingValues ->
+        ConstraintLayout(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+        ) {
+            val (times, list, resultTime, restSwitch, info) = createRefs()
 
+            Row(
+                modifier = Modifier
+                    .padding(24.dp)
+                    .constrainAs(resultTime) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(times.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (!timeValue.formValid) {
+                    Icon(
+                        imageVector = Icons.Default.ErrorOutline,
+                        tint = MaterialTheme.colorScheme.error,
+                        contentDescription = "Ошибка"
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 8.dp),
+                        text = timeValue.errorMessage,
+                        style = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.error),
+                    )
+                } else {
+                    Text(
+                        text = timeResult.getTimeInStringFormat(),
+                        style = Typography.headlineLarge.copy(color = MaterialTheme.colorScheme.primary)
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .constrainAs(times) {
+                        top.linkTo(resultTime.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    },
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Column(
+                    modifier = Modifier
+                        .clickable {
+                            calendarStartState.show()
+                        }
+                        .border(
+                            width = 0.5.dp,
+                            shape = ShapeBackground.small,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        .padding(18.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    val dateStartText = dateStart?.let { millis ->
+                        SimpleDateFormat(
+                            DateAndTimeFormat.DATE_FORMAT,
+                            Locale.getDefault()
+                        ).format(
+                            millis
+                        )
+                    } ?: DEFAULT_DATE_TEXT
+
+                    Text(
+                        text = dateStartText,
+                        style = Typography.bodyLarge,
+                        color = setTextColor(dateStart)
+                    )
+                    dateStart?.let { millis ->
+                        val time =
+                            SimpleDateFormat(
+                                DateAndTimeFormat.TIME_FORMAT,
+                                Locale.getDefault()
+                            ).format(millis)
                         Text(
-                            text = dateStartText,
+                            text = time,
                             style = Typography.bodyLarge,
                             color = setTextColor(dateStart)
                         )
-                        dateStart?.let { millis ->
-                            val time =
-                                SimpleDateFormat(
-                                    DateAndTimeFormat.TIME_FORMAT,
-                                    Locale.getDefault()
-                                ).format(millis)
-                            Text(
-                                text = time,
-                                style = Typography.bodyLarge,
-                                color = setTextColor(dateStart)
-                            )
-                        }
                     }
+                }
 
-                    Column(
-                        modifier = Modifier
-                            .border(
-                                width = 0.5.dp,
-                                shape = ShapeBackground.small,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                            .padding(18.dp)
-                            .clickable {
-                                calendarEndState.show()
-                            },
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        val dateStartText = dateEnd?.let { millis ->
+                Column(
+                    modifier = Modifier
+                        .border(
+                            width = 0.5.dp,
+                            shape = ShapeBackground.small,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        .padding(18.dp)
+                        .clickable {
+                            calendarEndState.show()
+                        },
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    val dateStartText = dateEnd?.let { millis ->
+                        SimpleDateFormat(
+                            DateAndTimeFormat.DATE_FORMAT,
+                            Locale.getDefault()
+                        ).format(
+                            millis
+                        )
+                    } ?: DEFAULT_DATE_TEXT
+
+                    Text(
+                        text = dateStartText,
+                        style = Typography.bodyLarge,
+                        color = setTextColor(dateEnd)
+                    )
+                    dateEnd?.let { millis ->
+                        val time =
                             SimpleDateFormat(
-                                DateAndTimeFormat.DATE_FORMAT,
+                                DateAndTimeFormat.TIME_FORMAT,
                                 Locale.getDefault()
-                            ).format(
-                                millis
-                            )
-                        } ?: DEFAULT_DATE_TEXT
-
+                            ).format(millis)
                         Text(
-                            text = dateStartText,
+                            text = time,
                             style = Typography.bodyLarge,
                             color = setTextColor(dateEnd)
                         )
-                        dateEnd?.let { millis ->
-                            val time =
-                                SimpleDateFormat(
-                                    DateAndTimeFormat.TIME_FORMAT,
-                                    Locale.getDefault()
-                                ).format(millis)
-                            Text(
-                                text = time,
-                                style = Typography.bodyLarge,
-                                color = setTextColor(dateEnd)
-                            )
-                        }
                     }
                 }
+            }
 
-                Row(
-                    modifier = Modifier
-                        .padding(end = 16.dp, top = 24.dp)
-                        .constrainAs(restSwitch) {
-                            top.linkTo(times.bottom)
-                            end.linkTo(parent.end)
-                        },
-                    verticalAlignment = Alignment.CenterVertically
-                )
-                {
-                    Text(
-                        modifier = Modifier
-                            .padding(end = 8.dp),
-                        text = "Отдых в ПО",
-                        style = Typography.bodyMedium.copy(
-                            color = if (viewModel.restState) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.secondary
-                            }
-                        )
-                    )
-
-                    Switch(
-                        checked = viewModel.restState,
-                        onCheckedChange = {
-                            viewModel.setRest(it)
-                        },
-                    )
-                }
-
-                val halfRest = timeResult / 2
-                val minRest: Long? = if (viewModel.timeEditState.value.formValid) {
-                    halfRest?.let { half ->
-                        if (half > viewModel.minTimeRest) {
-                            dateEnd + half
-                        } else {
-                            dateEnd + viewModel.minTimeRest
-                        }
-                    }
-                } else {
-                    null
-                }
-                val completeRest: Long? = if (viewModel.timeEditState.value.formValid) {
-                    dateEnd + timeResult
-                } else {
-                    null
-                }
-                val minTimeRestText = (viewModel.minTimeRest / 3_600_000f).let { time ->
-                    if (time % 1 == 0f) {
-                        time.toInt()
-                    } else {
-                        time
-                    }
-                }
-
-                val link = buildAnnotatedString {
-                    val text =
-                        stringResource(id = R.string.info_text_min_time_rest, minTimeRestText)
-
-                    val endIndex = text.length - 1
-                    val startIndex = startIndexLastWord(text)
-
-                    append(text)
-                    addStyle(
-                        style = SpanStyle(
-                            color = MaterialTheme.colorScheme.tertiary,
-                            textDecoration = TextDecoration.Underline
-                        ), start = startIndex, end = endIndex
-                    )
-
-                    addStringAnnotation(
-                        tag = LINK_TO_SETTING,
-                        annotation = Screen.Setting.route,
-                        start = startIndex,
-                        end = endIndex
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .constrainAs(info) {
-                            start.linkTo(parent.start)
-                            top.linkTo(restSwitch.bottom)
-                        },
-                ) {
-                    AnimatedVisibility(
-                        visible = viewModel.restState,
-                        enter = slideInHorizontally(animationSpec = tween(durationMillis = 300))
-                                + fadeIn(animationSpec = tween(durationMillis = 300)),
-                        exit = slideOutHorizontally(animationSpec = tween(durationMillis = 300))
-                                + fadeOut(animationSpec = tween(durationMillis = 150))
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f)),
-                            horizontalAlignment = Alignment.Start
-                        ) {
-                            Icon(
-                                modifier = Modifier.padding(
-                                    top = 16.dp,
-                                    start = 16.dp,
-                                    bottom = 8.dp
-                                ),
-                                painter = painterResource(id = R.drawable.ic_info_24),
-                                tint = MaterialTheme.colorScheme.tertiary,
-                                contentDescription = null
-                            )
-                            minRest?.let {
-                                SimpleDateFormat(
-                                    "${DateAndTimeFormat.DATE_FORMAT} ${DateAndTimeFormat.TIME_FORMAT}",
-                                    Locale.getDefault()
-                                ).format(
-                                    it
-                                )
-                            }
-                                ?.also {
-                                    Text(
-                                        modifier = Modifier.padding(horizontal = 16.dp),
-                                        text = stringResource(id = R.string.min_time_rest_text, it),
-                                        style = Typography.bodyMedium,
-                                        textAlign = TextAlign.End
-                                    )
-                                }
-
-                            completeRest?.let {
-                                SimpleDateFormat(
-                                    "${DateAndTimeFormat.DATE_FORMAT} ${DateAndTimeFormat.TIME_FORMAT}",
-                                    Locale.getDefault()
-                                ).format(
-                                    it
-                                )
-                            }
-                                ?.also {
-                                    Text(
-                                        modifier = Modifier.padding(horizontal = 16.dp),
-                                        text = stringResource(
-                                            id = R.string.complete_time_rest_text,
-                                            it
-                                        ),
-                                        style = Typography.bodyMedium,
-                                        textAlign = TextAlign.End
-                                    )
-                                }
-
-                            ClickableText(
-                                modifier = Modifier.padding(
-                                    start = 16.dp,
-                                    bottom = 16.dp,
-                                    end = 16.dp,
-                                    top = 12.dp
-                                ),
-                                text = link,
-                                style = Typography.bodySmall
-                                    .copy(
-                                        fontStyle = FontStyle.Italic,
-                                        color = MaterialTheme.colorScheme.onBackground
-                                    )
-                            ) {
-                                link.getStringAnnotations(LINK_TO_SETTING, it, it)
-                                    .firstOrNull()?.let { stringAnnotation ->
-                                        navController.navigate(stringAnnotation.item)
-                                    }
-                            }
-                        }
-                    }
-                }
-
-                Column(modifier = Modifier
-                    .constrainAs(list) {
-                        start.linkTo(parent.start)
+            Row(
+                modifier = Modifier
+                    .padding(end = 16.dp, top = 24.dp)
+                    .constrainAs(restSwitch) {
+                        top.linkTo(times.bottom)
                         end.linkTo(parent.end)
-                        top.linkTo(info.bottom)
-                        width = Dimension.fillToConstraints
+                    },
+                verticalAlignment = Alignment.CenterVertically
+            )
+            {
+                Text(
+                    modifier = Modifier
+                        .padding(end = 8.dp),
+                    text = "Отдых в ПО",
+                    style = Typography.bodyMedium.copy(
+                        color = if (viewModel.restState) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.secondary
+                        }
+                    )
+                )
+
+                Switch(
+                    checked = viewModel.restState,
+                    onCheckedChange = {
+                        viewModel.setRest(it)
+                    },
+                )
+            }
+
+            val halfRest = timeResult / 2
+            val minRest: Long? = if (viewModel.timeEditState.value.formValid) {
+                halfRest?.let { half ->
+                    if (half > viewModel.minTimeRest) {
+                        dateEnd + half
+                    } else {
+                        dateEnd + viewModel.minTimeRest
                     }
-                    .padding(vertical = 32.dp)) {
-                    NumberEditItem(
+                }
+            } else {
+                null
+            }
+            val completeRest: Long? = if (viewModel.timeEditState.value.formValid) {
+                dateEnd + timeResult
+            } else {
+                null
+            }
+            val minTimeRestText = (viewModel.minTimeRest / 3_600_000f).let { time ->
+                if (time % 1 == 0f) {
+                    time.toInt()
+                } else {
+                    time
+                }
+            }
+
+            val link = buildAnnotatedString {
+                val text =
+                    stringResource(id = R.string.info_text_min_time_rest, minTimeRestText)
+
+                val endIndex = text.length - 1
+                val startIndex = startIndexLastWord(text)
+
+                append(text)
+                addStyle(
+                    style = SpanStyle(
+                        color = MaterialTheme.colorScheme.tertiary,
+                        textDecoration = TextDecoration.Underline
+                    ), start = startIndex, end = endIndex
+                )
+
+                addStringAnnotation(
+                    tag = LINK_TO_SETTING,
+                    annotation = Screen.Setting.route,
+                    start = startIndex,
+                    end = endIndex
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .constrainAs(info) {
+                        start.linkTo(parent.start)
+                        top.linkTo(restSwitch.bottom)
+                    },
+            ) {
+                AnimatedVisibility(
+                    visible = viewModel.restState,
+                    enter = slideInHorizontally(animationSpec = tween(durationMillis = 300))
+                            + fadeIn(animationSpec = tween(durationMillis = 300)),
+                    exit = slideOutHorizontally(animationSpec = tween(durationMillis = 300))
+                            + fadeOut(animationSpec = tween(durationMillis = 150))
+                ) {
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 12.dp, horizontal = 16.dp),
-                        prefix = "№",
-                        placeholder = "маршрута",
-                        value = number,
-                        onValueChange = { viewModel.setNumber(it) }
-                    )
-                    HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
-                    Spacer(modifier = Modifier.height(24.dp))
-                    ItemAddLoco(
-                        openSheet,
-                        viewModel.stateLocoList,
-                        viewModel::deleteLocomotiveInRoute
-                    )
-                    HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
+                            .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f)),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Icon(
+                            modifier = Modifier.padding(
+                                top = 16.dp,
+                                start = 16.dp,
+                                bottom = 8.dp
+                            ),
+                            painter = painterResource(id = R.drawable.ic_info_24),
+                            tint = MaterialTheme.colorScheme.tertiary,
+                            contentDescription = null
+                        )
+                        minRest?.let {
+                            SimpleDateFormat(
+                                "${DateAndTimeFormat.DATE_FORMAT} ${DateAndTimeFormat.TIME_FORMAT}",
+                                Locale.getDefault()
+                            ).format(
+                                it
+                            )
+                        }
+                            ?.also {
+                                Text(
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    text = stringResource(id = R.string.min_time_rest_text, it),
+                                    style = Typography.bodyMedium,
+                                    textAlign = TextAlign.End
+                                )
+                            }
+
+                        completeRest?.let {
+                            SimpleDateFormat(
+                                "${DateAndTimeFormat.DATE_FORMAT} ${DateAndTimeFormat.TIME_FORMAT}",
+                                Locale.getDefault()
+                            ).format(
+                                it
+                            )
+                        }
+                            ?.also {
+                                Text(
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    text = stringResource(
+                                        id = R.string.complete_time_rest_text,
+                                        it
+                                    ),
+                                    style = Typography.bodyMedium,
+                                    textAlign = TextAlign.End
+                                )
+                            }
+
+                        ClickableText(
+                            modifier = Modifier.padding(
+                                start = 16.dp,
+                                bottom = 16.dp,
+                                end = 16.dp,
+                                top = 12.dp
+                            ),
+                            text = link,
+                            style = Typography.bodySmall
+                                .copy(
+                                    fontStyle = FontStyle.Italic,
+                                    color = MaterialTheme.colorScheme.onBackground
+                                )
+                        ) {
+                            link.getStringAnnotations(LINK_TO_SETTING, it, it)
+                                .firstOrNull()?.let { stringAnnotation ->
+                                    navController.navigate(stringAnnotation.item)
+                                }
+                        }
+                    }
+                }
+            }
+
+            Column(modifier = Modifier
+                .constrainAs(list) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(info.bottom)
+                    width = Dimension.fillToConstraints
+                }
+                .padding(vertical = 32.dp)) {
+                NumberEditItem(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 12.dp, horizontal = 16.dp),
+                    prefix = "№",
+                    placeholder = "маршрута",
+                    value = number,
+                    onValueChange = { viewModel.setNumber(it) }
+                )
+                HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
+                ItemAddLoco(
+                    navController,
+                    viewModel.stateLocoList,
+                    viewModel::deleteLocomotiveInRoute
+                )
+                HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
 //                    ItemAddLoco(openSheet, viewModel.stateLocoList.value)
 //                    HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
 //                    ItemAddLoco(openSheet, viewModel.stateLocoList.value)
-                }
             }
-        }
-    }
-}
-
-@Composable
-fun SheetLayout(sheet: BottomSheetScreen, closeSheet: () -> Unit, viewModel: AddingViewModel) {
-    BottomSheetWithCloseDialog(
-        modifier = Modifier.fillMaxHeight(0.96f), closeSheet = closeSheet
-    ) {
-        when (sheet) {
-            is BottomSheetScreen.AddingLoco -> AddingLocoScreen(
-                timeState = viewModel.timeEditState,
-                locomotive = sheet.locomotive,
-                closeAddingLocoScreen = closeSheet,
-                stateLocomotiveList = viewModel.stateLocoList
-            )
-            is BottomSheetScreen.AddingTrain -> AddingTrainScreen()
-            is BottomSheetScreen.AddingPass -> AddingPassScreen()
         }
     }
 }
@@ -673,12 +598,12 @@ fun NumberEditItem(
         onValueChange = onValueChange,
         placeholder = {
             placeholder?.let {
-                Text(text = it)
+                Text(text = it, color = MaterialTheme.colorScheme.secondary)
             }
         },
         prefix = {
             prefix?.let {
-                Text(text = prefix)
+                Text(text = prefix, color = MaterialTheme.colorScheme.secondary)
             }
         },
         textStyle = Typography.titleMedium.copy(color = MaterialTheme.colorScheme.primary),
@@ -698,7 +623,7 @@ fun NumberEditItem(
 
 @Composable
 fun ItemAddLoco(
-    openSheet: (BottomSheetScreen) -> Unit,
+    navController: NavController,
     locoList: List<Locomotive>,
     deleteLoco: (Locomotive) -> Unit
 ) {
@@ -708,9 +633,7 @@ fun ItemAddLoco(
             modifier = Modifier
                 .clickable {
                     scope.launch {
-                        val locoScreen = BottomSheetScreen.AddingLoco
-                        locoScreen.locomotive = null
-                        openSheet.invoke(locoScreen)
+                        navController.navigate(Screen.AddingLoco.route)
                     }
                 }
                 .padding(vertical = 16.dp, horizontal = 24.dp)
@@ -740,23 +663,25 @@ fun ItemAddLoco(
                         width = Dimension.fillToConstraints
                     },
             ) {
-                locoList.forEach { locomotive ->
+                locoList.forEachIndexed { index, locomotive ->
                     AssistChip(
                         modifier = Modifier
                             .padding(end = 16.dp),
                         onClick = {
                             scope.launch {
-                                val locoScreen = BottomSheetScreen.AddingLoco
-                                locoScreen.locomotive = locomotive
-                                openSheet.invoke(locoScreen)
+                                navController.navigate(Screen.AddingLoco.setId(locomotive.id))
                             }
                         },
                         shape = ShapeBackground.small,
                         label = {
-                            Text(
-                                text = "${locomotive.series} №${locomotive.number}",
-                                style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onPrimary)
-                            )
+                            if (locomotive.series.isNullOrBlank() && locomotive.number.isNullOrBlank()) {
+                                Text(text = "Локомотив №${index + 1}")
+                            } else {
+                                Text(
+                                    text = "${locomotive.series} №${locomotive.number}",
+                                    style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.primary)
+                                )
+                            }
                         },
                         trailingIcon = {
                             Icon(

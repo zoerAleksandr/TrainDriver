@@ -1,7 +1,6 @@
 package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.adding_loco
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.tween
@@ -12,11 +11,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -24,7 +27,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -41,12 +43,9 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.Lifecycle
 import com.example.traindriver.R
-import com.example.traindriver.domain.entity.Locomotive
 import com.example.traindriver.domain.entity.SectionDiesel
 import com.example.traindriver.domain.entity.SectionElectric
-import com.example.traindriver.ui.element_screen.OutlinedTextFieldCustom
 import com.example.traindriver.ui.screen.adding_screen.*
-import com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.BottomSheetWithCloseDialog
 import com.example.traindriver.ui.screen.adding_screen.custom_tab.CustomTab
 import com.example.traindriver.ui.screen.adding_screen.state_holder.*
 import com.example.traindriver.ui.screen.signin_screen.elements.SecondarySpacer
@@ -54,10 +53,8 @@ import com.example.traindriver.ui.screen.viewing_route_screen.element.BottomShad
 import com.example.traindriver.ui.screen.viewing_route_screen.element.isScrollInInitialState
 import com.example.traindriver.ui.screen.viewing_route_screen.element.setTextColor
 import com.example.traindriver.ui.theme.ShapeBackground
-import com.example.traindriver.ui.theme.ShapeSurface
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
-import com.example.traindriver.ui.util.ClickableTextTrainDriver
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.DateAndTimeFormat
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -66,39 +63,50 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.traindriver.domain.entity.Calculation
 import com.example.traindriver.ui.util.OnLifecycleEvent
 import com.example.traindriver.ui.util.double_util.plus
 import com.example.traindriver.ui.util.double_util.str
+import com.maxkeppeker.sheets.core.models.base.Header
+import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
+import com.maxkeppeler.sheets.calendar.CalendarDialog
+import com.maxkeppeler.sheets.calendar.models.CalendarConfig
+import com.maxkeppeler.sheets.calendar.models.CalendarSelection
+import com.maxkeppeler.sheets.clock.ClockDialog
+import com.maxkeppeler.sheets.clock.models.ClockConfig
+import com.maxkeppeler.sheets.clock.models.ClockSelection
 import java.time.*
 
 @OptIn(
     ExperimentalPagerApi::class,
-    ExperimentalMaterialApi::class,
-    ExperimentalFoundationApi::class
+    ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class
 )
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AddingLocoScreen(
-    locomotive: Locomotive? = null,
-    timeState: State<WorkTimeEditState>,
-    viewModel: AddingLocoViewModel = viewModel(),
-    stateLocomotiveList: SnapshotStateList<Locomotive>,
-    closeAddingLocoScreen: () -> Unit
+    navController: NavController,
+    locoId: String? = null,
+    addingRouteViewModel: AddingViewModel,
 ) {
+    val addingLocoViewModel: AddingLocoViewModel = viewModel()
     OnLifecycleEvent { _, event ->
         when (event) {
             Lifecycle.Event.ON_CREATE -> {
-                viewModel.setData(
-                    locomotive = locomotive,
-                    timeState = timeState
+                addingLocoViewModel.setData(
+                    locomotive = addingRouteViewModel.stateLocoList.find {
+                        it.id == locoId
+                    },
+                    timeState = addingRouteViewModel.timeEditState
                 )
             }
             else -> {}
         }
     }
 
-    val bottomSheetState =
-        rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+    var openBottomSheet by rememberSaveable { mutableStateOf(false) }
+    val bottomSheetState = rememberModalBottomSheetState()
+
     val coefficientState: MutableState<Pair<Int, String>> = remember {
         mutableStateOf(Pair(0, "0.0"))
     }
@@ -111,31 +119,30 @@ fun AddingLocoScreen(
         mutableStateOf(null)
     }
 
-    if (!bottomSheetState.isVisible) currentSheet = null
-
     val openSheet: (BottomSheetLoco) -> Unit = { screen ->
         scope.launch {
             currentSheet = screen
-            bottomSheetState.show()
+            openBottomSheet = !openBottomSheet
         }
     }
 
     val closeSheet: () -> Unit = {
         scope.launch {
             bottomSheetState.hide()
+            openBottomSheet = false
         }
     }
 
-    ModalBottomSheetLayout(
-        sheetState = bottomSheetState,
-        sheetShape = ShapeSurface.medium,
-        sheetBackgroundColor = MaterialTheme.colors.background,
-        sheetContent = {
-            Spacer(modifier = Modifier.height(1.dp))
+    if (openBottomSheet) {
+        ModalBottomSheet(
+            sheetState = bottomSheetState,
+            onDismissRequest = closeSheet,
+            containerColor = MaterialTheme.colorScheme.background
+        ) {
             currentSheet?.let { sheet ->
                 SheetLayoutLoco(
                     sheet = sheet,
-                    viewModel = viewModel,
+                    viewModel = addingLocoViewModel,
                     closeSheet = closeSheet,
                     bottomSheetState = bottomSheetState,
                     coefficientState = coefficientState,
@@ -143,105 +150,103 @@ fun AddingLocoScreen(
                 )
             }
         }
-    ) {
-        val scrollState = rememberLazyListState()
+    }
 
+    Scaffold(
+        modifier = Modifier
+            .fillMaxWidth(),
+        topBar = {
+            MediumTopAppBar(
+                title = {
+                    Text(
+                        text = "Локомотив",
+                        style = Typography.headlineSmall
+                            .copy(color = MaterialTheme.colorScheme.primary)
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.navigateUp()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Назад"
+                        )
+                    }
+                },
+                actions = {
+
+                    ClickableText(
+                        text = AnnotatedString(text = "Сохранить"),
+                        style = Typography.titleMedium,
+                        onClick = {
+                            addingLocoViewModel.addLocomotiveInRoute(
+                                addingRouteViewModel.stateLocoList
+                            )
+                            navController.navigateUp()
+                        }
+                    )
+                    var dropDownExpanded by remember { mutableStateOf(false) }
+
+                    IconButton(
+                        onClick = {
+                            dropDownExpanded = true
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "Меню"
+                        )
+                        DropdownMenu(
+                            expanded = dropDownExpanded,
+                            onDismissRequest = { dropDownExpanded = false },
+                            offset = DpOffset(x = 4.dp, y = 8.dp)
+                        ) {
+                            DropdownMenuItem(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                onClick = {
+                                    addingLocoViewModel.clearField()
+                                    dropDownExpanded = false
+                                },
+                                text = {
+                                    Text(
+                                        text = "Очистить",
+                                        style = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary)
+                                    )
+                                }
+                            )
+                        }
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    navigationIconContentColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
+
+    ) { paddingValues ->
+        val scrollState = rememberLazyListState()
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 56.dp),
+                .padding(paddingValues),
         ) {
-            val (saveButton, menu, title, divider, topShadow, lazyColumn) = createRefs()
-            val number = viewModel.numberLocoState
-            val series = viewModel.seriesLocoState
+            val (topShadow, lazyColumn) = createRefs()
+            val number = addingLocoViewModel.numberLocoState
+            val series = addingLocoViewModel.seriesLocoState
             val pagerState = rememberPagerState(pageCount = 2, initialPage = 0)
 
-            LaunchedEffect(viewModel.pagerState) {
+            LaunchedEffect(addingLocoViewModel.pagerState) {
                 scope.launch {
-                    pagerState.scrollToPage(viewModel.pagerState)
+                    pagerState.scrollToPage(addingLocoViewModel.pagerState)
                 }
             }
-
-            var dropDownExpanded by remember { mutableStateOf(false) }
-
-            IconButton(
-                modifier = Modifier
-                    .constrainAs(menu) {
-                        top.linkTo(parent.top)
-                        end.linkTo(parent.end)
-                    }
-                    .padding(end = 4.dp),
-                onClick = {
-                    dropDownExpanded = true
-                })
-            {
-                Icon(
-                    painter = painterResource(id = R.drawable.more_menu),
-                    contentDescription = null,
-                    tint = MaterialTheme.colors.primary
-                )
-                DropdownMenu(
-                    expanded = dropDownExpanded,
-                    onDismissRequest = { dropDownExpanded = false },
-                    offset = DpOffset(x = 4.dp, y = 8.dp)
-                ) {
-                    DropdownMenuItem(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        onClick = {
-                            viewModel.clearField()
-                            dropDownExpanded = false
-                        }
-                    ) {
-                        Text(
-                            text = "Очистить",
-                            style = Typography.bodyLarge.copy(color = MaterialTheme.colors.primary)
-                        )
-                    }
-                }
-            }
-
-            Text(
-                modifier = Modifier
-                    .constrainAs(saveButton) {
-                        top.linkTo(menu.top)
-                        bottom.linkTo(menu.bottom)
-                        end.linkTo(menu.start)
-                    }
-                    .clickable {
-                        closeAddingLocoScreen.invoke()
-                        viewModel.addLocomotiveInRoute(stateLocomotiveList)
-                    },
-                text = "Сохранить",
-                style = Typography.labelLarge.copy(color = MaterialTheme.colors.secondaryVariant)
-            )
-
-            Text(
-                modifier = Modifier
-                    .constrainAs(title) {
-                        top.linkTo(saveButton.bottom)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-                    .padding(top = 12.dp),
-                text = "Локомотив",
-                style = Typography.titleLarge.copy(color = MaterialTheme.colors.primary)
-            )
-
-            Divider(modifier = Modifier
-                .constrainAs(divider) {
-                    top.linkTo(title.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    width = Dimension.fillToConstraints
-                }
-                .padding(top = 12.dp)
-            )
 
             AnimatedVisibility(
                 modifier = Modifier
                     .zIndex(1f)
                     .constrainAs(topShadow) {
-                        top.linkTo(divider.bottom)
+                        top.linkTo(parent.top)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                         width = Dimension.fillToConstraints
@@ -256,7 +261,7 @@ fun AddingLocoScreen(
             LazyColumn(
                 modifier = Modifier
                     .constrainAs(lazyColumn) {
-                        top.linkTo(divider.bottom)
+                        top.linkTo(parent.top)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                         width = Dimension.fillToConstraints
@@ -270,16 +275,20 @@ fun AddingLocoScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 16.dp)
+                            .padding(top = 24.dp)
                     ) {
-                        OutlinedTextFieldCustom(
+                        OutlinedTextField(
                             modifier = Modifier
                                 .padding(end = 8.dp)
                                 .weight(1f),
                             value = series,
-                            labelText = "Серия",
+                            textStyle = Typography.bodyLarge
+                                .copy(color = MaterialTheme.colorScheme.primary),
+                            placeholder = {
+                                Text(text = "Серия", color = MaterialTheme.colorScheme.secondary)
+                            },
                             onValueChange = {
-                                viewModel.setSeriesLoco(it)
+                                addingLocoViewModel.setSeriesLoco(it)
                             },
                             keyboardOptions = KeyboardOptions(
                                 imeAction = ImeAction.Next
@@ -290,16 +299,24 @@ fun AddingLocoScreen(
                                         focusManager.moveFocus(FocusDirection.Right)
                                     }
                                 }
-                            )
+                            ),
+                            singleLine = true
                         )
-                        OutlinedTextFieldCustom(
+                        OutlinedTextField(
                             modifier = Modifier
                                 .padding(start = 8.dp)
                                 .weight(1f),
                             value = number,
-                            labelText = "Номер",
+                            textStyle = Typography.bodyLarge
+                                .copy(color = MaterialTheme.colorScheme.primary),
+                            placeholder = {
+                                Text(
+                                    text = "Номер",
+                                    color = MaterialTheme.colorScheme.secondary
+                                )
+                            },
                             onValueChange = {
-                                viewModel.setNumberLoco(it)
+                                addingLocoViewModel.setNumberLoco(it)
                             },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
@@ -311,100 +328,153 @@ fun AddingLocoScreen(
                                         focusManager.clearFocus()
                                     }
                                 }
-                            )
+                            ),
+                            singleLine = true
                         )
                     }
                 }
                 item {
-                    val configuration = LocalConfiguration.current
-                    val screenWidth = configuration.screenWidthDp.dp
+                    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
                     CustomTab(
                         modifier = Modifier
+                            .fillMaxWidth()
                             .padding(top = 12.dp),
                         items = listOf("Тепловоз", "Электровоз"),
-                        tabWidth = (screenWidth - 32.dp) / 2,
+                        tabWidth = (screenWidth - 48.dp) / 2,
                         selectedItemIndex = pagerState.currentPage,
                         pagerState = pagerState,
                     )
                 }
                 item {
-                    val stateAccepted = viewModel.acceptedTimeState.value
+                    val stateAccepted = addingLocoViewModel.acceptedTimeState.value
                     val startAcceptedTime = stateAccepted.startAccepted.time
                     val endAcceptedTime = stateAccepted.endAccepted.time
 
-                    val startAcceptedCalendar = Calendar.getInstance()
-                    startAcceptedTime?.let {
-                        startAcceptedCalendar.timeInMillis = it
+                    val calendarStartAcceptedState = rememberUseCaseState()
+                    val timeStartAcceptedState = rememberUseCaseState()
+
+                    val dateStartAcceptedLocalDateTime: LocalDateTime? =
+                        startAcceptedTime?.let {
+                            LocalDateTime.ofInstant(
+                                Instant.ofEpochMilli(it),
+                                ZoneId.systemDefault()
+                            )
+                        }
+
+                    var localDateAcceptedStart by remember {
+                        mutableStateOf<LocalDate?>(null)
+                    }
+                    var localTimeAcceptedStart by remember {
+                        mutableStateOf<LocalTime?>(null)
+                    }
+                    var dateAndTimeAcceptedStartWork by remember {
+                        mutableStateOf<LocalDateTime?>(null)
                     }
 
-                    val endAcceptedCalendar = Calendar.getInstance()
-                    endAcceptedTime?.let {
-                        endAcceptedCalendar.timeInMillis = it
+                    CalendarDialog(
+                        state = calendarStartAcceptedState,
+                        selection = CalendarSelection.Date(
+                            selectedDate = dateStartAcceptedLocalDateTime?.toLocalDate()
+                        ) { date ->
+                            localDateAcceptedStart =
+                                LocalDate.of(date.year, date.month, date.dayOfMonth)
+                            timeStartAcceptedState.show()
+                        },
+                        header = Header.Default(
+                            title = "Начало приемки"
+                        ),
+                        config = CalendarConfig(
+                            monthSelection = true,
+                            yearSelection = true,
+                        ),
+                    )
+
+                    ClockDialog(
+                        state = timeStartAcceptedState,
+                        selection = ClockSelection.HoursMinutes { hours, minutes ->
+                            localTimeAcceptedStart = LocalTime.of(hours, minutes)
+                            dateAndTimeAcceptedStartWork =
+                                LocalDateTime.of(localDateAcceptedStart, localTimeAcceptedStart)
+                            val dateInLong = dateAndTimeAcceptedStartWork!!.toLong()
+                            addingLocoViewModel.createEventAccepted(
+                                AcceptedEvent.EnteredStartAccepted(dateInLong)
+                            )
+                            addingLocoViewModel.createEventAccepted(
+                                AcceptedEvent.FocusChange(
+                                    AcceptedType.START
+                                )
+                            )
+                        },
+                        header = Header.Default(
+                            title = "Начало работы"
+                        ),
+                        config = ClockConfig(
+                            is24HourFormat = true,
+                        )
+                    )
+
+                    val calendarEndAcceptedState = rememberUseCaseState()
+                    val timeEndAcceptedState = rememberUseCaseState()
+
+                    val dateEndAcceptedLocalDateTime: LocalDateTime? =
+                        endAcceptedTime?.let {
+                            LocalDateTime.ofInstant(
+                                Instant.ofEpochMilli(it),
+                                ZoneId.systemDefault()
+                            )
+                        }
+
+                    var localDateAcceptedEnd by remember {
+                        mutableStateOf<LocalDate?>(null)
+                    }
+                    var localTimeAcceptedEnd by remember {
+                        mutableStateOf<LocalTime?>(null)
+                    }
+                    var dateAndTimeAcceptedEndWork by remember {
+                        mutableStateOf<LocalDateTime?>(null)
                     }
 
-                    val startAcceptedTimePicker = TimePickerDialog(
-                        LocalContext.current,
-                        { _, h: Int, m: Int ->
-                            startAcceptedCalendar[Calendar.HOUR_OF_DAY] = h
-                            startAcceptedCalendar[Calendar.MINUTE] = m
-                            startAcceptedCalendar[Calendar.SECOND] = 0
-                            startAcceptedCalendar[Calendar.MILLISECOND] = 0
-                            viewModel.createEventAccepted(
-                                AcceptedEvent.EnteredStartAccepted(
-                                    startAcceptedCalendar.timeInMillis
+                    CalendarDialog(
+                        state = calendarEndAcceptedState,
+                        selection = CalendarSelection.Date(
+                            selectedDate = dateEndAcceptedLocalDateTime?.toLocalDate()
+                        ) { date ->
+                            localDateAcceptedEnd =
+                                LocalDate.of(date.year, date.month, date.dayOfMonth)
+                            timeEndAcceptedState.show()
+                        },
+                        header = Header.Default(
+                            title = "Окончание приемки"
+                        ),
+                        config = CalendarConfig(
+                            monthSelection = true,
+                            yearSelection = true,
+                        ),
+                    )
+
+                    ClockDialog(
+                        state = timeEndAcceptedState,
+                        selection = ClockSelection.HoursMinutes { hours, minutes ->
+                            localTimeAcceptedEnd = LocalTime.of(hours, minutes)
+                            dateAndTimeAcceptedEndWork =
+                                LocalDateTime.of(localDateAcceptedEnd, localTimeAcceptedEnd)
+                            val dateInLong = dateAndTimeAcceptedEndWork!!.toLong()
+                            addingLocoViewModel.createEventAccepted(
+                                AcceptedEvent.EnteredEndAccepted(dateInLong)
+                            )
+                            addingLocoViewModel.createEventAccepted(
+                                AcceptedEvent.FocusChange(
+                                    AcceptedType.END
                                 )
                             )
-                            viewModel.createEventAccepted(AcceptedEvent.FocusChange(AcceptedType.START))
                         },
-                        startAcceptedCalendar[Calendar.HOUR_OF_DAY],
-                        startAcceptedCalendar[Calendar.MINUTE],
-                        true
-                    )
-
-                    val startAcceptedDatePicker = DatePickerDialog(
-                        LocalContext.current,
-                        { _, y: Int, m: Int, d: Int ->
-                            startAcceptedCalendar[Calendar.YEAR] = y
-                            startAcceptedCalendar[Calendar.MONTH] = m
-                            startAcceptedCalendar[Calendar.DAY_OF_MONTH] = d
-                            startAcceptedTimePicker.show()
-                        },
-                        startAcceptedCalendar[Calendar.YEAR],
-                        startAcceptedCalendar[Calendar.MONTH],
-                        startAcceptedCalendar[Calendar.DAY_OF_MONTH]
-                    )
-
-                    val endAcceptedTimePicker = TimePickerDialog(
-                        LocalContext.current,
-                        { _, h: Int, m: Int ->
-                            endAcceptedCalendar[Calendar.HOUR_OF_DAY] = h
-                            endAcceptedCalendar[Calendar.MINUTE] = m
-                            endAcceptedCalendar[Calendar.SECOND] = 0
-                            endAcceptedCalendar[Calendar.MILLISECOND] = 0
-                            viewModel.createEventAccepted(
-                                AcceptedEvent.EnteredEndAccepted(
-                                    endAcceptedCalendar.timeInMillis
-                                )
-                            )
-                            viewModel.createEventAccepted(AcceptedEvent.FocusChange(AcceptedType.END))
-                        },
-                        endAcceptedCalendar[Calendar.HOUR_OF_DAY],
-                        endAcceptedCalendar[Calendar.MINUTE],
-                        true
-                    )
-
-                    val endAcceptedDatePicker = DatePickerDialog(
-                        LocalContext.current,
-                        { _, y: Int, m: Int, d: Int ->
-                            endAcceptedCalendar[Calendar.YEAR] = y
-                            endAcceptedCalendar[Calendar.MONTH] = m
-                            endAcceptedCalendar[Calendar.DAY_OF_MONTH] = d
-                            endAcceptedTimePicker.show()
-                        },
-                        endAcceptedCalendar[Calendar.YEAR],
-                        endAcceptedCalendar[Calendar.MONTH],
-                        endAcceptedCalendar[Calendar.DAY_OF_MONTH]
+                        header = Header.Default(
+                            title = "Окончание приемки"
+                        ),
+                        config = ClockConfig(
+                            is24HourFormat = true,
+                        )
                     )
 
                     Column(
@@ -413,7 +483,7 @@ fun AddingLocoScreen(
                             .border(
                                 width = 1.dp,
                                 shape = ShapeBackground.small,
-                                color = MaterialTheme.colors.secondary
+                                color = MaterialTheme.colorScheme.outline
                             ),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -444,7 +514,7 @@ fun AddingLocoScreen(
                             Text(
                                 modifier = Modifier.padding(start = 16.dp),
                                 text = "Приемка",
-                                style = Typography.bodyLarge
+                                style = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.secondary)
                             )
 
                             Row(
@@ -455,7 +525,7 @@ fun AddingLocoScreen(
                                 Box(
                                     modifier = Modifier
                                         .clickable {
-                                            startAcceptedDatePicker.show()
+                                            calendarStartAcceptedState.show()
                                         }
                                         .padding(horizontal = 18.dp),
                                     contentAlignment = Alignment.Center
@@ -480,7 +550,7 @@ fun AddingLocoScreen(
                                     modifier = Modifier
                                         .padding(18.dp)
                                         .clickable {
-                                            endAcceptedDatePicker.show()
+                                            calendarEndAcceptedState.show()
                                         },
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -504,82 +574,134 @@ fun AddingLocoScreen(
                     }
                 }
                 item {
-                    val stateDelivery = viewModel.deliveryTimeState.value
+                    val stateDelivery = addingLocoViewModel.deliveryTimeState.value
                     val startDeliveryTime = stateDelivery.startDelivered.time
                     val endDeliveryTime = stateDelivery.endDelivered.time
 
-                    val startDeliveryCalendar = Calendar.getInstance()
-                    startDeliveryTime?.let {
-                        startDeliveryCalendar.timeInMillis = it
+                    val calendarStartDeliveryState = rememberUseCaseState()
+                    val timeStartDeliveryState = rememberUseCaseState()
+
+                    val dateStartDeliveryLocalDateTime: LocalDateTime? =
+                        startDeliveryTime?.let {
+                            LocalDateTime.ofInstant(
+                                Instant.ofEpochMilli(it),
+                                ZoneId.systemDefault()
+                            )
+                        }
+
+                    var localDateDeliveryStart by remember {
+                        mutableStateOf<LocalDate?>(null)
+                    }
+                    var localTimeDeliveryStart by remember {
+                        mutableStateOf<LocalTime?>(null)
+                    }
+                    var dateAndTimeDeliveryStartWork by remember {
+                        mutableStateOf<LocalDateTime?>(null)
                     }
 
-                    val endDeliveryCalendar = Calendar.getInstance()
-                    endDeliveryTime?.let {
-                        endDeliveryCalendar.timeInMillis = it
+                    CalendarDialog(
+                        state = calendarStartDeliveryState,
+                        selection = CalendarSelection.Date(
+                            selectedDate = dateStartDeliveryLocalDateTime?.toLocalDate()
+                        ) { date ->
+                            localDateDeliveryStart =
+                                LocalDate.of(date.year, date.month, date.dayOfMonth)
+                            timeStartDeliveryState.show()
+                        },
+                        header = Header.Default(
+                            title = "Начало сдачи"
+                        ),
+                        config = CalendarConfig(
+                            monthSelection = true,
+                            yearSelection = true,
+                        ),
+                    )
+
+                    ClockDialog(
+                        state = timeStartDeliveryState,
+                        selection = ClockSelection.HoursMinutes { hours, minutes ->
+                            localTimeDeliveryStart = LocalTime.of(hours, minutes)
+                            dateAndTimeDeliveryStartWork =
+                                LocalDateTime.of(localDateDeliveryStart, localTimeDeliveryStart)
+                            val dateInLong = dateAndTimeDeliveryStartWork!!.toLong()
+                            addingLocoViewModel.createEventDelivery(
+                                DeliveryEvent.EnteredStartDelivery(dateInLong)
+                            )
+                            addingLocoViewModel.createEventDelivery(
+                                DeliveryEvent.FocusChange(
+                                    DeliveredType.START
+                                )
+                            )
+                        },
+                        header = Header.Default(
+                            title = "Начало сдачи"
+                        ),
+                        config = ClockConfig(
+                            is24HourFormat = true,
+                        )
+                    )
+
+                    val calendarEndDeliveryState = rememberUseCaseState()
+                    val timeEndDeliveryState = rememberUseCaseState()
+
+                    val dateEndDeliveryLocalDateTime: LocalDateTime? =
+                        startDeliveryTime?.let {
+                            LocalDateTime.ofInstant(
+                                Instant.ofEpochMilli(it),
+                                ZoneId.systemDefault()
+                            )
+                        }
+
+                    var localDateDeliveryEnd by remember {
+                        mutableStateOf<LocalDate?>(null)
+                    }
+                    var localTimeDeliveryEnd by remember {
+                        mutableStateOf<LocalTime?>(null)
+                    }
+                    var dateAndTimeDeliveryEndWork by remember {
+                        mutableStateOf<LocalDateTime?>(null)
                     }
 
-                    val startDeliveryTimePicker = TimePickerDialog(
-                        LocalContext.current,
-                        { _, h: Int, m: Int ->
-                            startDeliveryCalendar[Calendar.HOUR_OF_DAY] = h
-                            startDeliveryCalendar[Calendar.MINUTE] = m
-                            startDeliveryCalendar[Calendar.SECOND] = 0
-                            startDeliveryCalendar[Calendar.MILLISECOND] = 0
-                            viewModel.createEventDelivery(
-                                DeliveryEvent.EnteredStartDelivery(
-                                    startDeliveryCalendar.timeInMillis
+                    CalendarDialog(
+                        state = calendarEndDeliveryState,
+                        selection = CalendarSelection.Date(
+                            selectedDate = dateEndDeliveryLocalDateTime?.toLocalDate()
+                        ) { date ->
+                            localDateDeliveryEnd =
+                                LocalDate.of(date.year, date.month, date.dayOfMonth)
+                            timeEndDeliveryState.show()
+                        },
+                        header = Header.Default(
+                            title = "Окончание сдачи"
+                        ),
+                        config = CalendarConfig(
+                            monthSelection = true,
+                            yearSelection = true,
+                        ),
+                    )
+
+                    ClockDialog(
+                        state = timeEndDeliveryState,
+                        selection = ClockSelection.HoursMinutes { hours, minutes ->
+                            localTimeDeliveryEnd = LocalTime.of(hours, minutes)
+                            dateAndTimeDeliveryEndWork =
+                                LocalDateTime.of(localDateDeliveryEnd, localTimeDeliveryEnd)
+                            val dateInLong = dateAndTimeDeliveryEndWork!!.toLong()
+                            addingLocoViewModel.createEventDelivery(
+                                DeliveryEvent.EnteredEndDelivery(dateInLong)
+                            )
+                            addingLocoViewModel.createEventDelivery(
+                                DeliveryEvent.FocusChange(
+                                    DeliveredType.END
                                 )
                             )
-                            viewModel.createEventDelivery(DeliveryEvent.FocusChange(DeliveredType.START))
                         },
-                        startDeliveryCalendar[Calendar.HOUR_OF_DAY],
-                        startDeliveryCalendar[Calendar.MINUTE],
-                        true
-                    )
-
-                    val startDeliveryDatePicker = DatePickerDialog(
-                        LocalContext.current,
-                        { _, y: Int, m: Int, d: Int ->
-                            startDeliveryCalendar[Calendar.YEAR] = y
-                            startDeliveryCalendar[Calendar.MONTH] = m
-                            startDeliveryCalendar[Calendar.DAY_OF_MONTH] = d
-                            startDeliveryTimePicker.show()
-                        },
-                        startDeliveryCalendar[Calendar.YEAR],
-                        startDeliveryCalendar[Calendar.MONTH],
-                        startDeliveryCalendar[Calendar.DAY_OF_MONTH]
-                    )
-
-                    val endDeliveryTimePicker = TimePickerDialog(
-                        LocalContext.current,
-                        { _, h: Int, m: Int ->
-                            endDeliveryCalendar[Calendar.HOUR_OF_DAY] = h
-                            endDeliveryCalendar[Calendar.MINUTE] = m
-                            endDeliveryCalendar[Calendar.SECOND] = 0
-                            endDeliveryCalendar[Calendar.MILLISECOND] = 0
-                            viewModel.createEventDelivery(
-                                DeliveryEvent.EnteredEndDelivery(
-                                    endDeliveryCalendar.timeInMillis
-                                )
-                            )
-                            viewModel.createEventDelivery(DeliveryEvent.FocusChange(DeliveredType.END))
-                        },
-                        endDeliveryCalendar[Calendar.HOUR_OF_DAY],
-                        endDeliveryCalendar[Calendar.MINUTE],
-                        true
-                    )
-
-                    val endDeliveryDatePicker = DatePickerDialog(
-                        LocalContext.current,
-                        { _, y: Int, m: Int, d: Int ->
-                            endDeliveryCalendar[Calendar.YEAR] = y
-                            endDeliveryCalendar[Calendar.MONTH] = m
-                            endDeliveryCalendar[Calendar.DAY_OF_MONTH] = d
-                            endDeliveryTimePicker.show()
-                        },
-                        endDeliveryCalendar[Calendar.YEAR],
-                        endDeliveryCalendar[Calendar.MONTH],
-                        endDeliveryCalendar[Calendar.DAY_OF_MONTH]
+                        header = Header.Default(
+                            title = "Окончание сдачи"
+                        ),
+                        config = ClockConfig(
+                            is24HourFormat = true,
+                        )
                     )
 
                     Column(
@@ -588,7 +710,7 @@ fun AddingLocoScreen(
                             .border(
                                 width = 1.dp,
                                 shape = ShapeBackground.small,
-                                color = MaterialTheme.colors.secondary
+                                color = MaterialTheme.colorScheme.outline
                             ),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -619,7 +741,7 @@ fun AddingLocoScreen(
                             Text(
                                 modifier = Modifier.padding(start = 16.dp),
                                 text = "Сдача",
-                                style = Typography.bodyLarge
+                                style = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.secondary)
                             )
 
                             Row(
@@ -630,7 +752,7 @@ fun AddingLocoScreen(
                                 Box(
                                     modifier = Modifier
                                         .clickable {
-                                            startDeliveryDatePicker.show()
+                                            calendarStartDeliveryState.show()
                                         }
                                         .padding(horizontal = 18.dp),
                                     contentAlignment = Alignment.Center
@@ -655,7 +777,7 @@ fun AddingLocoScreen(
                                     modifier = Modifier
                                         .padding(18.dp)
                                         .clickable {
-                                            endDeliveryDatePicker.show()
+                                            calendarEndDeliveryState.show()
                                         },
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -680,8 +802,9 @@ fun AddingLocoScreen(
                 }
                 when (pagerState.currentPage) {
                     0 -> {
-                        val list = viewModel.dieselSectionListState
-                        val revealedSectionIds = viewModel.revealedItemDieselSectionIdsList
+                        val list = addingLocoViewModel.dieselSectionListState
+                        val revealedSectionIds =
+                            addingLocoViewModel.revealedItemDieselSectionIdsList
                         itemsIndexed(
                             items = list,
                             key = { _, item -> item.sectionId }
@@ -704,23 +827,31 @@ fun AddingLocoScreen(
                                 contentAlignment = Alignment.CenterEnd
                             ) {
                                 ActionsRow(
-                                    onDelete = { viewModel.removeDieselSection(item) }
+                                    onDelete = { addingLocoViewModel.removeDieselSection(item) }
                                 )
                                 DraggableDieselItem(
                                     item = item,
                                     index = index,
-                                    viewModel = viewModel,
+                                    viewModel = addingLocoViewModel,
                                     coefficientState = coefficientState,
                                     refuelState = refuelState,
                                     openSheet = openSheet,
                                     isRevealed = revealedSectionIds.contains(item.sectionId),
-                                    onCollapse = { viewModel.onCollapsedDieselSection(item.sectionId) },
-                                    onExpand = { viewModel.onExpandedDieselSection(item.sectionId) },
+                                    onCollapse = {
+                                        addingLocoViewModel.onCollapsedDieselSection(
+                                            item.sectionId
+                                        )
+                                    },
+                                    onExpand = {
+                                        addingLocoViewModel.onExpandedDieselSection(
+                                            item.sectionId
+                                        )
+                                    },
                                 )
                             }
                             if (index == list.lastIndex && index > 0) {
                                 var overResult: Double? = null
-                                viewModel.dieselSectionListState.forEach {
+                                addingLocoViewModel.dieselSectionListState.forEach {
                                     val accepted = it.accepted.data?.toDoubleOrNull()
                                     val delivery = it.delivery.data?.toDoubleOrNull()
                                     val refuel = it.refuel.data?.toDoubleOrNull()
@@ -732,15 +863,16 @@ fun AddingLocoScreen(
                                 overResult?.let {
                                     Text(
                                         text = "Всего расход = ${maskInLiter(it.str())}",
-                                        style = Typography.bodyMedium.copy(color = MaterialTheme.colors.secondary),
+                                        style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.secondary),
                                     )
                                 }
                             }
                         }
                     }
                     1 -> {
-                        val list = viewModel.electricSectionListState
-                        val revealedSectionIds = viewModel.revealedItemElectricSectionIdsList
+                        val list = addingLocoViewModel.electricSectionListState
+                        val revealedSectionIds =
+                            addingLocoViewModel.revealedItemElectricSectionIdsList
                         itemsIndexed(
                             items = list,
                             key = { _, item -> item.sectionId }
@@ -764,22 +896,30 @@ fun AddingLocoScreen(
                                 contentAlignment = Alignment.CenterEnd
                             ) {
                                 ActionsRow(
-                                    onDelete = { viewModel.removeElectricSection(item) }
+                                    onDelete = { addingLocoViewModel.removeElectricSection(item) }
                                 )
                                 DraggableElectricItem(
                                     item = item,
                                     isRevealed = revealedSectionIds.contains(item.sectionId),
-                                    onExpand = { viewModel.onExpandedElectricSection(item.sectionId) },
-                                    onCollapse = { viewModel.onCollapsedElectricSection(item.sectionId) },
+                                    onExpand = {
+                                        addingLocoViewModel.onExpandedElectricSection(
+                                            item.sectionId
+                                        )
+                                    },
+                                    onCollapse = {
+                                        addingLocoViewModel.onCollapsedElectricSection(
+                                            item.sectionId
+                                        )
+                                    },
                                     index = index,
-                                    viewModel = viewModel
+                                    viewModel = addingLocoViewModel
                                 )
                             }
                             if (index == list.lastIndex && index > 0) {
                                 var overResult: Double? = null
                                 var overRecovery: Double? = null
 
-                                viewModel.electricSectionListState.forEach {
+                                addingLocoViewModel.electricSectionListState.forEach {
                                     val accepted = it.accepted.data?.toDoubleOrNull()
                                     val delivery = it.delivery.data?.toDoubleOrNull()
                                     val acceptedRecovery =
@@ -800,13 +940,13 @@ fun AddingLocoScreen(
                                     overResult?.let {
                                         Text(
                                             text = "Всего расход = ${it.str()}",
-                                            style = Typography.bodyMedium.copy(color = MaterialTheme.colors.secondary),
+                                            style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.secondary),
                                         )
                                     }
                                     overRecovery?.let {
                                         Text(
                                             text = "Всего рекуперация = ${it.str()}",
-                                            style = Typography.bodyMedium.copy(color = MaterialTheme.colors.secondary),
+                                            style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.secondary),
                                         )
                                     }
                                 }
@@ -815,13 +955,14 @@ fun AddingLocoScreen(
                     }
                 }
                 item {
-                    ClickableTextTrainDriver(
+                    ClickableText(
                         modifier = Modifier.padding(top = 24.dp),
-                        text = AnnotatedString("Добавить секцию")
+                        text = AnnotatedString("Добавить секцию"),
+                        style = Typography.titleMedium.copy(color = MaterialTheme.colorScheme.tertiary)
                     ) {
                         when (pagerState.currentPage) {
-                            0 -> viewModel.addDieselSection(SectionDiesel())
-                            1 -> viewModel.addElectricSection(SectionElectric())
+                            0 -> addingLocoViewModel.addDieselSection(SectionDiesel())
+                            1 -> addingLocoViewModel.addElectricSection(SectionElectric())
                         }
 
                         scope.launch {
@@ -836,46 +977,43 @@ fun AddingLocoScreen(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SheetLayoutLoco(
     sheet: BottomSheetLoco,
     viewModel: AddingLocoViewModel,
     closeSheet: () -> Unit,
-    bottomSheetState: ModalBottomSheetState,
+    bottomSheetState: SheetState,
     coefficientState: MutableState<Pair<Int, String>>,
     refuelState: MutableState<Pair<Int, String>>
 ) {
-    BottomSheetWithCloseDialog(
-        modifier = Modifier
-            .fillMaxHeight(0.65f),
-        closeSheet = closeSheet
-    ) {
-        when (sheet) {
-            is BottomSheetLoco.CoefficientSheet -> {
-                BottomSheetCoefficient(
-                    viewModel = viewModel,
-                    coefficientData = coefficientState,
-                    sheetState = bottomSheetState
-                )
-            }
-            is BottomSheetLoco.RefuelSheet -> {
-                BottomSheetRefuel(
-                    viewModel = viewModel,
-                    refuelData = refuelState,
-                    sheetState = bottomSheetState
-                )
-            }
+    when (sheet) {
+        is BottomSheetLoco.CoefficientSheet -> {
+            BottomSheetCoefficient(
+                viewModel = viewModel,
+                coefficientData = coefficientState,
+                sheetState = bottomSheetState,
+                closeSheet = closeSheet
+            )
+        }
+        is BottomSheetLoco.RefuelSheet -> {
+            BottomSheetRefuel(
+                viewModel = viewModel,
+                refuelData = refuelState,
+                sheetState = bottomSheetState,
+                closeSheet = closeSheet
+            )
         }
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomSheetRefuel(
     viewModel: AddingLocoViewModel,
     refuelData: MutableState<Pair<Int, String>>,
-    sheetState: ModalBottomSheetState
+    sheetState: SheetState,
+    closeSheet: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val requester = FocusRequester()
@@ -888,15 +1026,14 @@ fun BottomSheetRefuel(
 
     Column(
         modifier = Modifier
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+            .padding(start = 16.dp, end = 16.dp),
         horizontalAlignment = Alignment.Start
     ) {
         Text(
-            modifier = Modifier.fillMaxWidth(),
             text = "Экипировка", style = Typography.titleLarge,
             textAlign = TextAlign.Center
         )
-        OutlinedTextFieldCustom(
+        OutlinedTextField(
             modifier = Modifier
                 .focusable(true)
                 .focusRequester(requester)
@@ -920,6 +1057,9 @@ fun BottomSheetRefuel(
                     second = it.text
                 )
             },
+            textStyle = Typography.bodyLarge.copy(
+                color = MaterialTheme.colorScheme.primary
+            ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
@@ -928,12 +1068,13 @@ fun BottomSheetRefuel(
                 onDone = {
                     scope.launch {
                         focusManager.clearFocus()
-                        sheetState.hide()
+                        closeSheet.invoke()
                     }
                 }
             )
         )
     }
+
     if (sheetState.isVisible) {
         SideEffect {
             requester.requestFocus()
@@ -941,12 +1082,13 @@ fun BottomSheetRefuel(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BottomSheetCoefficient(
     viewModel: AddingLocoViewModel,
     coefficientData: MutableState<Pair<Int, String>>,
-    sheetState: ModalBottomSheetState
+    sheetState: SheetState,
+    closeSheet: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val requester = FocusRequester()
@@ -958,15 +1100,14 @@ private fun BottomSheetCoefficient(
     )
     Column(
         modifier = Modifier
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+            .padding(start = 16.dp, end = 16.dp),
         horizontalAlignment = Alignment.Start
     ) {
         Text(
-            modifier = Modifier.fillMaxWidth(),
             text = "Коэффициент", style = Typography.titleLarge,
             textAlign = TextAlign.Center
         )
-        OutlinedTextFieldCustom(
+        OutlinedTextField(
             modifier = Modifier
                 .focusable(true)
                 .focusRequester(requester)
@@ -990,6 +1131,7 @@ private fun BottomSheetCoefficient(
                     second = it.text
                 )
             },
+            textStyle = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
@@ -998,7 +1140,7 @@ private fun BottomSheetCoefficient(
                 onDone = {
                     scope.launch {
                         focusManager.clearFocus()
-                        sheetState.hide()
+                        closeSheet.invoke()
                     }
                 }
             )

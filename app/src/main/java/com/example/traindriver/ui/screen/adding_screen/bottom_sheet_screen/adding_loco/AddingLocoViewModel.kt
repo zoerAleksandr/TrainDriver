@@ -40,8 +40,15 @@ class AddingLocoViewModel : ViewModel(), KoinComponent {
     }
 
     fun clearField() {
-        currentLoco = Locomotive(
-            type = defaultLocoType
+        currentLoco = currentLoco.copy(
+            series = null,
+            number = null,
+            type = true,
+            sectionList = listOf(),
+            timeStartOfAcceptance = null,
+            timeEndOfAcceptance = null,
+            timeStartOfDelivery = null,
+            timeEndOfDelivery = null
         )
         dieselSectionListState.clear()
         electricSectionListState.clear()
@@ -95,7 +102,6 @@ class AddingLocoViewModel : ViewModel(), KoinComponent {
             Log.e("ERROR_ADDING_LOCO", e.message.toString())
         }
     }
-
 
     private suspend fun getTypeLoco(): Boolean =
         withContext(viewModelScope.coroutineContext) {
@@ -151,7 +157,6 @@ class AddingLocoViewModel : ViewModel(), KoinComponent {
         )
     }
 
-
     private var workTimeState: State<WorkTimeEditState> =
         mutableStateOf(WorkTimeEditState(formValid = true))
 
@@ -166,7 +171,6 @@ class AddingLocoViewModel : ViewModel(), KoinComponent {
         seriesLocoState = newValue
     }
 
-
     var numberLocoState by mutableStateOf(TextFieldValue(currentLoco.number ?: ""))
         private set
 
@@ -174,10 +178,8 @@ class AddingLocoViewModel : ViewModel(), KoinComponent {
         numberLocoState = newValue
     }
 
-
     var pagerState by mutableStateOf(if (defaultLocoType) 1 else 0)
         private set
-
 
     var acceptedTimeState = mutableStateOf(
         AcceptedBlockState(

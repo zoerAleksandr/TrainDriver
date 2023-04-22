@@ -19,12 +19,12 @@ import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.ui.element_screen.CustomScrollableTabRow
 import com.example.traindriver.ui.element_screen.TopSnackbar
+import com.example.traindriver.ui.screen.ROUTE
 import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.signin_screen.elements.SecondarySpacer
 import com.example.traindriver.ui.screen.viewing_route_screen.element.*
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
-import com.example.traindriver.ui.util.Constants.ROUTE
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.DateAndTimeFormat.DATE_FORMAT
 import com.example.traindriver.ui.util.OnLifecycleEvent
