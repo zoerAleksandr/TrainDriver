@@ -5,6 +5,7 @@ import com.example.traindriver.domain.entity.*
 import com.example.traindriver.domain.repository.DataRepository
 import com.example.traindriver.ui.screen.main_screen.RouteListByMonthResponse
 import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
+import com.example.traindriver.ui.util.collection_util.extension.addOrReplace
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -12,7 +13,7 @@ import kotlinx.coroutines.flow.callbackFlow
 
 class MockDataRepository : DataRepository {
     private val one = Route(
-        number = 3856,
+        number = "3856",
         timeStartWork = 1_675_789_800_000,
         timeEndWork = 1_675_876_200_000,
         stationList = mutableListOf(
@@ -131,7 +132,7 @@ class MockDataRepository : DataRepository {
         )
     )
     private val two = Route(
-        number = 1989,
+        number = "1989",
         timeStartWork = 1_675_857_000_000,
         timeEndWork = 1_675_876_200_000,
         stationList = mutableListOf(
@@ -148,7 +149,7 @@ class MockDataRepository : DataRepository {
 
     private
     val three = Route(
-        number = 4490,
+        number = "4490",
         timeStartWork = 1_675_857_000_000,
         timeEndWork = 1_675_876_200_000,
         stationList = mutableListOf(
@@ -163,12 +164,11 @@ class MockDataRepository : DataRepository {
             Locomotive(series = "3эс4к", number = "064"),
         )
     )
-
+    val list = mutableListOf(one, two, three)
     override fun getListItineraryByMonth(month: Int): Flow<RouteListByMonthResponse> =
         callbackFlow {
             trySend(ResultState.Loading())
             delay(300)
-            val list = listOf(one, two, three, one, two, three, one, two, three)
             trySend(ResultState.Success(list))
             awaitClose { close() }
         }
@@ -176,22 +176,24 @@ class MockDataRepository : DataRepository {
     override fun getItineraryById(id: String): Flow<RouteResponse> =
         callbackFlow {
             trySend(ResultState.Loading())
-            delay(300)
-//            trySend(ResultState.Failure(Throwable()))
-            trySend(ResultState.Success(one))
-            awaitClose { close() }
-        }
-
-    override fun addLocomotiveInRoute(locomotive: Locomotive): Flow<ResultState<Boolean>> =
-        callbackFlow {
-            trySend(ResultState.Loading())
-            try {
-                one.locoList.add(locomotive)
-                trySend(ResultState.Success(true))
-            } catch (e: Exception) {
-                trySend(ResultState.Failure(e))
+            val route = list.find { it.id == id }
+            if (route != null) {
+                trySend(ResultState.Success(route))
+            } else {
+                trySend(ResultState.Failure(Throwable()))
             }
             awaitClose { close() }
         }
 
+    override fun addRoute(route: Route): Flow<ResultState<Boolean>> =
+        callbackFlow {
+            trySend(ResultState.Loading())
+            try {
+                list.addOrReplace(route)
+                trySend(ResultState.Success(true))
+            } catch (e: Throwable) {
+                trySend(ResultState.Failure(e))
+            }
+            awaitClose { close() }
+        }
 }

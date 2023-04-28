@@ -31,6 +31,8 @@ class AddingLocoViewModel : ViewModel(), KoinComponent {
         locomotive: Locomotive?,
         timeState: State<WorkTimeEditState>
     ) {
+        Log.d("ZZZ", "locomotive = $locomotive")
+
         workTimeState = timeState
         dieselSectionListState.clear()
         electricSectionListState.clear()
@@ -96,7 +98,6 @@ class AddingLocoViewModel : ViewModel(), KoinComponent {
 
         try {
             stateLocomotive.addOrReplace(currentLoco)
-            Log.d("ZZZ", "state in LocoViewModel = ${stateLocomotive.hashCode()}")
             clearField()
         } catch (e: Throwable) {
             Log.e("ERROR_ADDING_LOCO", e.message.toString())

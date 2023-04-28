@@ -1,6 +1,5 @@
 package com.example.traindriver.ui.screen.adding_screen.custom_tab
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
@@ -90,7 +89,6 @@ fun CustomTab(
     tabWidth: Dp,
     pagerState: PagerState,
 ) {
-    Log.d("ZZZ", "tabWidth = $tabWidth")
     val indicatorOffset: Dp by animateDpAsState(
         targetValue = tabWidth * selectedItemIndex,
         animationSpec = tween(durationMillis = 300, easing = LinearEasing),

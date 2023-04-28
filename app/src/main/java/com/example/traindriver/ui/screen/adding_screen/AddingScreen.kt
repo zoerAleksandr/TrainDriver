@@ -1,6 +1,7 @@
 package com.example.traindriver.ui.screen.adding_screen
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
@@ -35,7 +36,6 @@ import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.traindriver.R
 import com.example.traindriver.domain.entity.Locomotive
@@ -63,6 +63,9 @@ import java.util.Calendar.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.DpOffset
+import com.example.traindriver.data.util.ResultState
+import com.example.traindriver.ui.screen.ROUTE
 import com.maxkeppeker.sheets.core.models.base.Header
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
@@ -78,17 +81,29 @@ import java.time.*
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 fun AddingScreen(
     navController: NavController,
-    uid: String? = null,
-    viewModel: AddingViewModel = viewModel()
+    uid: String,
+    viewModel: AddingViewModel
 ) {
     OnLifecycleEvent { _, event ->
         when (event) {
             Lifecycle.Event.ON_RESUME -> {
                 viewModel.getMinTimeRest()
+                if (uid.contains(ROUTE.toRegex())){
+                    viewModel.newRoute()
+                } else {
+                    viewModel.setData(uid)
+                }
             }
             else -> {}
         }
     }
+
+    BackHandler {
+        navController.navigateUp()
+        viewModel.clearField()
+    }
+
+    SavesStateHomeScreen(viewModel, navController)
 
     val number = viewModel.numberRouteState
 
@@ -215,6 +230,7 @@ fun AddingScreen(
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.navigateUp()
+                        viewModel.clearField()
                     }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
@@ -227,18 +243,39 @@ fun AddingScreen(
                         text = AnnotatedString(text = "Сохранить"),
                         style = Typography.titleMedium,
                         onClick = {
-                            /*TODO*/
+                            viewModel.addRouteInRepository()
                         }
                     )
+                    var dropDownExpanded by remember { mutableStateOf(false) }
+
                     IconButton(
                         onClick = {
-                            /*TODO*/
+                            dropDownExpanded = true
                         }
                     ) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
                             contentDescription = "Меню"
                         )
+                        DropdownMenu(
+                            expanded = dropDownExpanded,
+                            onDismissRequest = { dropDownExpanded = false },
+                            offset = DpOffset(x = 4.dp, y = 8.dp)
+                        ) {
+                            DropdownMenuItem(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                onClick = {
+                                    viewModel.clearField()
+                                    dropDownExpanded = false
+                                },
+                                text = {
+                                    Text(
+                                        text = "Очистить",
+                                        style = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary)
+                                    )
+                                }
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -669,7 +706,9 @@ fun ItemAddLoco(
                             .padding(end = 16.dp),
                         onClick = {
                             scope.launch {
-                                navController.navigate(Screen.AddingLoco.setId(locomotive.id))
+                                navController.navigate(
+                                    Screen.AddingLoco.setId(locomotive.id)
+                                )
                             }
                         },
                         shape = ShapeBackground.small,
@@ -709,6 +748,25 @@ fun ItemAddLoco(
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)
             )
+        }
+    }
+}
+
+@Composable
+fun SavesStateHomeScreen(viewModel: AddingViewModel, navController: NavController) {
+    when (val state = viewModel.savesState) {
+        is ResultState.Loading -> {
+
+        }
+        is ResultState.Success -> {
+            if (state == ResultState.Success(true)) {
+                viewModel.savesState = ResultState.Success(false)
+                navController.navigate(Screen.Home.route)
+                viewModel.clearField()
+            }
+        }
+        is ResultState.Failure -> {
+
         }
     }
 }

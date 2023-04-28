@@ -60,9 +60,13 @@ fun SetupNavGraph(
             })
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getString(ROUTE)
+            /**
+             * backStackEntry.arguments?.getString(ROUTE) при отсутствии аргумента невозвращает null
+             * а возвращает строковае значение константы ROUTE. Поэтому для отслеживания вызова
+             * метода без аргумента в AddingScreen проверяю не на null а .contains(ROUTE)*/
             AddingScreen(
                 navController = navController,
-                uid = id,
+                uid = id ?: ROUTE,
                 viewModel = addingRouteViewModel
             )
         }

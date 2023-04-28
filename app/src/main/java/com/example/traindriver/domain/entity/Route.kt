@@ -7,9 +7,9 @@ fun generateUid() = UUID.randomUUID().toString()
 
 data class Route(
     val id: String = generateUid(),
-    var number: Int? = null,
+    var number: String? = null,
     var timeStartWork: Long? = null,
-    val timeEndWork: Long? = null,
+    var timeEndWork: Long? = null,
 
     val locoList: MutableList<Locomotive> = mutableListOf(),
     val trainList: MutableList<Train> = mutableListOf(),
@@ -24,6 +24,25 @@ data class Route(
         } else {
             null
         }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other is Route){
+            return other.id == this.id
+        }
+        return super.equals(other)
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + (number?.hashCode() ?: 0)
+        result = 31 * result + (timeStartWork?.hashCode() ?: 0)
+        result = 31 * result + (timeEndWork?.hashCode() ?: 0)
+        result = 31 * result + locoList.hashCode()
+        result = 31 * result + trainList.hashCode()
+        result = 31 * result + stationList.hashCode()
+        result = 31 * result + passengerList.hashCode()
+        return result
     }
 }
 

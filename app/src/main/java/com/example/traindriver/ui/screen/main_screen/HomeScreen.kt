@@ -7,11 +7,13 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -22,9 +24,12 @@ import com.example.traindriver.ui.screen.main_screen.elements.HomeBottomSheetCon
 import com.example.traindriver.ui.screen.main_screen.elements.CircularIndicator
 import com.example.traindriver.ui.theme.*
 import com.example.traindriver.ui.util.DarkLightPreviews
+import com.example.traindriver.ui.util.OnLifecycleEvent
 import com.example.traindriver.ui.util.changeAlphaWithScroll
 import com.example.traindriver.ui.util.long_util.getHour
 import com.example.traindriver.ui.util.long_util.getRemainingMinuteFromHour
+import kotlinx.coroutines.launch
+import java.util.*
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,7 +37,14 @@ import com.example.traindriver.ui.util.long_util.getRemainingMinuteFromHour
 fun HomeScreen(
     navController: NavController, mainViewModel: MainViewModel = viewModel()
 ) {
-    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState()
+    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberStandardBottomSheetState(
+            confirmValueChange = {
+                it != SheetValue.Hidden
+            }
+        )
+    )
+    val scope = rememberCoroutineScope()
 
     val heightScreen = LocalConfiguration.current.screenHeightDp
     val widthScreen = LocalConfiguration.current.screenWidthDp
@@ -49,18 +61,31 @@ fun HomeScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val totalTime = mainViewModel.totalTime
 
+    OnLifecycleEvent { _, event ->
+        when (event) {
+            Lifecycle.Event.ON_RESUME -> {
+                val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
+                mainViewModel.getListItineraryByMonth(currentMonth)
+                scope.launch {
+                    bottomSheetScaffoldState.bottomSheetState.partialExpand()
+                }
+            }
+            else -> {}
+        }
+    }
+
     BottomSheetScaffold(
         sheetContainerColor = changeAlphaWithScroll(
             offset = offset,
             initColor = MaterialTheme.colorScheme.background
         ),
         sheetDragHandle = {
-                BottomSheetDefaults.DragHandle(
-                    color = changeAlphaWithScroll(
-                        offset = offset,
-                        initColor = MaterialTheme.colorScheme.onBackground
-                    )
+            BottomSheetDefaults.DragHandle(
+                color = changeAlphaWithScroll(
+                    offset = offset,
+                    initColor = MaterialTheme.colorScheme.onBackground
                 )
+            )
         },
         sheetShadowElevation = 0.dp,
         scaffoldState = bottomSheetScaffoldState,
@@ -79,7 +104,8 @@ fun HomeScreen(
             topBar = {
                 TopAppBar(
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background
+                        containerColor = MaterialTheme.colorScheme.background,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     ),
                     title = {
                         Row(
