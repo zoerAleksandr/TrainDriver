@@ -8,6 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.traindriver.ui.screen.adding_screen.AddingScreen
 import com.example.traindriver.ui.screen.adding_screen.AddingViewModel
+import com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.AddingTrainScreen
 import com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.adding_loco.AddingLocoScreen
 import com.example.traindriver.ui.screen.main_screen.HomeScreen
 import com.example.traindriver.ui.screen.password_conf_screen.PasswordConfScreen
@@ -82,6 +83,21 @@ fun SetupNavGraph(
             AddingLocoScreen(
                 navController = navController,
                 locoId = id,
+                addingRouteViewModel = addingRouteViewModel
+            )
+        }
+        composable(
+            route = Screen.AddingTrain.route,
+            arguments = listOf(
+                navArgument(TRAIN_ID) {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString(TRAIN_ID)
+            AddingTrainScreen(
+                navController = navController,
+                trainId = id,
                 addingRouteViewModel = addingRouteViewModel
             )
         }

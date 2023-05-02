@@ -9,6 +9,7 @@ import com.example.traindriver.data.repository.DataStoreRepository
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.Locomotive
 import com.example.traindriver.domain.entity.Route
+import com.example.traindriver.domain.entity.Train
 import com.example.traindriver.domain.use_case.AddRouteUseCase
 import com.example.traindriver.domain.use_case.GetRouteByIdUseCase
 import com.example.traindriver.ui.screen.adding_screen.state_holder.*
@@ -36,6 +37,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
         setNumber(TextFieldValue(route.number ?: ""))
         setTimeEditState(route)
         setLocoListState(route)
+        setTrainListState(route)
     }
 
     fun addRouteInRepository() {
@@ -44,9 +46,13 @@ class AddingViewModel : ViewModel(), KoinComponent {
             timeStartWork = timeEditState.value.startTime.time
             timeEndWork = timeEditState.value.endTime.time
             locoList.clear()
+            trainList.clear()
         }
         stateLocoList.forEach {
             currentRoute.locoList.addOrReplace(it)
+        }
+        stateTrainList.forEach {
+            currentRoute.trainList.addOrReplace(it)
         }
         viewModelScope.launch {
             addRouteUseCase.execute(currentRoute).collect { result ->
@@ -66,13 +72,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
             passengerList = mutableListOf()
         )
         stateLocoList.clear()
-    }
-
-    private fun setLocoListState(route: Route) {
-        stateLocoList.clear()
-        route.locoList.forEach { locomotive ->
-            stateLocoList.add(locomotive)
-        }
+        stateTrainList.clear()
     }
 
     private fun setTimeEditState(route: Route) {
@@ -124,11 +124,30 @@ class AddingViewModel : ViewModel(), KoinComponent {
     }
 
     val stateLocoList = mutableStateListOf<Locomotive>()
+    private fun setLocoListState(route: Route) {
+        stateLocoList.clear()
+        route.locoList.forEach { locomotive ->
+            stateLocoList.add(locomotive)
+        }
+    }
     fun deleteLocomotiveInRoute(
         locomotive: Locomotive
     ) {
         if (stateLocoList.contains(locomotive)) {
             stateLocoList.remove(locomotive)
+        }
+    }
+
+    var stateTrainList = mutableStateListOf<Train>()
+    private fun setTrainListState(route: Route) {
+        stateTrainList.clear()
+        route.trainList.forEach { train ->
+            stateTrainList.add(train)
+        }
+    }
+    fun deleteTrainInRoute(train: Train){
+        if (stateTrainList.contains(train)){
+            stateTrainList.remove(train)
         }
     }
 

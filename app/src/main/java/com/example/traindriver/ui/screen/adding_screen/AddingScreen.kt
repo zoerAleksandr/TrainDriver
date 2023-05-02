@@ -61,10 +61,12 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Calendar.*
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.DpOffset
 import com.example.traindriver.data.util.ResultState
+import com.example.traindriver.domain.entity.Train
 import com.example.traindriver.ui.screen.ROUTE
 import com.maxkeppeker.sheets.core.models.base.Header
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
@@ -609,11 +611,106 @@ fun AddingScreen(
                     viewModel.stateLocoList,
                     viewModel::deleteLocomotiveInRoute
                 )
-                HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
-//                    ItemAddLoco(openSheet, viewModel.stateLocoList.value)
-//                    HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
+//                HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
+                ItemAddTrain(navController, viewModel.stateTrainList, viewModel::deleteTrainInRoute)
+//                HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
 //                    ItemAddLoco(openSheet, viewModel.stateLocoList.value)
             }
+        }
+    }
+}
+
+@Composable
+fun ItemAddTrain(
+    navController: NavController,
+    trainList: SnapshotStateList<Train>,
+    deleteTrain: (Train) -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    Card(modifier = Modifier.padding(horizontal = 16.dp)) {
+        ConstraintLayout(
+            modifier = Modifier
+                .clickable {
+                    scope.launch {
+                        navController.navigate(Screen.AddingTrain.route)
+                    }
+                }
+                .padding(vertical = 16.dp, horizontal = 24.dp)
+                .fillMaxWidth()
+        ){
+            val (title, data, icon) = createRefs()
+            createVerticalChain(title, data, chainStyle = ChainStyle.SpreadInside)
+            Text(
+                modifier = Modifier
+                    .constrainAs(title) {
+                        start.linkTo(parent.start)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(data.top)
+                    }
+                    .padding(bottom = 8.dp),
+                text = "Поезд",
+                style = Typography.titleMedium.copy(color = MaterialTheme.colorScheme.primary)
+            )
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(rememberScrollState())
+                    .fillMaxWidth()
+                    .constrainAs(data) {
+                        start.linkTo(parent.start)
+                        bottom.linkTo(parent.bottom)
+                        end.linkTo(icon.start, 8.dp)
+                        width = Dimension.fillToConstraints
+                    },
+            ) {
+                trainList.forEachIndexed { index, train ->
+                    AssistChip(
+                        modifier = Modifier
+                            .padding(end = 16.dp),
+                        onClick = {
+                            scope.launch {
+                                navController.navigate(
+                                    Screen.AddingTrain.setId(train.id)
+                                )
+                            }
+                        },
+                        shape = ShapeBackground.small,
+                        label = {
+                            if (train.number.isNullOrBlank()) {
+                                Text(text = "Поезд №${index + 1}")
+                            } else {
+                                Text(
+                                    text = "№${train.number}",
+                                    style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.primary)
+                                )
+                            }
+                        },
+                        trailingIcon = {
+                            Icon(
+                                modifier = Modifier
+                                    .padding(start = 4.dp)
+                                    .clickable {
+                                        deleteTrain.invoke(train)
+                                    },
+                                painter = painterResource(id = R.drawable.ic_close_24),
+                                contentDescription = null
+                            )
+                        }
+                    )
+                }
+            }
+            Image(
+                modifier = Modifier
+                    .size(20.dp)
+                    .constrainAs(icon) {
+                        end.linkTo(parent.end)
+                        bottom.linkTo(parent.bottom)
+                        top.linkTo(parent.top)
+                    },
+                painter = painterResource(id = R.drawable.ic_forward_24),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)
+            )
         }
     }
 }
