@@ -1,7 +1,6 @@
-package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.adding_loco
+package com.example.traindriver.ui.screen.adding_screen.adding_loco
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.tween
@@ -94,10 +93,8 @@ fun AddingLocoScreen(
     OnLifecycleEvent { _, event ->
         when (event) {
             Lifecycle.Event.ON_CREATE -> {
-                Log.d("ZZZ", "param id = $locoId")
                 addingLocoViewModel.setData(
                     locomotive = addingRouteViewModel.stateLocoList.find {
-                        Log.d("ZZZ", "loco id = ${it.id}")
                         it.id == locoId
                     },
                     timeState = addingRouteViewModel.timeEditState

@@ -1,4 +1,4 @@
-package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.adding_loco
+package com.example.traindriver.ui.screen.adding_screen.adding_loco
 
 sealed class BottomSheetLoco{
     object CoefficientSheet: BottomSheetLoco()

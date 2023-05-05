@@ -19,6 +19,7 @@ private val DarkColorPalette = darkColorScheme(
     onSurface = Color(0xFF383838),
     background = Color(0xFF5F5F5F),
     onBackground = Color(0xFFC5C5C5),
+    errorContainer = Color(0x25FF3434)
 )
 
 private val LightColorPalette = lightColorScheme(

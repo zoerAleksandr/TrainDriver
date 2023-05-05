@@ -1,4 +1,4 @@
-package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.adding_loco
+package com.example.traindriver.ui.screen.adding_screen.adding_loco
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.*
@@ -77,7 +77,14 @@ fun DieselSectionItem(
     val resultInKilo = Calculation.getTotalFuelInKiloConsumption(result, coefficient)
     val formValid = viewModel.dieselSectionListState[index].formValid
     val errorMessageText = viewModel.dieselSectionListState[index].errorMessage
-    ConstraintLayout {
+    ConstraintLayout(
+        modifier = Modifier
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline,
+                shape = ShapeBackground.extraSmall
+            )
+    ) {
         val (sectionNum, refuelButton,
             energyAccepted, energyDelivery,
             inKiloBlock, infoBlock, errorMessage) = createRefs()
@@ -153,7 +160,7 @@ fun DieselSectionItem(
             }
             Image(
                 modifier = Modifier
-                    .size(dimensionResource(id = R.dimen.icon_size))
+                    .size(dimensionResource(id = R.dimen.min_size_view))
                     .padding(8.dp),
                 painter = painterResource(id = R.drawable.refuel_icon),
                 contentDescription = null,
@@ -339,7 +346,14 @@ fun ElectricSectionItem(
 
     var expandState by remember { mutableStateOf(false) }
 
-    ConstraintLayout {
+    ConstraintLayout(
+        modifier = Modifier
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline,
+                shape = ShapeBackground.extraSmall
+            )
+    ){
         val (
             sectionNum, energyAccepted, buttonVisible,
             energyDelivery, recoveryBlock,
@@ -663,9 +677,6 @@ fun DraggableItem(
                 }
             }
         },
-        border = BorderStroke(
-            width = 1.dp, color = MaterialTheme.colorScheme.outline
-        ),
         shape = ShapeBackground.extraSmall,
         colors =  CardDefaults.cardColors(
             containerColor = backgroundColor

@@ -52,7 +52,7 @@ data class Train(
     var weight: Int? = null,
     var axle: Int? = null,
     var conditionalLength: Int? = null,
-    var locomotive: Locomotive? = null,
+    @get:JvmName("locomotiveTrain") var locomotive: Locomotive? = null,
     var stations: MutableList<Station> = mutableListOf()
 )
 

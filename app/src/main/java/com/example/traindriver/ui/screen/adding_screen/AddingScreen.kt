@@ -612,9 +612,7 @@ fun AddingScreen(
                     viewModel::deleteLocomotiveInRoute
                 )
                 Spacer(modifier = Modifier.height(24.dp))
-//                HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
                 ItemAddTrain(navController, viewModel.stateTrainList, viewModel::deleteTrainInRoute)
-//                HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
 //                    ItemAddLoco(openSheet, viewModel.stateLocoList.value)
             }
         }

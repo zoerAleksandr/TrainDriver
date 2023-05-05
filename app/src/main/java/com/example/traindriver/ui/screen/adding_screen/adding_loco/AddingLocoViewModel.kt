@@ -1,4 +1,4 @@
-package com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.adding_loco
+package com.example.traindriver.ui.screen.adding_screen.adding_loco
 
 import android.util.Log
 import androidx.compose.runtime.*
@@ -31,8 +31,6 @@ class AddingLocoViewModel : ViewModel(), KoinComponent {
         locomotive: Locomotive?,
         timeState: State<WorkTimeEditState>
     ) {
-        Log.d("ZZZ", "locomotive = $locomotive")
-
         workTimeState = timeState
         dieselSectionListState.clear()
         electricSectionListState.clear()
