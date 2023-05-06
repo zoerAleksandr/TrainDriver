@@ -67,7 +67,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.DpOffset
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.Train
-import com.example.traindriver.ui.screen.ROUTE
 import com.maxkeppeker.sheets.core.models.base.Header
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
 import com.maxkeppeler.sheets.calendar.CalendarDialog
@@ -88,13 +87,9 @@ fun AddingScreen(
 ) {
     OnLifecycleEvent { _, event ->
         when (event) {
-            Lifecycle.Event.ON_RESUME -> {
+            Lifecycle.Event.ON_CREATE -> {
                 viewModel.getMinTimeRest()
-                if (uid.contains(ROUTE.toRegex())){
-                    viewModel.newRoute()
-                } else {
-                    viewModel.setData(uid)
-                }
+                viewModel.setData(uid)
             }
             else -> {}
         }
@@ -612,7 +607,11 @@ fun AddingScreen(
                     viewModel::deleteLocomotiveInRoute
                 )
                 Spacer(modifier = Modifier.height(24.dp))
-                ItemAddTrain(navController, viewModel.stateTrainList, viewModel::deleteTrainInRoute)
+                ItemAddTrain(
+                    navController,
+                    viewModel.stateTrainList,
+                    viewModel::deleteTrainInRoute
+                )
 //                    ItemAddLoco(openSheet, viewModel.stateLocoList.value)
             }
         }
@@ -636,7 +635,7 @@ fun ItemAddTrain(
                 }
                 .padding(vertical = 16.dp, horizontal = 24.dp)
                 .fillMaxWidth()
-        ){
+        ) {
             val (title, data, icon) = createRefs()
             createVerticalChain(title, data, chainStyle = ChainStyle.SpreadInside)
             Text(

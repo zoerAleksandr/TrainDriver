@@ -12,6 +12,7 @@ import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.domain.entity.Train
 import com.example.traindriver.domain.use_case.AddRouteUseCase
 import com.example.traindriver.domain.use_case.GetRouteByIdUseCase
+import com.example.traindriver.ui.screen.ROUTE
 import com.example.traindriver.ui.screen.adding_screen.state_holder.*
 import com.example.traindriver.ui.util.collection_util.extension.addOrReplace
 import com.example.traindriver.ui.util.long_util.minus
@@ -31,7 +32,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
 
     var savesState by mutableStateOf<ResultState<Boolean>>(ResultState.Success(false))
 
-    var currentRoute: Route by Delegates.observable(
+    private var currentRoute: Route by Delegates.observable(
         initialValue = Route()
     ) { _, _, route ->
         setNumber(TextFieldValue(route.number ?: ""))
@@ -89,20 +90,26 @@ class AddingViewModel : ViewModel(), KoinComponent {
     }
 
     fun setData(uid: String) {
-        viewModelScope.launch {
-            getRouteByIdUseCase.execute(uid).collect {
-                when (it) {
-                    is ResultState.Loading -> {
-                        // TODO
-                    }
-                    is ResultState.Success -> {
-                        it.data?.let { route ->
-                            currentRoute = route
-                            Log.d("ZZZ", "after setting = ${currentRoute.hashCode()}")
+/**
+ * Проверка на то, содержится в uid константа ROUTE,
+ * если да, значит uid не был передан в качестве uid для редактирования маршрута,
+ * и нужно открыть экран с пустыми или ранее заполнеными полями*/
+        if (!uid.contains(ROUTE.toRegex())) {
+            viewModelScope.launch {
+                getRouteByIdUseCase.execute(uid).collect {
+                    when (it) {
+                        is ResultState.Loading -> {
+                            // TODO
                         }
-                    }
-                    is ResultState.Failure -> {
-                        // TODO
+                        is ResultState.Success -> {
+                            it.data?.let { route ->
+                                currentRoute = route
+                                Log.d("ZZZ", "after setting = ${currentRoute.hashCode()}")
+                            }
+                        }
+                        is ResultState.Failure -> {
+                            // TODO
+                        }
                     }
                 }
             }
@@ -218,9 +225,5 @@ class AddingViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
             minTimeRest = dataStoreRepository.getMinTimeRest().first()
         }
-    }
-
-    fun newRoute() {
-        currentRoute = Route()
     }
 }
