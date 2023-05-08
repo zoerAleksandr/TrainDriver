@@ -58,12 +58,12 @@ data class Train(
 
 data class Passenger(
     val id: String = generateUid(),
-    val trainNumber: String? = null,
-    val stationDeparture: String? = null,
-    val stationArrival: String? = null,
-    val timeArrival: Long? = null,
-    val timeDeparture: Long? = null,
-    val notes: String? = null
+    var trainNumber: String? = null,
+    var stationDeparture: String? = null,
+    var stationArrival: String? = null,
+    var timeArrival: Long? = null,
+    var timeDeparture: Long? = null,
+    var notes: String? = null
 )
 
 data class Station(

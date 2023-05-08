@@ -430,8 +430,13 @@ fun AddingTrainScreen(
                         style = Typography.titleMedium.copy(color = MaterialTheme.colorScheme.tertiary)
                     ) {
                         addingTrainViewModel.addStation(Station())
+                        scope.launch {
+                            val countItems = scrollState.layoutInfo.totalItemsCount
+                            scrollState.animateScrollToItem(countItems)
+                        }
                     }
                 }
+                item { Spacer(modifier = Modifier.padding(70.dp)) }
             }
         }
     }
@@ -462,7 +467,6 @@ private fun StationDraggableItem(
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxWidth()
-
         ) {
             val (stationField, timeArrivalField, timeDepartureField) = createRefs()
 
@@ -596,7 +600,7 @@ private fun StationDraggableItem(
                     clockDepartureState.show()
                 },
                 header = Header.Default(
-                    title = "Прибытие"
+                    title = "Отправление"
                 ),
                 config = CalendarConfig(
                     monthSelection = true,

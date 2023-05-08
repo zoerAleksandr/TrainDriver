@@ -10,6 +10,7 @@ import com.example.traindriver.ui.screen.adding_screen.AddingScreen
 import com.example.traindriver.ui.screen.adding_screen.AddingViewModel
 import com.example.traindriver.ui.screen.adding_screen.adding_train.AddingTrainScreen
 import com.example.traindriver.ui.screen.adding_screen.adding_loco.AddingLocoScreen
+import com.example.traindriver.ui.screen.adding_screen.adding_passenger.AddingPassengerScreen
 import com.example.traindriver.ui.screen.main_screen.HomeScreen
 import com.example.traindriver.ui.screen.password_conf_screen.PasswordConfScreen
 import com.example.traindriver.ui.screen.setting_screen.SettingScreen
@@ -98,6 +99,21 @@ fun SetupNavGraph(
             AddingTrainScreen(
                 navController = navController,
                 trainId = id,
+                addingRouteViewModel = addingRouteViewModel
+            )
+        }
+        composable(
+            route = Screen.AddingPassenger.route,
+            arguments = listOf(
+                navArgument(PASSENGER_ID) {
+                    type = NavType.StringType
+                }
+            )
+        ) {backStackEntry ->
+            val id = backStackEntry.arguments?.getString(PASSENGER_ID)
+            AddingPassengerScreen(
+                navController = navController,
+                passengerId = id,
                 addingRouteViewModel = addingRouteViewModel
             )
         }

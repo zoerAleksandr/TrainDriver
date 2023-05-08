@@ -41,7 +41,6 @@ import com.example.traindriver.R
 import com.example.traindriver.domain.entity.Locomotive
 import com.example.traindriver.ui.element_screen.HorizontalDividerTrainDriver
 import com.example.traindriver.ui.screen.Screen
-import com.example.traindriver.ui.screen.adding_screen.bottom_sheet_screen.*
 import com.example.traindriver.ui.screen.adding_screen.state_holder.WorkTimeEvent
 import com.example.traindriver.ui.screen.adding_screen.state_holder.WorkTimeType
 import com.example.traindriver.ui.screen.viewing_route_screen.element.LINK_TO_SETTING
@@ -66,6 +65,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.DpOffset
 import com.example.traindriver.data.util.ResultState
+import com.example.traindriver.domain.entity.Passenger
 import com.example.traindriver.domain.entity.Train
 import com.maxkeppeker.sheets.core.models.base.Header
 import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
@@ -335,9 +335,9 @@ fun AddingScreen(
                             calendarStartState.show()
                         }
                         .border(
-                            width = 0.5.dp,
+                            width = 1.dp,
                             shape = ShapeBackground.small,
-                            color = MaterialTheme.colorScheme.secondary
+                            color = MaterialTheme.colorScheme.outline
                         )
                         .padding(18.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -373,9 +373,9 @@ fun AddingScreen(
                 Column(
                     modifier = Modifier
                         .border(
-                            width = 0.5.dp,
+                            width = 1.dp,
                             shape = ShapeBackground.small,
-                            color = MaterialTheme.colorScheme.secondary
+                            color = MaterialTheme.colorScheme.outline
                         )
                         .padding(18.dp)
                         .clickable {
@@ -600,20 +600,122 @@ fun AddingScreen(
                     onValueChange = { viewModel.setNumber(it) }
                 )
                 HorizontalDividerTrainDriver(modifier = Modifier.padding(horizontal = 24.dp))
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 ItemAddLoco(
                     navController,
                     viewModel.stateLocoList,
                     viewModel::deleteLocomotiveInRoute
                 )
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 ItemAddTrain(
                     navController,
                     viewModel.stateTrainList,
                     viewModel::deleteTrainInRoute
                 )
-//                    ItemAddLoco(openSheet, viewModel.stateLocoList.value)
+                Spacer(modifier = Modifier.height(16.dp))
+                ItemAddPassenger(
+                    navController,
+                    viewModel.statePassengerList,
+                    viewModel::deletePassengerInRoute
+                )
             }
+        }
+    }
+}
+
+@Composable
+fun ItemAddPassenger(
+    navController: NavController,
+    passengerList: SnapshotStateList<Passenger>,
+    deletePassenger: (Passenger) -> Unit
+){
+    val scope = rememberCoroutineScope()
+    Card(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        shape = ShapeBackground.extraSmall
+    ){
+        ConstraintLayout(
+            modifier = Modifier
+                .clickable {
+                    scope.launch {
+                        navController.navigate(Screen.AddingPassenger.route)
+                    }
+                }
+                .padding(vertical = 16.dp, horizontal = 24.dp)
+                .fillMaxWidth()
+        ){
+            val (title, data, icon) = createRefs()
+            createVerticalChain(title, data, chainStyle = ChainStyle.SpreadInside)
+            Text(
+                modifier = Modifier
+                    .constrainAs(title) {
+                        start.linkTo(parent.start)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(data.top)
+                    }
+                    .padding(bottom = 8.dp),
+                text = "Пассажиром",
+                style = Typography.titleMedium.copy(color = MaterialTheme.colorScheme.primary)
+            )
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(rememberScrollState())
+                    .fillMaxWidth()
+                    .constrainAs(data) {
+                        start.linkTo(parent.start)
+                        bottom.linkTo(parent.bottom)
+                        end.linkTo(icon.start, 8.dp)
+                        width = Dimension.fillToConstraints
+                    },
+            ) {
+                passengerList.forEachIndexed { index, passenger ->
+                    AssistChip(
+                        modifier = Modifier
+                            .padding(end = 16.dp),
+                        onClick = {
+                            scope.launch {
+                                navController.navigate(
+                                    Screen.AddingPassenger.setId(passenger.id)
+                                )
+                            }
+                        },
+                        shape = ShapeBackground.small,
+                        label = {
+                            if (passenger.trainNumber.isNullOrBlank()) {
+                                Text(text = "Поезд №${index + 1}")
+                            } else {
+                                Text(
+                                    text = "№${passenger.trainNumber}",
+                                    style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.primary)
+                                )
+                            }
+                        },
+                        trailingIcon = {
+                            Icon(
+                                modifier = Modifier
+                                    .padding(start = 4.dp)
+                                    .clickable {
+                                        deletePassenger.invoke(passenger)
+                                    },
+                                painter = painterResource(id = R.drawable.ic_close_24),
+                                contentDescription = null
+                            )
+                        }
+                    )
+                }
+            }
+            Image(
+                modifier = Modifier
+                    .size(20.dp)
+                    .constrainAs(icon) {
+                        end.linkTo(parent.end)
+                        bottom.linkTo(parent.bottom)
+                        top.linkTo(parent.top)
+                    },
+                painter = painterResource(id = R.drawable.ic_forward_24),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)
+            )
         }
     }
 }
@@ -625,7 +727,10 @@ fun ItemAddTrain(
     deleteTrain: (Train) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    Card(modifier = Modifier.padding(horizontal = 16.dp)) {
+    Card(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        shape = ShapeBackground.extraSmall
+    ) {
         ConstraintLayout(
             modifier = Modifier
                 .clickable {
@@ -759,7 +864,10 @@ fun ItemAddLoco(
     deleteLoco: (Locomotive) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    Card(modifier = Modifier.padding(horizontal = 16.dp)) {
+    Card(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        shape = ShapeBackground.extraSmall
+    ) {
         ConstraintLayout(
             modifier = Modifier
                 .clickable {

@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.traindriver.data.repository.DataStoreRepository
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.Locomotive
+import com.example.traindriver.domain.entity.Passenger
 import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.domain.entity.Train
 import com.example.traindriver.domain.use_case.AddRouteUseCase
@@ -39,6 +40,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
         setTimeEditState(route)
         setLocoListState(route)
         setTrainListState(route)
+        setPassengerListState(route)
     }
 
     fun addRouteInRepository() {
@@ -74,6 +76,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
         )
         stateLocoList.clear()
         stateTrainList.clear()
+        statePassengerList.clear()
     }
 
     private fun setTimeEditState(route: Route) {
@@ -155,6 +158,20 @@ class AddingViewModel : ViewModel(), KoinComponent {
     fun deleteTrainInRoute(train: Train){
         if (stateTrainList.contains(train)){
             stateTrainList.remove(train)
+        }
+    }
+
+    var statePassengerList = mutableStateListOf<Passenger>()
+
+    private fun setPassengerListState(route: Route) {
+        statePassengerList.clear()
+        route.passengerList.forEach { passenger ->
+            statePassengerList.add(passenger)
+        }
+    }
+    fun deletePassengerInRoute(passenger: Passenger){
+        if (statePassengerList.contains(passenger)){
+            statePassengerList.remove(passenger)
         }
     }
 

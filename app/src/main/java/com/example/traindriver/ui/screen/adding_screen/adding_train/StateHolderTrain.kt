@@ -9,7 +9,7 @@ data class StationField(
     val type: StationDataType
 )
 
-data class StationFieldData(
+data class StationFieldDate(
     val data: Long? = null,
     val type: StationDataType
 )
@@ -22,8 +22,8 @@ data class StationIsValidField(
 data class StationFormState(
     val id: String,
     val station: StationField = StationField(type = StationDataType.NAME),
-    val arrival: StationFieldData = StationFieldData(type = StationDataType.ARRIVAL),
-    val departure: StationFieldData = StationFieldData(type = StationDataType.DEPARTURE),
+    val arrival: StationFieldDate = StationFieldDate(type = StationDataType.ARRIVAL),
+    val departure: StationFieldDate = StationFieldDate(type = StationDataType.DEPARTURE),
     val formValid: StationIsValidField = StationIsValidField(),
     val errorMessage: String = ""
 )

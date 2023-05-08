@@ -4,6 +4,7 @@ package com.example.traindriver.ui.screen
 const val ROUTE = "route"
 const val LOCO_ID = "loco_id"
 const val TRAIN_ID = "train_id"
+const val PASSENGER_ID = "passenger_id"
 
 sealed class Screen(val route: String) {
     object SignIn : Screen(route = "sign_in_screen")
@@ -33,6 +34,12 @@ sealed class Screen(val route: String) {
     object AddingTrain : Screen(route = "adding_train_screen/{$TRAIN_ID}") {
         fun setId(id: String): String {
             return this.route.replace(oldValue = "{$TRAIN_ID}", newValue = id)
+        }
+    }
+
+    object AddingPassenger : Screen(route = "adding_passenger_screen/{$PASSENGER_ID}") {
+        fun setId(id: String): String {
+            return this.route.replace(oldValue = "{$PASSENGER_ID}", newValue = id)
         }
     }
 
