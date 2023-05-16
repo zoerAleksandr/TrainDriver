@@ -618,7 +618,46 @@ fun AddingScreen(
                     viewModel.statePassengerList,
                     viewModel::deletePassengerInRoute
                 )
+                Spacer(modifier = Modifier.height(16.dp))
+                ItemNotes(
+                    navController
+                )
             }
+        }
+    }
+}
+
+@Composable
+fun ItemNotes(navController: NavController) {
+    val scope = rememberCoroutineScope()
+
+    Card(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        shape = ShapeBackground.extraSmall
+    ) {
+        Row(modifier = Modifier
+            .clickable {
+                scope.launch {
+                    navController.navigate(Screen.AddingNotes.route)
+                }
+            }
+            .padding(vertical = 16.dp, horizontal = 24.dp)
+            .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                modifier = Modifier
+                    .padding(bottom = 8.dp),
+                text = "Примечания",
+                style = Typography.titleMedium.copy(color = MaterialTheme.colorScheme.primary)
+            )
+            Image(
+                modifier = Modifier
+                    .size(20.dp),
+                painter = painterResource(id = R.drawable.ic_forward_24),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)
+            )
         }
     }
 }
@@ -628,12 +667,12 @@ fun ItemAddPassenger(
     navController: NavController,
     passengerList: SnapshotStateList<Passenger>,
     deletePassenger: (Passenger) -> Unit
-){
+) {
     val scope = rememberCoroutineScope()
     Card(
         modifier = Modifier.padding(horizontal = 16.dp),
         shape = ShapeBackground.extraSmall
-    ){
+    ) {
         ConstraintLayout(
             modifier = Modifier
                 .clickable {
@@ -643,7 +682,7 @@ fun ItemAddPassenger(
                 }
                 .padding(vertical = 16.dp, horizontal = 24.dp)
                 .fillMaxWidth()
-        ){
+        ) {
             val (title, data, icon) = createRefs()
             createVerticalChain(title, data, chainStyle = ChainStyle.SpreadInside)
             Text(

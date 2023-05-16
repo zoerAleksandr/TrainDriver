@@ -14,7 +14,8 @@ data class Route(
     val locoList: MutableList<Locomotive> = mutableListOf(),
     val trainList: MutableList<Train> = mutableListOf(),
     val stationList: MutableList<Station> = mutableListOf(),
-    val passengerList: MutableList<Passenger> = mutableListOf()
+    val passengerList: MutableList<Passenger> = mutableListOf(),
+    var notes: Notes? = null
 ) {
     fun getWorkTime(): Long? {
         val timeEnd = timeEndWork
@@ -124,3 +125,9 @@ abstract class Section(
 ) {
     abstract fun getConsumption(): Double?
 }
+
+data class Notes(
+    val id: String = generateUid(),
+    var text: String? = null,
+    var photos: MutableList<String?> = mutableListOf()
+)

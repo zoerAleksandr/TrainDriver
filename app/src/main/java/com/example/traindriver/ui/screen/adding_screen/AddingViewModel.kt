@@ -7,10 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.traindriver.data.repository.DataStoreRepository
 import com.example.traindriver.data.util.ResultState
-import com.example.traindriver.domain.entity.Locomotive
-import com.example.traindriver.domain.entity.Passenger
-import com.example.traindriver.domain.entity.Route
-import com.example.traindriver.domain.entity.Train
+import com.example.traindriver.domain.entity.*
 import com.example.traindriver.domain.use_case.AddRouteUseCase
 import com.example.traindriver.domain.use_case.GetRouteByIdUseCase
 import com.example.traindriver.ui.screen.ROUTE
@@ -41,6 +38,7 @@ class AddingViewModel : ViewModel(), KoinComponent {
         setLocoListState(route)
         setTrainListState(route)
         setPassengerListState(route)
+        setNotesState(route)
     }
 
     fun addRouteInRepository() {
@@ -48,14 +46,19 @@ class AddingViewModel : ViewModel(), KoinComponent {
             number = numberRouteState.text
             timeStartWork = timeEditState.value.startTime.time
             timeEndWork = timeEditState.value.endTime.time
+            notes = stateNotes.value
             locoList.clear()
             trainList.clear()
+            passengerList.clear()
         }
         stateLocoList.forEach {
             currentRoute.locoList.addOrReplace(it)
         }
         stateTrainList.forEach {
             currentRoute.trainList.addOrReplace(it)
+        }
+        statePassengerList.forEach {
+            currentRoute.passengerList.addOrReplace(it)
         }
         viewModelScope.launch {
             addRouteUseCase.execute(currentRoute).collect { result ->
@@ -173,6 +176,11 @@ class AddingViewModel : ViewModel(), KoinComponent {
         if (statePassengerList.contains(passenger)){
             statePassengerList.remove(passenger)
         }
+    }
+
+    var stateNotes : MutableState<Notes?> = mutableStateOf(null)
+    private fun setNotesState(route: Route){
+        stateNotes.value = route.notes
     }
 
     var minTimeRest by mutableStateOf(0L)

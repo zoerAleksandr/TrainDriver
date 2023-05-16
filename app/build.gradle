@@ -58,7 +58,7 @@ dependencies {
 
     implementation "androidx.compose.material3:material3:1.1.0-beta02"
     implementation "androidx.compose.material:material-icons-core:1.4.1"
-    implementation "androidx.compose.material:material-icons-extended:1.4.1"
+    implementation "androidx.compose.material:material-icons-extended:1.4.3"
     implementation "androidx.compose.material3:material3-window-size-class:1.0.1"
 
     implementation 'androidx.core:core-ktx:1.9.0'
@@ -116,6 +116,11 @@ dependencies {
 
     // Reflection
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.7.10"
+
+    // CameraX
+    implementation "androidx.camera:camera-camera2:1.2.2"
+    implementation "androidx.camera:camera-lifecycle:1.2.2"
+    implementation "androidx.camera:camera-view:1.2.2"
 
     implementation 'androidx.browser:browser:1.4.0'
     implementation 'com.google.firebase:firebase-firestore-ktx'

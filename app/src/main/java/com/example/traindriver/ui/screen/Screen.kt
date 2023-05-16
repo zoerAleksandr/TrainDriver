@@ -5,6 +5,7 @@ const val ROUTE = "route"
 const val LOCO_ID = "loco_id"
 const val TRAIN_ID = "train_id"
 const val PASSENGER_ID = "passenger_id"
+const val NOTES_ID = "notes_id"
 
 sealed class Screen(val route: String) {
     object SignIn : Screen(route = "sign_in_screen")
@@ -43,4 +44,9 @@ sealed class Screen(val route: String) {
         }
     }
 
+    object AddingNotes : Screen(route = "adding_notes_screen/{$NOTES_ID}") {
+        fun setId(id: String): String {
+            return this.route.replace(oldValue = "{$NOTES_ID}", newValue = id)
+        }
+    }
 }
