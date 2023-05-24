@@ -38,7 +38,7 @@ class AddingNotesViewModel : ViewModel() {
             text = null,
             photos = mutableListOf()
         )
-        photosList.clear()
+        photosList = mutableStateListOf(EMPTY_IMAGE_URI)
     }
 
     fun setData(notes: Notes?) {
@@ -59,6 +59,9 @@ class AddingNotesViewModel : ViewModel() {
             is NotesEvent.AddingPhoto -> {
                 addPhoto(event.data)
             }
+            is NotesEvent.RemovePhoto -> {
+                removePhoto(event.data)
+            }
         }
     }
 
@@ -74,6 +77,10 @@ class AddingNotesViewModel : ViewModel() {
         viewModelScope.launch {
             photosList.add(0, newPhoto)
         }
+    }
+
+    private fun removePhoto(photo: Uri) {
+        photosList.remove(photo)
     }
 
     private fun setPhotos(newValue: MutableList<Uri?>) {

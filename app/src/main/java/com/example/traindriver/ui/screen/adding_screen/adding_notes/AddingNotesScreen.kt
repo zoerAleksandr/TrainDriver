@@ -6,7 +6,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -20,6 +22,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.AnnotatedString
@@ -44,8 +47,12 @@ import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.OnLifecycleEvent
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.maxkeppeker.sheets.core.views.Grid
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @OptIn(
     ExperimentalMaterial3Api::class,
@@ -77,22 +84,47 @@ fun AddingNotesScreen(
                 ),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
             content = {
-                Image(
-                    modifier = Modifier.fillMaxSize(),
-                    painter = rememberAsyncImagePainter(photo),
-                    contentDescription = null
-                )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Image(
+                        modifier = Modifier.fillMaxSize(),
+                        painter = rememberAsyncImagePainter(photo),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null
+                    )
+                    IconButton(
+                        modifier = Modifier.align(Alignment.TopEnd).padding(6.dp),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.7f),
+                            contentColor = MaterialTheme.colorScheme.error
+                        ),
+                        onClick = {
+                            addingNotesViewModel.createEventNotes(NotesEvent.RemovePhoto(photo))
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Удалить"
+                        )
+                    }
+                }
             },
             onClick = {
                 scope.launch {
-                    // TODO navigate to viewing photo
+                    val encodeUri =
+                        withContext(Dispatchers.IO) {
+                            URLEncoder.encode(
+                                photo.toString(),
+                                StandardCharsets.UTF_8.toString()
+                            )
+                        }
+                    navController.navigate(Screen.ViewingPhoto.openPhoto(encodeUri))
                 }
             }
         )
     }
 
     @Composable
-    fun ItemPreview() {
+    fun ItemCameraPreview() {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -290,7 +322,7 @@ fun AddingNotesScreen(
                         columnSpacing = 12.dp,
                     ) { item ->
                         if (list.isEmpty() || item == EMPTY_IMAGE_URI) {
-                            ItemPreview()
+                            ItemCameraPreview()
                         } else {
                             ItemPhoto(item)
                         }

@@ -40,7 +40,6 @@ suspend fun ImageCapture.takePicture(executor: Executor): File {
             File("/dev/null")
         }
     }
-    Log.d("ZZZ", "file = $photoFile")
 
     return suspendCoroutine { continuation ->
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()

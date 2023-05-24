@@ -28,4 +28,5 @@ data class NotesFormState(
 sealed class NotesEvent {
     data class EnteredNotesText(val data: String?) : NotesEvent()
     data class AddingPhoto(val data: Uri) : NotesEvent()
+    data class RemovePhoto(val data: Uri) : NotesEvent()
 }

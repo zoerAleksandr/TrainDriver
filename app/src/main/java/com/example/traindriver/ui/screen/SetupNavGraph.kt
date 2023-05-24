@@ -154,6 +154,7 @@ fun SetupNavGraph(
             backStackEntry.arguments?.getString(PHOTO)?.let { photo ->
                 ViewingPhotoScreen(
                     navController = navController,
+                    addingNotesViewModel = addingNotesViewModel,
                     photo = photo
                 )
             }
