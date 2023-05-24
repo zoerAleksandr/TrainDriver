@@ -1,4 +1,4 @@
-package com.example.traindriver.ui.screen.adding_screen.adding_notes
+package com.example.traindriver.ui.screen.photo
 
 import android.content.Context
 import android.net.Uri

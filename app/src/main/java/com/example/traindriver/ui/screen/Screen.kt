@@ -6,6 +6,7 @@ const val LOCO_ID = "loco_id"
 const val TRAIN_ID = "train_id"
 const val PASSENGER_ID = "passenger_id"
 const val NOTES_ID = "notes_id"
+const val PHOTO = "photo"
 
 sealed class Screen(val route: String) {
     object SignIn : Screen(route = "sign_in_screen")
@@ -49,4 +50,12 @@ sealed class Screen(val route: String) {
             return this.route.replace(oldValue = "{$NOTES_ID}", newValue = id)
         }
     }
+
+    object ViewingPhoto: Screen(route = "viewing_photo/{$PHOTO}") {
+        fun openPhoto(photo: String): String {
+            return this.route.replace(oldValue = "{$PHOTO}", newValue = photo)
+        }
+    }
+
+    object CreatePhoto: Screen(route = "create_photo")
 }

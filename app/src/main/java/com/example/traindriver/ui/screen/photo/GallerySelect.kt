@@ -1,4 +1,4 @@
-package com.example.traindriver.ui.screen.adding_screen.adding_notes
+package com.example.traindriver.ui.screen.photo
 
 
 import android.Manifest
@@ -20,6 +20,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.traindriver.ui.screen.adding_screen.adding_notes.Permission
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
 @ExperimentalPermissionsApi
@@ -46,7 +47,7 @@ fun GallerySelect(
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         Permission(
             permission = Manifest.permission.ACCESS_MEDIA_LOCATION,
-            rationale = "You want to read from photo gallery, so I'm going to have to ask for permission.",
+            rationale = "Для выбора фото из галереи предоставьте разрешение на доступ к хранилищу",
             permissionNotAvailableContent = {
                 Column(modifier) {
                     Text("O noes! No Photo Gallery!")

@@ -1,9 +1,13 @@
 package com.example.traindriver.ui.screen.adding_screen.adding_notes
 
+import android.net.Uri
 import androidx.compose.runtime.*
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.traindriver.domain.entity.Notes
+import com.example.traindriver.ui.screen.photo.EMPTY_IMAGE_URI
+import kotlinx.coroutines.launch
 import kotlin.properties.Delegates
 
 class AddingNotesViewModel : ViewModel() {
@@ -17,17 +21,16 @@ class AddingNotesViewModel : ViewModel() {
     var formState by mutableStateOf(NotesFormState(id = currentNotes.id))
         private set
 
-    fun addNotesInRoute(stateNotes: MutableState<Notes?>) {
-        val photosList = mutableListOf<String?>()
-        formState.photos.forEach {
-            photosList.add(it.data)
-        }
+    var photosList = mutableStateListOf(EMPTY_IMAGE_URI)
+        private set
 
+    fun addNotesInRoute(stateNotes: MutableState<Notes?>) {
         currentNotes.apply {
             text = formState.notesText.data
-            photos = photosList
+            photos = photosList.toMutableList()
         }
         stateNotes.value = currentNotes
+        clearField()
     }
 
     fun clearField() {
@@ -35,6 +38,7 @@ class AddingNotesViewModel : ViewModel() {
             text = null,
             photos = mutableListOf()
         )
+        photosList.clear()
     }
 
     fun setData(notes: Notes?) {
@@ -53,7 +57,7 @@ class AddingNotesViewModel : ViewModel() {
                 setNotesText(TextFieldValue(event.data ?: ""))
             }
             is NotesEvent.AddingPhoto -> {
-
+                addPhoto(event.data)
             }
         }
     }
@@ -66,14 +70,20 @@ class AddingNotesViewModel : ViewModel() {
         )
     }
 
-    private fun setPhotos(newValue: MutableList<String?>) {
+    private fun addPhoto(newPhoto: Uri) {
+        viewModelScope.launch {
+            photosList.add(0, newPhoto)
+        }
+    }
+
+    private fun setPhotos(newValue: MutableList<Uri?>) {
         formState.photos.clear()
-        newValue.forEach { fieldText ->
+        newValue.forEach { photo ->
             formState.photos
                 .add(
-                    NotesFieldText(
-                        type = NotesDataType.NOTES_TEXT,
-                        data = fieldText
+                    NotesFieldPhoto(
+                        type = NotesDataType.PHOTOS,
+                        data = photo
                     )
                 )
         }

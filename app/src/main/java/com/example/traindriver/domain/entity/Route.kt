@@ -1,5 +1,6 @@
 package com.example.traindriver.domain.entity
 
+import android.net.Uri
 import com.example.traindriver.ui.util.double_util.times
 import java.util.*
 
@@ -129,5 +130,5 @@ abstract class Section(
 data class Notes(
     val id: String = generateUid(),
     var text: String? = null,
-    var photos: MutableList<String?> = mutableListOf()
+    var photos: MutableList<Uri?> = mutableListOf()
 )

@@ -1,5 +1,7 @@
 package com.example.traindriver.ui.screen.adding_screen.adding_notes
 
+import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -30,9 +32,11 @@ import androidx.compose.ui.zIndex
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
+import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.adding_screen.AddingViewModel
+import com.example.traindriver.ui.screen.photo.EMPTY_IMAGE_URI
 import com.example.traindriver.ui.screen.viewing_route_screen.element.BottomShadow
 import com.example.traindriver.ui.screen.viewing_route_screen.element.isScrollInInitialState
 import com.example.traindriver.ui.theme.ShapeBackground
@@ -44,13 +48,97 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 
 @OptIn(
-    ExperimentalMaterial3Api::class
+    ExperimentalMaterial3Api::class,
+    ExperimentalPermissionsApi::class,
+    ExperimentalCoroutinesApi::class
 )
 @Composable
 fun AddingNotesScreen(
-    navController: NavController, notesId: String?, addingRouteViewModel: AddingViewModel
+    navController: NavController,
+    notesId: String?,
+    addingRouteViewModel: AddingViewModel,
+    addingNotesViewModel: AddingNotesViewModel
 ) {
-    val addingNotesViewModel: AddingNotesViewModel = viewModel()
+    val widthScreen = LocalConfiguration.current.screenWidthDp
+
+    @Composable
+    fun ItemPhoto(
+        photo: Uri,
+    ) {
+        val scope = rememberCoroutineScope()
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height((widthScreen / 2).dp)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline,
+                    shape = ShapeBackground.extraSmall
+                ),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+            content = {
+                Image(
+                    modifier = Modifier.fillMaxSize(),
+                    painter = rememberAsyncImagePainter(photo),
+                    contentDescription = null
+                )
+            },
+            onClick = {
+                scope.launch {
+                    // TODO navigate to viewing photo
+                }
+            }
+        )
+    }
+
+    @Composable
+    fun ItemPreview() {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height((widthScreen / 2).dp)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline,
+                    shape = ShapeBackground.extraSmall
+                ),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+            onClick = {
+                navController.navigate(Screen.CreatePhoto.route)
+            }
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CameraCapturePreview()
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.White.copy(alpha = 0.7f))
+                )
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .size(64.dp)
+                            .padding(12.dp),
+                        imageVector = Icons.Default.PhotoCamera,
+                        contentDescription = "Добавить фото"
+                    )
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "Добавить фото",
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
+    }
+
     val scope = rememberCoroutineScope()
 
     OnLifecycleEvent { _, event ->
@@ -63,6 +151,12 @@ fun AddingNotesScreen(
             else -> {}
         }
     }
+
+    BackHandler {
+        addingNotesViewModel.clearField()
+        navController.navigateUp()
+    }
+
     Scaffold(modifier = Modifier.fillMaxWidth(), topBar = {
         MediumTopAppBar(title = {
             Text(
@@ -71,6 +165,7 @@ fun AddingNotesScreen(
             )
         }, navigationIcon = {
             IconButton(onClick = {
+                addingNotesViewModel.clearField()
                 navController.navigateUp()
             }) {
                 Icon(
@@ -186,77 +281,22 @@ fun AddingNotesScreen(
                     )
                 }
                 item {
-                    val listPhoto = mutableListOf(PREVIEW_ITEM)
+                    val list = addingNotesViewModel.photosList
                     Grid(
                         modifier = Modifier.padding(horizontal = 24.dp),
-                        items = listPhoto,
+                        items = list,
                         columns = 2,
                         rowSpacing = 12.dp,
                         columnSpacing = 12.dp,
                     ) { item ->
-                        if (item == PREVIEW_ITEM || listPhoto.isEmpty()) {
+                        if (list.isEmpty() || item == EMPTY_IMAGE_URI) {
                             ItemPreview()
                         } else {
-                            ItemPhoto {
-                                Text(item)
-                            }
+                            ItemPhoto(item)
                         }
                     }
                 }
-                item { Spacer(modifier = Modifier.padding(24.dp))}
-            }
-        }
-    }
-}
-
-private const val PREVIEW_ITEM = "previewItem"
-
-@Composable
-private fun ItemPhoto(content: @Composable (ColumnScope.() -> Unit)) {
-    val widthScreen = LocalConfiguration.current.screenWidthDp
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height((widthScreen / 2).dp)
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline,
-                shape = ShapeBackground.extraSmall
-            ),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
-        content = content
-    )
-}
-
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalCoroutinesApi::class)
-@Composable
-private fun ItemPreview() {
-    ItemPhoto {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CameraCapturePreview()
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.White.copy(alpha = 0.7f))
-            )
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    modifier = Modifier.size(64.dp).padding(12.dp),
-                    imageVector = Icons.Default.PhotoCamera,
-                    contentDescription = "Добавить фото"
-                )
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = "Добавить фото",
-                    textAlign = TextAlign.Center
-                )
+                item { Spacer(modifier = Modifier.padding(24.dp)) }
             }
         }
     }

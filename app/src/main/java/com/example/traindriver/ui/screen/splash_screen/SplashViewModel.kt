@@ -46,7 +46,7 @@ class SplashViewModel : ViewModel(), KoinComponent {
             _startDestination.value = Screen.Home.route
             true
         } else {
-            _startDestination.value = Screen.SignIn.route
+            _startDestination.value = Screen.Home.route
             false
         }
     }

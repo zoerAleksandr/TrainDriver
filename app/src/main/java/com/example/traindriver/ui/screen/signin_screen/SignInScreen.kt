@@ -112,13 +112,13 @@ fun SignInScreen(
         },
         snackbarHost = { sheetState.snackbarHostState }
     ) {
-//        Scaffold(scaffoldState = scaffoldState, snackbarHost = {
-//            SnackbarHost(
-//                hostState = it
-//            ) { snackBarData ->
-//                TopSnackbar(snackBarData)
-//            }
-//        }) {
+        Scaffold(snackbarHost = {
+            SnackbarHost(
+                hostState = sheetState.snackbarHostState
+            ) { snackBarData ->
+                TopSnackbar(snackBarData)
+            }
+        }) {
             ConstraintLayout(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -206,7 +206,7 @@ fun SignInScreen(
                 )
             }
         }
-//    }
+    }
 
     val launcher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->

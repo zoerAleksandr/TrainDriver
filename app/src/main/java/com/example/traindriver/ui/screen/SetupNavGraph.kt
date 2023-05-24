@@ -6,14 +6,18 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import coil.annotation.ExperimentalCoilApi
 import com.example.traindriver.ui.screen.adding_screen.AddingScreen
 import com.example.traindriver.ui.screen.adding_screen.AddingViewModel
 import com.example.traindriver.ui.screen.adding_screen.adding_train.AddingTrainScreen
 import com.example.traindriver.ui.screen.adding_screen.adding_loco.AddingLocoScreen
 import com.example.traindriver.ui.screen.adding_screen.adding_notes.AddingNotesScreen
+import com.example.traindriver.ui.screen.adding_screen.adding_notes.AddingNotesViewModel
+import com.example.traindriver.ui.screen.photo.ViewingPhotoScreen
 import com.example.traindriver.ui.screen.adding_screen.adding_passenger.AddingPassengerScreen
 import com.example.traindriver.ui.screen.main_screen.HomeScreen
 import com.example.traindriver.ui.screen.password_conf_screen.PasswordConfScreen
+import com.example.traindriver.ui.screen.photo.CreatePhotoScreen
 import com.example.traindriver.ui.screen.setting_screen.SettingScreen
 import com.example.traindriver.ui.screen.signin_screen.SignInScreen
 import com.example.traindriver.ui.screen.signin_screen.SignInViewModel
@@ -21,8 +25,12 @@ import com.example.traindriver.ui.screen.viewing_route_screen.ViewingRouteScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalPermissionsApi::class,
+    ExperimentalCoilApi::class, ExperimentalCoroutinesApi::class
+)
 @Composable
 fun SetupNavGraph(
     startDestination: String,
@@ -30,6 +38,7 @@ fun SetupNavGraph(
 ) {
     val signInViewModel: SignInViewModel = viewModel()
     val addingRouteViewModel: AddingViewModel = viewModel()
+    val addingNotesViewModel: AddingNotesViewModel = viewModel()
     val navController = rememberAnimatedNavController()
 
     AnimatedNavHost(
@@ -110,7 +119,7 @@ fun SetupNavGraph(
                     type = NavType.StringType
                 }
             )
-        ) {backStackEntry ->
+        ) { backStackEntry ->
             val id = backStackEntry.arguments?.getString(PASSENGER_ID)
             AddingPassengerScreen(
                 navController = navController,
@@ -125,12 +134,35 @@ fun SetupNavGraph(
                     type = NavType.StringType
                 }
             )
-        ) {backStackEntry ->
+        ) { backStackEntry ->
             val id = backStackEntry.arguments?.getString(NOTES_ID)
             AddingNotesScreen(
                 navController = navController,
                 notesId = id,
-                addingRouteViewModel = addingRouteViewModel
+                addingRouteViewModel = addingRouteViewModel,
+                addingNotesViewModel = addingNotesViewModel
+            )
+        }
+        composable(
+            route = Screen.ViewingPhoto.route,
+            arguments = listOf(
+                navArgument(PHOTO) {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString(PHOTO)?.let { photo ->
+                ViewingPhotoScreen(
+                    navController = navController,
+                    photo = photo
+                )
+            }
+        }
+
+        composable(route = Screen.CreatePhoto.route){
+            CreatePhotoScreen(
+                addingNotesViewModel = addingNotesViewModel,
+                navController = navController
             )
         }
     }
