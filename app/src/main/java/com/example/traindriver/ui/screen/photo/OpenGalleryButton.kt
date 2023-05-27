@@ -1,6 +1,5 @@
 package com.example.traindriver.ui.screen.photo
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -69,7 +67,7 @@ fun OpenGalleryButton(
 }
 
 @Composable
-fun ReverseCameraButton(modifier: Modifier = Modifier, onClick: () -> Unit){
+fun ReverseCameraButton(modifier: Modifier = Modifier, onClick: () -> Unit) {
     Box(modifier = Modifier.background(Color.Transparent)) {
         IconButton(
             modifier = modifier,

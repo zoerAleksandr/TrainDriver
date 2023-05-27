@@ -1,8 +1,12 @@
-package com.example.traindriver.ui.screen.adding_screen.adding_notes
+package com.example.traindriver.ui.screen.photo
 
 import android.Manifest
+import android.content.Context.AUDIO_SERVICE
 import android.content.Intent
 import android.graphics.ImageDecoder
+import android.media.AudioManager
+import android.media.AudioManager.*
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -13,6 +17,10 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY
 import androidx.camera.core.Preview
 import androidx.camera.core.UseCase
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -28,11 +36,12 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.dp
 import com.example.traindriver.R
-import com.example.traindriver.ui.screen.photo.*
+import com.example.traindriver.ui.screen.adding_screen.adding_notes.Permission
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import java.io.File
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.io.File
 
 @ExperimentalPermissionsApi
 @ExperimentalCoroutinesApi
@@ -44,6 +53,21 @@ fun CameraCapture(
     onImageFile: (File) -> Unit = { }
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val audioManager = context.getSystemService(AUDIO_SERVICE) as AudioManager
+
+    val volumeLevel = audioManager.getStreamVolume(STREAM_MUSIC)
+    val maxVolumeLevel =
+        audioManager.getStreamMaxVolume(STREAM_MUSIC).times(0.7).toInt()
+
+    var shimmerState by remember { mutableStateOf(false) }
+    fun cameraShimmerStart() {
+        scope.launch {
+            shimmerState = true
+            delay(100)
+            shimmerState = false
+        }
+    }
     Permission(
         permission = Manifest.permission.CAMERA,
         permissionNotAvailableContent = {
@@ -88,6 +112,18 @@ fun CameraCapture(
                     previewUseCase = it
                 })
 
+                AnimatedVisibility(
+                    exit = fadeOut(animationSpec = tween(durationMillis = 100)),
+                    enter = fadeIn(animationSpec = tween(durationMillis = 100)),
+                    visible = shimmerState
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black)
+                    )
+                }
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -121,13 +157,31 @@ fun CameraCapture(
                         gallerySelect.value = true
                     }
 
-                    CapturePictureButton(modifier = Modifier, onClick = {
-                        coroutineScope.launch {
-                            imageCaptureUseCase.takePicture(context.executor).let {
-                                onImageFile(it)
+                    CapturePictureButton(
+                        modifier = Modifier,
+                        onClick = {
+                            cameraShimmerStart()
+                            audioManager.setStreamVolume(
+                                STREAM_MUSIC,
+                                maxVolumeLevel,
+                                FLAG_REMOVE_SOUND_AND_VIBRATE
+                            )
+                            val sound: MediaPlayer =
+                                MediaPlayer.create(context, R.raw.sound_snapshot)
+
+                            sound.start()
+
+                            coroutineScope.launch {
+                                imageCaptureUseCase.takePicture(context.executor).let {
+                                    onImageFile(it)
+                                    audioManager.setStreamVolume(
+                                        STREAM_MUSIC,
+                                        volumeLevel,
+                                        FLAG_REMOVE_SOUND_AND_VIBRATE
+                                    )
+                                }
                             }
-                        }
-                    })
+                        })
 
                     ReverseCameraButton(
                         modifier = Modifier.size(45.dp)

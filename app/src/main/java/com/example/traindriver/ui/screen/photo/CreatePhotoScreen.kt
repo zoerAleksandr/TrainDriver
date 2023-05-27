@@ -11,7 +11,6 @@ import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
 import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.adding_screen.adding_notes.AddingNotesViewModel
-import com.example.traindriver.ui.screen.adding_screen.adding_notes.CameraCapture
 import com.example.traindriver.ui.screen.adding_screen.adding_notes.NotesEvent
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.Dispatchers
