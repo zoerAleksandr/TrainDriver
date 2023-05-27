@@ -4,15 +4,22 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import coil.annotation.ExperimentalCoilApi
+import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.adding_screen.adding_notes.AddingNotesViewModel
 import com.example.traindriver.ui.screen.adding_screen.adding_notes.CameraCapture
 import com.example.traindriver.ui.screen.adding_screen.adding_notes.NotesEvent
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @ExperimentalCoilApi
 @ExperimentalCoroutinesApi
@@ -24,6 +31,7 @@ fun CreatePhotoScreen(
     navController: NavController
 ) {
     val showGallerySelect = remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     if (showGallerySelect.value) {
         GallerySelect(
             modifier = modifier,
@@ -40,8 +48,16 @@ fun CreatePhotoScreen(
                 gallerySelect = showGallerySelect,
                 onImageFile = { file ->
                     showGallerySelect.value = false
-                    addingNotesViewModel.createEventNotes(NotesEvent.AddingPhoto(file.toUri()))
-                    navController.popBackStack()
+                    scope.launch {
+                        val encodeUri =
+                            withContext(Dispatchers.IO) {
+                                URLEncoder.encode(
+                                    file.toUri().toString(),
+                                    StandardCharsets.UTF_8.toString()
+                                )
+                            }
+                        navController.navigate(Screen.PreviewPhoto.setPhoto(encodeUri))
+                    }
                 }
             )
         }

@@ -130,5 +130,5 @@ abstract class Section(
 data class Notes(
     val id: String = generateUid(),
     var text: String? = null,
-    var photos: MutableList<Uri?> = mutableListOf()
+    var photos: MutableList<Uri> = mutableListOf()
 )

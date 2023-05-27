@@ -83,16 +83,17 @@ class AddingNotesViewModel : ViewModel() {
         photosList.remove(photo)
     }
 
-    private fun setPhotos(newValue: MutableList<Uri?>) {
+    private fun setPhotos(newValue: MutableList<Uri>) {
         formState.photos.clear()
         newValue.forEach { photo ->
-            formState.photos
-                .add(
-                    NotesFieldPhoto(
-                        type = NotesDataType.PHOTOS,
-                        data = photo
-                    )
-                )
+            photosList.add(photo)
+//            formState.photos
+//                .add(
+//                    NotesFieldPhoto(
+//                        type = NotesDataType.PHOTOS,
+//                        data = photo
+//                    )
+//                )
         }
     }
 }

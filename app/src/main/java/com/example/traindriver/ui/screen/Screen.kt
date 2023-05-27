@@ -7,6 +7,7 @@ const val TRAIN_ID = "train_id"
 const val PASSENGER_ID = "passenger_id"
 const val NOTES_ID = "notes_id"
 const val PHOTO = "photo"
+const val PREV_PHOTO = "prev_photo"
 
 sealed class Screen(val route: String) {
     object SignIn : Screen(route = "sign_in_screen")
@@ -58,4 +59,9 @@ sealed class Screen(val route: String) {
     }
 
     object CreatePhoto: Screen(route = "create_photo")
+    object PreviewPhoto: Screen(route = "preview_photo/{$PREV_PHOTO}") {
+        fun setPhoto(photo: String): String {
+            return this.route.replace(oldValue = "{$PREV_PHOTO}", newValue = photo)
+        }
+    }
 }

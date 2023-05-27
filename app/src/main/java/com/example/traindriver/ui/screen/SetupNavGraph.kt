@@ -18,6 +18,7 @@ import com.example.traindriver.ui.screen.adding_screen.adding_passenger.AddingPa
 import com.example.traindriver.ui.screen.main_screen.HomeScreen
 import com.example.traindriver.ui.screen.password_conf_screen.PasswordConfScreen
 import com.example.traindriver.ui.screen.photo.CreatePhotoScreen
+import com.example.traindriver.ui.screen.photo.PreviewPhotoScreen
 import com.example.traindriver.ui.screen.setting_screen.SettingScreen
 import com.example.traindriver.ui.screen.signin_screen.SignInScreen
 import com.example.traindriver.ui.screen.signin_screen.SignInViewModel
@@ -28,7 +29,8 @@ import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalPermissionsApi::class,
+@OptIn(
+    ExperimentalAnimationApi::class, ExperimentalPermissionsApi::class,
     ExperimentalCoilApi::class, ExperimentalCoroutinesApi::class
 )
 @Composable
@@ -160,11 +162,28 @@ fun SetupNavGraph(
             }
         }
 
-        composable(route = Screen.CreatePhoto.route){
+        composable(route = Screen.CreatePhoto.route) {
             CreatePhotoScreen(
                 addingNotesViewModel = addingNotesViewModel,
                 navController = navController
             )
+        }
+
+        composable(
+            route = Screen.PreviewPhoto.route,
+            arguments = listOf(
+                navArgument(PREV_PHOTO) {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+            backStackEntry.arguments?.getString(PREV_PHOTO)?.let { photo ->
+                PreviewPhotoScreen(
+                    addingNotesViewModel = addingNotesViewModel,
+                    navController = navController,
+                    photo = photo
+                )
+            }
         }
     }
 }

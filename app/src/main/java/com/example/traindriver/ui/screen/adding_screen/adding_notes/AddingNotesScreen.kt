@@ -12,6 +12,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -26,8 +27,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -92,7 +95,9 @@ fun AddingNotesScreen(
                         contentDescription = null
                     )
                     IconButton(
-                        modifier = Modifier.align(Alignment.TopEnd).padding(6.dp),
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(6.dp),
                         colors = IconButtonDefaults.iconButtonColors(
                             containerColor = Color.White.copy(alpha = 0.7f),
                             contentColor = MaterialTheme.colorScheme.error
@@ -285,6 +290,10 @@ fun AddingNotesScreen(
             ) {
                 item {
                     val focusManager = LocalFocusManager.current
+                    val screenHeight = LocalConfiguration.current.screenHeightDp
+                    val minSize = (screenHeight / 5).dp
+                    val maxSize = (screenHeight / 3).dp
+
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -298,33 +307,35 @@ fun AddingNotesScreen(
                         textStyle = Typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
                         placeholder = {
                             Text(
-                                text = "Здесь можно добавить заметки",
-                                color = MaterialTheme.colorScheme.secondary
+                                text = "Введите текст",
+                                color = MaterialTheme.colorScheme.secondary,
+                                style = Typography.bodyLarge
                             )
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
-                        ),
-                        keyboardActions = KeyboardActions(onNext = {
-                            scope.launch {
-                                focusManager.clearFocus()
-                            }
-                        })
+                        }
                     )
                 }
                 item {
-                    val list = addingNotesViewModel.photosList
-                    Grid(
-                        modifier = Modifier.padding(horizontal = 24.dp),
-                        items = list,
-                        columns = 2,
-                        rowSpacing = 12.dp,
-                        columnSpacing = 12.dp,
-                    ) { item ->
-                        if (list.isEmpty() || item == EMPTY_IMAGE_URI) {
-                            ItemCameraPreview()
-                        } else {
-                            ItemPhoto(item)
+                    Column {
+                        Text(
+                            modifier = Modifier.padding(start = 24.dp, bottom = 12.dp),
+                            text = "Фотографии",
+                            style = Typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                        val list = addingNotesViewModel.photosList
+                        Grid(
+                            modifier = Modifier.padding(horizontal = 24.dp),
+                            items = list,
+                            columns = 2,
+                            rowSpacing = 12.dp,
+                            columnSpacing = 12.dp,
+                        ) { item ->
+                            if (list.isEmpty() || item == EMPTY_IMAGE_URI) {
+                                ItemCameraPreview()
+                            } else {
+                                ItemPhoto(item)
+                            }
                         }
                     }
                 }

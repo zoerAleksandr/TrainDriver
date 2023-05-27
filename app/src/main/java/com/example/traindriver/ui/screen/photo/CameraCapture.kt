@@ -124,7 +124,6 @@ fun CameraCapture(
                     CapturePictureButton(modifier = Modifier, onClick = {
                         coroutineScope.launch {
                             imageCaptureUseCase.takePicture(context.executor).let {
-                                Log.d("ZZZ", "file = ${it.name}")
                                 onImageFile(it)
                             }
                         }
