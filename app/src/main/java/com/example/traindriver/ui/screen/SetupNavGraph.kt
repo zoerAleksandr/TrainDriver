@@ -132,15 +132,21 @@ fun SetupNavGraph(
         composable(
             route = Screen.AddingNotes.route,
             arguments = listOf(
-                navArgument(NOTES_ID) {
+                navArgument(NOTES_TAG) {
                     type = NavType.StringType
                 }
             )
         ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getString(NOTES_ID)
+            val tag =
+                if (backStackEntry.arguments?.getString(NOTES_TAG) == Screen.AddingNotesTag.SET_LIST.name) {
+                    Screen.AddingNotesTag.SET_LIST
+                } else {
+                    Screen.AddingNotesTag.NOT_LIST
+                }
+
             AddingNotesScreen(
                 navController = navController,
-                notesId = id,
+                tag = tag,
                 addingRouteViewModel = addingRouteViewModel,
                 addingNotesViewModel = addingNotesViewModel
             )

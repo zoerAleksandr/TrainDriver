@@ -3,6 +3,7 @@ package com.example.traindriver.ui.screen.adding_screen.adding_notes
 import android.net.Uri
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.example.traindriver.ui.screen.photo.EMPTY_IMAGE_URI
 
 enum class NotesDataType {
     NOTES_TEXT, PHOTOS
@@ -14,7 +15,7 @@ data class NotesFieldText(
 )
 
 data class NotesFieldPhoto(
-    val data: Uri? = null,
+    val data: Uri = EMPTY_IMAGE_URI,
     val type: NotesDataType = NotesDataType.PHOTOS
 )
 

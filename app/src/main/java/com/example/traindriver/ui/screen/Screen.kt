@@ -6,6 +6,7 @@ const val LOCO_ID = "loco_id"
 const val TRAIN_ID = "train_id"
 const val PASSENGER_ID = "passenger_id"
 const val NOTES_ID = "notes_id"
+const val NOTES_TAG = "notes_tag"
 const val PHOTO = "photo"
 const val PREV_PHOTO = "prev_photo"
 
@@ -46,10 +47,14 @@ sealed class Screen(val route: String) {
         }
     }
 
-    object AddingNotes : Screen(route = "adding_notes_screen/{$NOTES_ID}") {
-        fun setId(id: String): String {
-            return this.route.replace(oldValue = "{$NOTES_ID}", newValue = id)
+    object AddingNotes : Screen(route = "adding_notes_screen/{$NOTES_TAG}/{$NOTES_ID}") {
+        fun openScreen(tag: AddingNotesTag): String {
+            this.route.replace(oldValue = "{$NOTES_TAG}", newValue = tag.name)
+            return this.route.replace(oldValue = "{$NOTES_TAG}", newValue = tag.name)
         }
+    }
+    enum class AddingNotesTag {
+        SET_LIST, NOT_LIST
     }
 
     object ViewingPhoto: Screen(route = "viewing_photo/{$PHOTO}") {

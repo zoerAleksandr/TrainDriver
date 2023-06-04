@@ -12,10 +12,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -28,9 +25,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -65,7 +59,7 @@ import java.nio.charset.StandardCharsets
 @Composable
 fun AddingNotesScreen(
     navController: NavController,
-    notesId: String?,
+    tag: Screen.AddingNotesTag,
     addingRouteViewModel: AddingViewModel,
     addingNotesViewModel: AddingNotesViewModel
 ) {
@@ -176,14 +170,14 @@ fun AddingNotesScreen(
         }
     }
 
-    val scope = rememberCoroutineScope()
-
     OnLifecycleEvent { _, event ->
         when (event) {
             Lifecycle.Event.ON_CREATE -> {
-                addingNotesViewModel.setData(
-                    notes = addingRouteViewModel.stateNotes.value
-                )
+                if (tag == Screen.AddingNotesTag.SET_LIST) {
+                    addingNotesViewModel.setData(
+                        notes = addingRouteViewModel.stateNotes.value
+                    )
+                }
             }
             else -> {}
         }
@@ -289,11 +283,6 @@ fun AddingNotesScreen(
                 state = scrollState
             ) {
                 item {
-                    val focusManager = LocalFocusManager.current
-                    val screenHeight = LocalConfiguration.current.screenHeightDp
-                    val minSize = (screenHeight / 5).dp
-                    val maxSize = (screenHeight / 3).dp
-
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -323,7 +312,7 @@ fun AddingNotesScreen(
                                 fontWeight = FontWeight.Bold
                             )
                         )
-                        val list = addingNotesViewModel.photosList
+                        val list = addingNotesViewModel.formState.photos
                         Grid(
                             modifier = Modifier.padding(horizontal = 24.dp),
                             items = list,
@@ -331,10 +320,10 @@ fun AddingNotesScreen(
                             rowSpacing = 12.dp,
                             columnSpacing = 12.dp,
                         ) { item ->
-                            if (list.isEmpty() || item == EMPTY_IMAGE_URI) {
+                            if (list.isEmpty() || item.data == EMPTY_IMAGE_URI) {
                                 ItemCameraPreview()
                             } else {
-                                ItemPhoto(item)
+                                ItemPhoto(item.data)
                             }
                         }
                     }

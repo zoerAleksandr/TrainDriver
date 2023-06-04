@@ -63,7 +63,7 @@ fun PreviewPhotoScreen(
                         addingNotesViewModel.createEventNotes(NotesEvent.AddingPhoto(photo.toUri()))
                         navController.apply {
                             popBackStack(Screen.AddingNotes.route, true)
-                            navController.navigate(Screen.AddingNotes.route)
+                            navController.navigate(Screen.AddingNotes.openScreen(Screen.AddingNotesTag.NOT_LIST))
                         }
                     }
                 ) {

@@ -638,7 +638,7 @@ fun ItemNotes(navController: NavController) {
         Row(modifier = Modifier
             .clickable {
                 scope.launch {
-                    navController.navigate(Screen.AddingNotes.route)
+                    navController.navigate(Screen.AddingNotes.openScreen(Screen.AddingNotesTag.SET_LIST))
                 }
             }
             .padding(vertical = 16.dp, horizontal = 24.dp)

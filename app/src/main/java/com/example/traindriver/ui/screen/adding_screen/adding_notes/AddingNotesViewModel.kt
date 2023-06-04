@@ -4,10 +4,8 @@ import android.net.Uri
 import androidx.compose.runtime.*
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.traindriver.domain.entity.Notes
 import com.example.traindriver.ui.screen.photo.EMPTY_IMAGE_URI
-import kotlinx.coroutines.launch
 import kotlin.properties.Delegates
 
 class AddingNotesViewModel : ViewModel() {
@@ -18,27 +16,38 @@ class AddingNotesViewModel : ViewModel() {
         setPhotos(notes.photos)
     }
 
-    var formState by mutableStateOf(NotesFormState(id = currentNotes.id))
-        private set
-
-    var photosList = mutableStateListOf(EMPTY_IMAGE_URI)
+    var formState by mutableStateOf(
+        NotesFormState(
+            id = currentNotes.id,
+            photos = mutableStateListOf(NotesFieldPhoto(EMPTY_IMAGE_URI))
+        )
+    )
         private set
 
     fun addNotesInRoute(stateNotes: MutableState<Notes?>) {
+        val photoList = mutableListOf<Uri>()
+        formState.photos.forEach {
+            if (it.data != EMPTY_IMAGE_URI) {
+                photoList.add(it.data)
+            }
+        }
         currentNotes.apply {
             text = formState.notesText.data
-            photos = photosList.toMutableList()
+            photos = photoList
         }
         stateNotes.value = currentNotes
         clearField()
     }
 
     fun clearField() {
-        currentNotes = currentNotes.copy(
-            text = null,
-            photos = mutableListOf()
+        formState = formState.copy(
+            notesText = NotesFieldText(data = null),
+            photos = mutableStateListOf(NotesFieldPhoto(EMPTY_IMAGE_URI))
         )
-        photosList = mutableStateListOf(EMPTY_IMAGE_URI)
+//        currentNotes = currentNotes.copy(
+//            text = null,
+//            photos = mutableListOf(EMPTY_IMAGE_URI)
+//        )
     }
 
     fun setData(notes: Notes?) {
@@ -74,26 +83,20 @@ class AddingNotesViewModel : ViewModel() {
     }
 
     private fun addPhoto(newPhoto: Uri) {
-        viewModelScope.launch {
-            photosList.add(0, newPhoto)
-        }
+        formState.photos.add(NotesFieldPhoto(newPhoto))
     }
 
     private fun removePhoto(photo: Uri) {
-        photosList.remove(photo)
+        val element = formState.photos.find {
+            it.data == photo
+        }
+        formState.photos.remove(element)
     }
 
     private fun setPhotos(newValue: MutableList<Uri>) {
-        formState.photos.clear()
+        formState.photos = mutableStateListOf(NotesFieldPhoto(data = EMPTY_IMAGE_URI))
         newValue.forEach { photo ->
-            photosList.add(photo)
-//            formState.photos
-//                .add(
-//                    NotesFieldPhoto(
-//                        type = NotesDataType.PHOTOS,
-//                        data = photo
-//                    )
-//                )
+            formState.photos.add(NotesFieldPhoto(photo))
         }
     }
 }
