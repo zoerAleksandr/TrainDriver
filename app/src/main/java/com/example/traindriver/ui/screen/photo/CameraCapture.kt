@@ -3,13 +3,10 @@ package com.example.traindriver.ui.screen.photo
 import android.Manifest
 import android.content.Context.AUDIO_SERVICE
 import android.content.Intent
-import android.graphics.ImageDecoder
 import android.media.AudioManager
 import android.media.AudioManager.*
 import android.media.MediaPlayer
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
 import androidx.camera.core.CameraSelector
@@ -25,15 +22,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.dp
 import com.example.traindriver.R
 import com.example.traindriver.ui.screen.adding_screen.adding_notes.Permission
@@ -94,19 +90,6 @@ fun CameraCapture(
                 )
             }
 
-            val lastImage = remember { mutableStateOf<Uri?>(null) }
-//            val launcher =
-//                rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
-//                    lastImage.value = it
-//                }
-//
-//            @Composable
-//            fun LaunchGallery() {
-//                SideEffect {
-//                    launcher.launch("image/*")
-//                }
-//            }
-
             Box {
                 CameraPreview(modifier = Modifier.fillMaxSize(), onUseCase = {
                     previewUseCase = it
@@ -143,16 +126,7 @@ fun CameraCapture(
                 ) {
                     OpenGalleryButton(
                         modifier = Modifier.size(50.dp),
-                        image = lastImage.value?.let { uri ->
-                            if (Build.VERSION.SDK_INT < 28) {
-                                MediaStore.Images
-                                    .Media.getBitmap(context.contentResolver, uri).asImageBitmap()
-                            } else {
-                                val source = ImageDecoder
-                                    .createSource(context.contentResolver, uri)
-                                ImageDecoder.decodeBitmap(source).asImageBitmap()
-                            }
-                        } ?: ImageBitmap.imageResource(id = R.drawable.belarus)
+                        image = Icons.Default.Image
                     ) {
                         gallerySelect.value = true
                     }

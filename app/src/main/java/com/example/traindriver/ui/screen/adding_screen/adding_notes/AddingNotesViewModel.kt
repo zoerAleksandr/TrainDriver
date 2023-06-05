@@ -44,10 +44,6 @@ class AddingNotesViewModel : ViewModel() {
             notesText = NotesFieldText(data = null),
             photos = mutableStateListOf(NotesFieldPhoto(EMPTY_IMAGE_URI))
         )
-//        currentNotes = currentNotes.copy(
-//            text = null,
-//            photos = mutableListOf(EMPTY_IMAGE_URI)
-//        )
     }
 
     fun setData(notes: Notes?) {
@@ -83,7 +79,7 @@ class AddingNotesViewModel : ViewModel() {
     }
 
     private fun addPhoto(newPhoto: Uri) {
-        formState.photos.add(NotesFieldPhoto(newPhoto))
+        formState.photos.add(1, NotesFieldPhoto(newPhoto))
     }
 
     private fun removePhoto(photo: Uri) {

@@ -1,6 +1,5 @@
 package com.example.traindriver.ui.screen.photo
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -8,8 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Card
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
@@ -17,12 +14,10 @@ import androidx.compose.material.icons.sharp.Lens
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.traindriver.R
-
 
 @Composable
 fun CapturePictureButton(
@@ -46,23 +41,24 @@ fun CapturePictureButton(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OpenGalleryButton(
     modifier: Modifier = Modifier,
-    image: ImageBitmap,
+    image: ImageVector,
     onClick: () -> Unit
 ) {
-    Card(
-        modifier = modifier,
-        onClick = onClick
-    ) {
-        Image(
-            modifier = Modifier.fillMaxSize(),
-            bitmap = image,
-            contentScale = ContentScale.Crop,
-            contentDescription = "Открыть галлерею"
-        )
+    Box(modifier = Modifier.background(Color.Transparent)) {
+        IconButton(
+            modifier = modifier,
+            onClick = onClick
+        ) {
+            Icon(
+                modifier = Modifier.fillMaxSize(),
+                imageVector = image,
+                tint = Color.White,
+                contentDescription = "Открыть галлерею"
+            )
+        }
     }
 }
 

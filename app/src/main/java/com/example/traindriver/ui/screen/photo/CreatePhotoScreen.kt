@@ -34,10 +34,15 @@ fun CreatePhotoScreen(
     if (showGallerySelect.value) {
         GallerySelect(
             modifier = modifier,
-            onImageUri = { uri ->
+            onImageUri = { uriList ->
                 showGallerySelect.value = false
-                addingNotesViewModel.createEventNotes(NotesEvent.AddingPhoto(uri))
-                navController.popBackStack()
+                uriList.forEach { uri ->
+                    addingNotesViewModel.createEventNotes(NotesEvent.AddingPhoto(uri))
+                }
+                navController.apply {
+                    popBackStack(Screen.AddingNotes.route, true)
+                    navController.navigate(Screen.AddingNotes.openScreen(Screen.AddingNotesTag.NOT_LIST))
+                }
             }
         )
     } else {

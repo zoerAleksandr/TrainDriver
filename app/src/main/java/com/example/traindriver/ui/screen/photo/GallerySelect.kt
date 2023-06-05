@@ -1,6 +1,5 @@
 package com.example.traindriver.ui.screen.photo
 
-
 import android.Manifest
 import android.content.Intent
 import android.net.Uri
@@ -27,13 +26,13 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 @Composable
 fun GallerySelect(
     modifier: Modifier = Modifier,
-    onImageUri: (Uri) -> Unit = { }
+    onImageUri: (List<Uri>) -> Unit = { }
 ) {
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri: Uri? ->
-            onImageUri(uri ?: EMPTY_IMAGE_URI)
+        contract = ActivityResultContracts.GetMultipleContents(),
+        onResult = { listUri: List<Uri> ->
+            onImageUri(listUri)
         }
     )
 
@@ -69,7 +68,7 @@ fun GallerySelect(
                         Button(
                             modifier = Modifier.padding(4.dp),
                             onClick = {
-                                onImageUri(EMPTY_IMAGE_URI)
+                                onImageUri(emptyList())
                             }
                         ) {
                             Text("Use Camera")
