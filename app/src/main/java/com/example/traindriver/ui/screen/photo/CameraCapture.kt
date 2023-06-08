@@ -1,6 +1,7 @@
 package com.example.traindriver.ui.screen.photo
 
 import android.Manifest
+import android.content.Context
 import android.content.Context.AUDIO_SERVICE
 import android.content.Intent
 import android.media.AudioManager
@@ -20,8 +21,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.runtime.*
@@ -32,7 +33,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import com.example.traindriver.R
-import com.example.traindriver.ui.screen.adding_screen.adding_notes.Permission
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -66,18 +66,9 @@ fun CameraCapture(
     }
     Permission(
         permission = Manifest.permission.CAMERA,
+        rationale = "Разрешить приложению использовать камеру?",
         permissionNotAvailableContent = {
-            Column(modifier) {
-                Text("O noes! No Camera!")
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(onClick = {
-                    context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                        data = Uri.fromParts("package", context.packageName, null)
-                    })
-                }) {
-                    Text("Open Settings")
-                }
-            }
+            NotAvailableContent(context)
         }
     ) {
         Box(modifier = modifier) {
@@ -167,7 +158,6 @@ fun CameraCapture(
             LaunchedEffect(previewUseCase) {
                 val cameraProvider = context.getCameraProvider()
                 try {
-                    // Must unbind the use-cases before rebinding them.
                     cameraProvider.unbindAll()
                     cameraProvider.bindToLifecycle(
                         lifecycleOwner, cameraSelector, previewUseCase, imageCaptureUseCase
@@ -176,6 +166,27 @@ fun CameraCapture(
                     Log.e("CameraCapture", "Failed to bind camera use cases", ex)
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun NotAvailableContent(context: Context) {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Вы не предоставили разрешение, камера недоступна. " +
+                    "Предоставить разрешение можно в настройках"
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = {
+            context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", context.packageName, null)
+            })
+        }) {
+            Text("Открыть настройки")
         }
     }
 }

@@ -1,8 +1,9 @@
-package com.example.traindriver.ui.screen.adding_screen.adding_notes
+package com.example.traindriver.ui.screen.photo
 
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionRequired
@@ -12,7 +13,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 @Composable
 fun Permission(
     permission: String = android.Manifest.permission.CAMERA,
-    rationale: String = "Для добавления фото нужно разрешение на использование камеры",
+    rationale: String = "",
     permissionNotAvailableContent: @Composable () -> Unit = { },
     content: @Composable () -> Unit = { }
 ) {
@@ -38,7 +39,7 @@ private fun Rationale(
     AlertDialog(
         onDismissRequest = { /* Don't */ },
         title = {
-            Text(text = "Запрос разрешения")
+            Text(text = "Запрос разрешения", color = MaterialTheme.colorScheme.primary)
         },
         text = {
             Text(text)

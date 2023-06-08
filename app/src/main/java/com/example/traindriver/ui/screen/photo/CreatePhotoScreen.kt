@@ -33,7 +33,6 @@ fun CreatePhotoScreen(
     val scope = rememberCoroutineScope()
     if (showGallerySelect.value) {
         GallerySelect(
-            modifier = modifier,
             onImageUri = { uriList ->
                 showGallerySelect.value = false
                 uriList.forEach { uri ->
