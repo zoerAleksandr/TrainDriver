@@ -11,7 +11,6 @@ import com.example.traindriver.domain.use_case.GetRouteListByMonthUseCase
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import java.util.*
 
 typealias RouteListByMonthResponse = ResultState<List<Route>>
 
@@ -22,8 +21,9 @@ class MainViewModel : ViewModel(), KoinComponent {
         private set
 
     var totalTime by mutableStateOf(0L)
+        private set
 
-    private fun getListItineraryByMonth(month: Int) {
+    fun getListItineraryByMonth(month: Int) {
         viewModelScope.launch {
             getRouteListByMonthUseCase.execute(month).collect { result ->
                 listRoute = result
@@ -37,15 +37,11 @@ class MainViewModel : ViewModel(), KoinComponent {
     }
 
     private fun calculationOfTotalTime(listRoute: List<Route>) {
+        totalTime = 0
         for (item in listRoute) {
             item.getWorkTime().let { routeTime ->
                 totalTime += routeTime ?: 0
             }
         }
-    }
-
-    init {
-        val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
-        getListItineraryByMonth(currentMonth)
     }
 }

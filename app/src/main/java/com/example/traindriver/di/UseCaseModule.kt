@@ -11,4 +11,5 @@ val useCaseModule = module {
 
     single { GetRouteListByMonthUseCase(repository = get()) }
     single { GetRouteByIdUseCase(repository = get()) }
+    single { AddRouteUseCase(repository = get()) }
 }

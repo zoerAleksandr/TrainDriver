@@ -5,8 +5,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,8 +20,8 @@ import com.example.traindriver.ui.util.DarkLightPreviews
 fun LoadingElement() {
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colors.secondary.copy(alpha = 0.15f)),
+            .fillMaxSize(),
+//            .background(color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f)),
         contentAlignment = Alignment.Center
     ) {
         TrainDriverProgressBar()
@@ -35,10 +35,10 @@ fun TrainDriverProgressBar(modifier: Modifier = Modifier) {
             .size(dimensionResource(id = R.dimen.size_background_progress_bar))
             .background(
                 shape = ShapeBackground.medium,
-                color = MaterialTheme.colors.primaryVariant
+                color = MaterialTheme.colorScheme.surface
             )
             .padding(dimensionResource(id = R.dimen.primary_padding_between_view)),
-        color = MaterialTheme.colors.onPrimary,
+        color = MaterialTheme.colorScheme.secondary,
         strokeWidth = dimensionResource(id = R.dimen.stroke_width_progress_bar)
     )
 }

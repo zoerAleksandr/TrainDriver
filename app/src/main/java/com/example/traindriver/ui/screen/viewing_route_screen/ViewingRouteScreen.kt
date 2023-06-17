@@ -1,11 +1,12 @@
 package com.example.traindriver.ui.screen.viewing_route_screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -18,10 +19,12 @@ import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.ui.element_screen.CustomScrollableTabRow
 import com.example.traindriver.ui.element_screen.TopSnackbar
+import com.example.traindriver.ui.screen.ROUTE
+import com.example.traindriver.ui.screen.Screen
+import com.example.traindriver.ui.screen.signin_screen.elements.SecondarySpacer
 import com.example.traindriver.ui.screen.viewing_route_screen.element.*
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
-import com.example.traindriver.ui.util.Constants.ROUTE
 import com.example.traindriver.ui.util.DarkLightPreviews
 import com.example.traindriver.ui.util.DateAndTimeFormat.DATE_FORMAT
 import com.example.traindriver.ui.util.OnLifecycleEvent
@@ -29,15 +32,16 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.*
 
+@OptIn(ExperimentalPagerApi::class, ExperimentalMaterial3Api::class)
 @Composable
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 fun ViewingRouteScreen(
     navController: NavController,
     viewModel: ViewingRouteViewModel = viewModel()
 ) {
-    val scaffoldState = rememberScaffoldState()
     val uid = navController.currentBackStackEntry?.arguments?.getString(ROUTE)
     OnLifecycleEvent { _, event ->
         when (event) {
@@ -50,37 +54,58 @@ fun ViewingRouteScreen(
         }
     }
 
-    Scaffold(scaffoldState = scaffoldState, snackbarHost = {
-        SnackbarHost(
-            hostState = it
-        ) { snackBarData ->
-            TopSnackbar(snackBarData)
-        }
-    }) {
-        TabScreen(navController, scaffoldState.snackbarHostState, viewModel)
-    }
-}
+    val snackbarHostState = remember { SnackbarHostState() }
 
-@OptIn(ExperimentalPagerApi::class)
-@Composable
-fun TabScreen(
-    navController: NavController,
-    snackbarHostState: SnackbarHostState,
-    viewModel: ViewingRouteViewModel
-) {
     val pagerState = rememberPagerState(
-        pageCount = 4,
+        pageCount = 5,
         initialPage = 0
     )
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 38.dp)
-    ) {
-        Header(response = viewModel.routeState, snackbarHostState = snackbarHostState)
-        Tabs(pagerState)
-        TabContent(pagerState, navController, viewModel)
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { snackBarData ->
+                TopSnackbar(snackBarData)
+            }
+        },
+        topBar = {
+            TopAppBar(
+                title = {
+                    Header(response = viewModel.routeState, snackbarHostState = snackbarHostState)
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navController.navigateUp() }
+                    ) {
+                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Назад")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        navController.navigate(
+                            Screen.Adding.setId(
+                                uid ?: ""
+                            )
+                        )
+                    }) {
+                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Изменить")
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.primary,
+                    actionIconContentColor = MaterialTheme.colorScheme.primary
+                ),
+                scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+            )
+        },
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            Tabs(pagerState)
+            TabContent(pagerState, navController, viewModel)
+        }
     }
 }
 
@@ -90,7 +115,6 @@ private fun Header(response: RouteResponse, snackbarHostState: SnackbarHostState
         mutableStateOf(Route())
     }
     DataHeader(route = currentRoute.value)
-    val scope = rememberCoroutineScope()
     when (response) {
         is ResultState.Loading -> {
         }
@@ -98,7 +122,7 @@ private fun Header(response: RouteResponse, snackbarHostState: SnackbarHostState
             currentRoute.value = route
         }
         is ResultState.Failure -> {
-            scope.launch {
+            LaunchedEffect(currentRoute) {
                 snackbarHostState.showSnackbar(response.msg.message.toString())
             }
         }
@@ -108,23 +132,25 @@ private fun Header(response: RouteResponse, snackbarHostState: SnackbarHostState
 @Composable
 private fun DataHeader(route: Route) {
     val dateStartWorkText = route.timeStartWork?.let { millis ->
-        SimpleDateFormat(DATE_FORMAT).format(millis)
+        SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(millis)
     } ?: ""
 
-    val routeNumberText = route.number ?: "0000"
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(start = 16.dp, end = 32.dp),
+        horizontalArrangement = Arrangement.Start
     ) {
+        route.number?.let { number ->
+            Text(
+                text = "№ $number",
+                style = Typography.titleLarge
+            )
+        }
+        SecondarySpacer()
         Text(
             text = dateStartWorkText,
-            style = Typography.subtitle2.copy(color = setTextColor(route.timeStartWork))
-        )
-        Text(
-            text = "№ $routeNumberText",
-            style = Typography.subtitle2.copy(color = setTextColor(route.number))
+            style = Typography.titleLarge
         )
     }
 }
@@ -137,6 +163,7 @@ private fun Tabs(pagerState: PagerState) {
         stringResource(id = R.string.locomotive),
         stringResource(id = R.string.train),
         stringResource(id = R.string.passenger),
+        stringResource(id = R.string.notes)
     )
     CustomScrollableTabRow(
         tabs = tabsLabel,
@@ -155,9 +182,10 @@ private fun TabContent(
     HorizontalPager(state = pagerState) { page ->
         when (page) {
             0 -> WorkTimeScreen(navController, viewModel.routeState, viewModel.minTimeRest)
-            1 -> LocoScreen(viewModel.routeState, navController)
+            1 -> LocoScreen(viewModel.routeState)
             2 -> TrainScreen(viewModel.routeState)
             3 -> PassengerScreen(viewModel.routeState)
+            4 -> NotesScreen(viewModel.routeState, navController)
         }
     }
 }

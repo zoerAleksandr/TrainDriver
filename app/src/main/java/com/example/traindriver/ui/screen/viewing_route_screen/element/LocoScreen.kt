@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
@@ -24,21 +22,16 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.*
 import com.example.traindriver.ui.element_screen.LoadingElement
-import com.example.traindriver.ui.screen.Screen
+import com.example.traindriver.ui.element_screen.SuperDivider
+import com.example.traindriver.ui.screen.signin_screen.elements.SecondarySpacer
 import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
-import com.example.traindriver.ui.theme.ColorClickableText
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
@@ -52,9 +45,10 @@ import com.example.traindriver.ui.util.double_util.plus
 import com.example.traindriver.ui.util.double_util.rounding
 import com.example.traindriver.ui.util.double_util.str
 import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
-fun LocoScreen(response: RouteResponse, navController: NavController) {
+fun LocoScreen(response: RouteResponse) {
     Crossfade(
         targetState = response,
         animationSpec = tween(durationMillis = DURATION_CROSSFADE)
@@ -64,7 +58,7 @@ fun LocoScreen(response: RouteResponse, navController: NavController) {
                 LoadingScreen()
             }
             is ResultState.Success -> state.data?.let { route ->
-                DataScreen(route, navController)
+                DataScreen(route)
             }
             is ResultState.Failure -> {
                 FailureScreen()
@@ -79,7 +73,7 @@ private fun LoadingScreen() {
 }
 
 @Composable
-private fun DataScreen(route: Route, navController: NavController) {
+private fun DataScreen(route: Route) {
     val scrollState = rememberLazyListState()
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
         val (shadow, data) = createRefs()
@@ -107,7 +101,12 @@ private fun DataScreen(route: Route, navController: NavController) {
             state = scrollState
         ) {
             itemsIndexed(route.locoList) { index, item ->
-                ItemLocomotive(item, navController)
+                if (index == 0) {
+                    SecondarySpacer()
+                } else {
+                    SuperDivider()
+                }
+                ItemLocomotive(item)
                 if (index == route.locoList.lastIndex) {
                     Spacer(modifier = Modifier.height(60.dp))
                 }
@@ -119,142 +118,140 @@ private fun DataScreen(route: Route, navController: NavController) {
 @Composable
 private fun FailureScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = stringResource(id = R.string.route_opening_error), style = Typography.h3)
+        Text(
+            text = stringResource(id = R.string.route_opening_error),
+            style = Typography.displaySmall
+        )
     }
 }
 
 @Composable
-fun ItemLocomotive(loco: Locomotive, navController: NavController) {
-    Card(
+fun ItemLocomotive(loco: Locomotive) {
+    ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-        backgroundColor = MaterialTheme.colors.surface,
-        shape = ShapeBackground.medium,
-        elevation = 6.dp
+            .padding(16.dp)
     ) {
-        ConstraintLayout(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            val (seriesAndNumber, time, sections) = createRefs()
+        val (seriesAndNumber, time, sections) = createRefs()
 
-            Box(modifier = Modifier.constrainAs(seriesAndNumber) {
+        Box(modifier = Modifier
+            .padding(start = 8.dp)
+            .constrainAs(seriesAndNumber) {
                 top.linkTo(parent.top)
                 start.linkTo(parent.start)
             }) {
-                Row(horizontalArrangement = Arrangement.SpaceAround) {
-                    val seriesText = loco.series ?: "xxxx"
-                    val numberText = loco.number ?: "000"
-                    Text(
-                        text = seriesText,
-                        color = setTextColor(loco.series),
-                        style = Typography.subtitle2
-                    )
-                    Text(
-                        text = " - ",
-                        color = setTextColor(loco.number),
-                        style = Typography.subtitle2
-                    )
-                    Text(
-                        text = numberText,
-                        color = setTextColor(loco.number),
-                        style = Typography.subtitle2
-                    )
-                }
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-                    .constrainAs(time) {
-                        top.linkTo(seriesAndNumber.bottom)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    },
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier.border(
-                        width = 0.5.dp,
-                        color = MaterialTheme.colors.secondary,
-                        shape = ShapeBackground.medium
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ) {
-                        val timeStartAcceptance = loco.timeStartOfAcceptance?.let { millis ->
-                            SimpleDateFormat(TIME_FORMAT).format(millis)
-                        } ?: DEFAULT_TIME_TEXT
-
-                        val timeEndAcceptance = loco.timeEndOfAcceptance?.let { millis ->
-                            SimpleDateFormat(TIME_FORMAT).format(millis)
-                        } ?: DEFAULT_TIME_TEXT
-
-                        Text(
-                            text = timeStartAcceptance,
-                            color = setTextColor(loco.timeStartOfAcceptance)
-                        )
-                        Text(
-                            text = " - ", color = setTextColor(loco.timeEndOfAcceptance)
-                        )
-                        Text(
-                            text = timeEndAcceptance, color = setTextColor(loco.timeEndOfAcceptance)
-                        )
-                    }
-                }
-
-                Box(
-                    modifier = Modifier.border(
-                        width = 0.5.dp,
-                        color = MaterialTheme.colors.secondary,
-                        shape = ShapeBackground.medium
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ) {
-                        val timeStartDelivery = loco.timeStartOfDelivery?.let { millis ->
-                            SimpleDateFormat(TIME_FORMAT).format(millis)
-                        } ?: DEFAULT_TIME_TEXT
-
-                        val timeEndDelivery = loco.timeEndOfDelivery?.let { millis ->
-                            SimpleDateFormat(TIME_FORMAT).format(millis)
-                        } ?: DEFAULT_TIME_TEXT
-
-                        Text(
-                            text = timeStartDelivery,
-                            color = setTextColor(loco.timeStartOfAcceptance)
-                        )
-                        Text(
-                            text = " - ", color = setTextColor(loco.timeEndOfAcceptance)
-                        )
-                        Text(
-                            text = timeEndDelivery, color = setTextColor(loco.timeEndOfAcceptance)
-                        )
-                    }
-                }
-            }
-            Column(modifier = Modifier
-                .constrainAs(sections) {
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    top.linkTo(time.bottom)
-                }
-                .padding(top = 8.dp)) {
-                loco.sectionList.forEach { item: Section ->
-                    ItemSection(section = item, navController = navController)
-                }
-                GeneralResult(
-                    modifier = Modifier.padding(top = 8.dp, end = 16.dp, start = 16.dp),
-                    loco = loco
+            Row(horizontalArrangement = Arrangement.SpaceAround) {
+                val seriesText = loco.series ?: "XXXX"
+                val numberText = loco.number ?: "000"
+                Text(
+                    text = seriesText,
+                    color = setTextColor(loco.series),
+                    style = Typography.titleLarge
+                )
+                Text(
+                    text = " - ",
+                    color = setTextColor(loco.number),
+                    style = Typography.titleLarge
+                )
+                Text(
+                    text = numberText,
+                    color = setTextColor(loco.number),
+                    style = Typography.titleLarge
                 )
             }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+                .constrainAs(time) {
+                    top.linkTo(seriesAndNumber.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                },
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier.border(
+                    width = 0.5.dp,
+                    color = MaterialTheme.colorScheme.secondary,
+                    shape = ShapeBackground.small
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    val timeStartAcceptance = loco.timeStartOfAcceptance?.let { millis ->
+                        SimpleDateFormat(TIME_FORMAT, Locale.getDefault()).format(millis)
+                    } ?: DEFAULT_TIME_TEXT
+
+                    val timeEndAcceptance = loco.timeEndOfAcceptance?.let { millis ->
+                        SimpleDateFormat(TIME_FORMAT, Locale.getDefault()).format(millis)
+                    } ?: DEFAULT_TIME_TEXT
+
+                    Text(
+                        text = timeStartAcceptance,
+                        color = setTextColor(loco.timeStartOfAcceptance)
+                    )
+                    Text(
+                        text = " - ", color = setTextColor(loco.timeEndOfAcceptance)
+                    )
+                    Text(
+                        text = timeEndAcceptance, color = setTextColor(loco.timeEndOfAcceptance)
+                    )
+                }
+            }
+
+            Box(
+                modifier = Modifier.border(
+                    width = 0.5.dp,
+                    color = MaterialTheme.colorScheme.secondary,
+                    shape = ShapeBackground.small
+                )
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    val timeStartDelivery = loco.timeStartOfDelivery?.let { millis ->
+                        SimpleDateFormat(TIME_FORMAT, Locale.getDefault()).format(millis)
+                    } ?: DEFAULT_TIME_TEXT
+
+                    val timeEndDelivery = loco.timeEndOfDelivery?.let { millis ->
+                        SimpleDateFormat(TIME_FORMAT, Locale.getDefault()).format(millis)
+                    } ?: DEFAULT_TIME_TEXT
+
+                    Text(
+                        text = timeStartDelivery,
+                        color = setTextColor(loco.timeStartOfAcceptance)
+                    )
+                    Text(
+                        text = " - ", color = setTextColor(loco.timeEndOfAcceptance)
+                    )
+                    Text(
+                        text = timeEndDelivery, color = setTextColor(loco.timeEndOfAcceptance)
+                    )
+                }
+            }
+        }
+        Column(modifier = Modifier
+            .constrainAs(sections) {
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                top.linkTo(time.bottom)
+            }
+            .padding(top = 16.dp)) {
+            loco.sectionList.forEach { item ->
+                ItemSection(
+                    section = item
+                )
+            }
+            GeneralResult(
+                modifier = Modifier.padding(top = 8.dp, end = 16.dp, start = 16.dp),
+                loco = loco
+            )
         }
     }
 }
@@ -281,8 +278,8 @@ fun GeneralResult(modifier: Modifier, loco: Locomotive) {
                 if (totalConsumption != 0.0) {
                     Text(
                         text = "${totalConsumption.str()} / ${totalRecovery.str()}",
-                        style = Typography.body2,
-                        color = MaterialTheme.colors.primary
+                        style = Typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -306,8 +303,8 @@ fun GeneralResult(modifier: Modifier, loco: Locomotive) {
                 if (totalConsumption != 0.0) {
                     Text(
                         text = "${totalConsumption.str()}л / ${totalConsumptionInKilo.str()}кг",
-                        style = Typography.body2,
-                        color = MaterialTheme.colors.primary
+                        style = Typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -316,17 +313,17 @@ fun GeneralResult(modifier: Modifier, loco: Locomotive) {
 }
 
 @Composable
-fun ItemSection(section: Section, navController: NavController) {
+fun ItemSection(section: Section) {
     when (section) {
         is SectionElectric -> {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 4.dp)
+                    .padding(top = 8.dp)
                     .border(
                         width = 0.5.dp,
-                        color = MaterialTheme.colors.secondary,
-                        shape = ShapeBackground.medium
+                        color = MaterialTheme.colorScheme.secondary,
+                        shape = ShapeBackground.small
                     )
             ) {
                 Column(
@@ -362,24 +359,24 @@ fun ItemSection(section: Section, navController: NavController) {
                             section.acceptedRecovery?.let { value ->
                                 Text(
                                     text = value.str(),
-                                    style = Typography.body1.copy(color = setTextColor(value))
+                                    style = Typography.bodyLarge.copy(color = setTextColor(value))
                                 )
                             }
                             section.deliveryRecovery?.let { value ->
                                 Text(
                                     text = " - ",
-                                    style = Typography.body1.copy(color = setTextColor(value))
+                                    style = Typography.bodyLarge.copy(color = setTextColor(value))
                                 )
                                 Text(
                                     text = value.str(),
-                                    style = Typography.body1.copy(color = setTextColor(value))
+                                    style = Typography.bodyLarge.copy(color = setTextColor(value))
                                 )
                             }
                         }
                         section.getRecoveryResult()?.let { value ->
                             Text(
                                 text = value.str(),
-                                style = Typography.body1.copy(color = setTextColor(value))
+                                style = Typography.bodyLarge.copy(color = setTextColor(value))
                             )
                         }
                     }
@@ -390,11 +387,11 @@ fun ItemSection(section: Section, navController: NavController) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 4.dp)
+                    .padding(top = 8.dp)
                     .border(
                         width = 0.5.dp,
-                        color = MaterialTheme.colors.secondary,
-                        shape = ShapeBackground.medium
+                        color = MaterialTheme.colorScheme.secondary,
+                        shape = ShapeBackground.small
                     )
             ) {
                 Column(
@@ -415,28 +412,28 @@ fun ItemSection(section: Section, navController: NavController) {
                             Text(
                                 text = acceptedText,
                                 color = setTextColor(section.acceptedEnergy),
-                                style = Typography.body1
+                                style = Typography.bodyLarge
                             )
                             Text(
                                 text = " - ",
                                 color = setTextColor(section.deliveryEnergy),
-                                style = Typography.body1
+                                style = Typography.bodyLarge
                             )
                             Text(
                                 text = deliveryText,
                                 color = setTextColor(section.deliveryEnergy),
-                                style = Typography.body1
+                                style = Typography.bodyLarge
                             )
                         }
                         val resultText = "${section.getConsumption()?.str() ?: RESULT_ENERGY} л"
                         Text(
                             text = resultText,
                             color = setTextColor(section.getConsumption()),
-                            style = Typography.body1
+                            style = Typography.bodyLarge
                         )
                     }
 
-                    if (section.acceptedEnergy != null || section.deliveryEnergy != null) {
+                    if (section.acceptedInKilo != null || section.deliveryInKilo != null) {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -452,17 +449,17 @@ fun ItemSection(section: Section, navController: NavController) {
                                     Text(
                                         text = acceptedText,
                                         color = setTextColor(section.acceptedInKilo),
-                                        style = Typography.body1
+                                        style = Typography.bodyLarge
                                     )
                                     Text(
                                         text = " - ",
                                         color = setTextColor(section.deliveryInKilo),
-                                        style = Typography.body1
+                                        style = Typography.bodyLarge
                                     )
                                     Text(
                                         text = deliveryText,
                                         color = setTextColor(section.deliveryInKilo),
-                                        style = Typography.body1
+                                        style = Typography.bodyLarge
                                     )
                                 }
                                 val r = section.getConsumptionInKilo()?.let { rounding(it, 2) }
@@ -471,46 +468,18 @@ fun ItemSection(section: Section, navController: NavController) {
                                 Text(
                                     text = resultText,
                                     color = setTextColor(section.getConsumptionInKilo()),
-                                    style = Typography.body1
+                                    style = Typography.bodyLarge
                                 )
                             }
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                val linkText = buildAnnotatedString {
-                                    val value = section.coefficient?.toString() ?: "0.00"
-                                    val text = "k = $value"
 
-                                    val startIndex = startIndexLastWord(text)
-                                    val endIndex = text.length
-
-                                    append(text)
-                                    addStyle(
-                                        SpanStyle(
-                                            color = ColorClickableText,
-                                            textDecoration = TextDecoration.Underline
-                                        ), start = startIndex, end = endIndex
-                                    )
-
-                                    addStringAnnotation(
-                                        tag = LINK_TO_SETTING,
-                                        annotation = Screen.Setting.route,
-                                        start = startIndex,
-                                        end = endIndex
-                                    )
-                                }
-                                ClickableText(
-                                    text = linkText,
-                                    style = Typography.body2
-                                        .copy(color = setTextColor(section.coefficient))
-                                ) {
-                                    linkText.getStringAnnotations(LINK_TO_SETTING, it, it)
-                                        .firstOrNull()?.let { annotation ->
-                                            navController.navigate(annotation.item)
-                                        }
-                                }
-                            }
+                            val value = section.coefficient?.toString() ?: "0.00"
+                            val text = "k = $value"
+                            Text(
+                                text = text,
+                                style = Typography.bodyMedium
+                                    .copy(color = setTextColor(section.coefficient))
+                            )
+//
                         }
                     }
                     section.fuelSupply?.let { fuel ->
@@ -525,12 +494,12 @@ fun ItemSection(section: Section, navController: NavController) {
                                     .padding(end = 8.dp),
                                 painter = painterResource(id = R.drawable.refuel_icon),
                                 contentDescription = null,
-                                colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary)
+                                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)
                             )
                             Text(
                                 text = "${fuel.str()}л",
-                                style = Typography.body2,
-                                color = MaterialTheme.colors.primary
+                                style = Typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
@@ -543,18 +512,37 @@ fun ItemSection(section: Section, navController: NavController) {
 @Composable
 @ReadOnlyComposable
 fun setTextColor(any: Any?): Color = if (any == null) {
-    MaterialTheme.colors.primaryVariant
+    MaterialTheme.colorScheme.secondary
 } else {
-    MaterialTheme.colors.primary
+    MaterialTheme.colorScheme.primary
 }
 
 @Composable
 @DarkLightPreviews
 private fun ItemSectionPrev() {
     TrainDriverTheme {
-        ItemSection(
-            SectionElectric(acceptedEnergy = 133032.0, deliveryEnergy = 113064.3),
-            rememberNavController()
+        ItemLocomotive(
+            loco = Locomotive(
+                series = "2тэ116у",
+                number = "338",
+                type = false,
+                sectionList = listOf(
+                    SectionDiesel(
+                        acceptedEnergy = 2000.0,
+                        deliveryEnergy = 3100.0,
+                        coefficient = 0.83,
+                        fuelSupply = 2000.0,
+                        coefficientSupply = 0.85
+                    ),
+                    SectionDiesel(
+                        acceptedEnergy = 3000.0,
+                        deliveryEnergy = 4000.0,
+                        coefficient = 0.83,
+                        fuelSupply = 2000.0,
+                        coefficientSupply = 0.85
+                    ),
+                )
+            ),
         )
     }
 }

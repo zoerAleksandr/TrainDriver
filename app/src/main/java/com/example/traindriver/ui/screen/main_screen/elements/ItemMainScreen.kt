@@ -1,10 +1,11 @@
 package com.example.traindriver.ui.screen.main_screen.elements
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.MarqueeAnimationMode
+import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Card
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,26 +14,29 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension.Companion.fillToConstraints
 import com.example.traindriver.domain.entity.Route
+import com.example.traindriver.ui.element_screen.TextBodyLarge
 import com.example.traindriver.ui.element_screen.VerticalDividerTrainDriver
 import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.TrainDriverTheme
-import com.example.traindriver.ui.theme.Typography
-import com.example.traindriver.ui.util.*
+import com.example.traindriver.ui.util.DarkLightPreviews
+import com.example.traindriver.ui.util.FontScalePreviews
+import com.example.traindriver.ui.util.getDay
+import com.example.traindriver.ui.util.getMonth
+import com.example.traindriver.ui.util.long_util.getTimeInStringFormat
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ItemMainScreen(route: Route, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 2.dp)
-            .height(80.dp),
-        backgroundColor = MaterialTheme.colors.background,
+            .height(80.dp)
+            .clickable { onClick.invoke() },
         shape = ShapeBackground.medium,
-        elevation = 2.dp,
-        onClick = onClick
     ) {
-        ConstraintLayout {
+        ConstraintLayout(
+            modifier = Modifier.fillMaxWidth()
+        ) {
             val (date, verticalDividerFirst, station, verticalDividerSecond, workTime) = createRefs()
 
             DateElementItem(
@@ -52,16 +56,19 @@ fun ItemMainScreen(route: Route, onClick: () -> Unit) {
                 }
                 .padding(vertical = 10.dp),
                 thickness = 0.5.dp)
-            StationElementItem(modifier = Modifier
-                .constrainAs(station) {
-                    top.linkTo(parent.top)
-                    start.linkTo(verticalDividerFirst.end)
-                    end.linkTo(verticalDividerSecond.start)
-                    bottom.linkTo(parent.bottom)
-                    width = fillToConstraints
-                    height = fillToConstraints
-                }
-                .padding(horizontal = 16.dp), route = route)
+            StationElementItem(
+                modifier = Modifier
+                    .constrainAs(station) {
+                        top.linkTo(parent.top)
+                        start.linkTo(verticalDividerFirst.end)
+                        end.linkTo(verticalDividerSecond.start)
+                        bottom.linkTo(parent.bottom)
+                        width = fillToConstraints
+                        height = fillToConstraints
+                    }
+                    .padding(horizontal = 16.dp),
+                route = route
+            )
             VerticalDividerTrainDriver(modifier = Modifier
                 .constrainAs(verticalDividerSecond) {
                     end.linkTo(workTime.start)
@@ -86,28 +93,11 @@ fun WorkTimeElementItem(
     modifier: Modifier = Modifier, route: Route
 ) {
     val workTime = route.getWorkTime()
-
-    val textTime = if (workTime != null) {
-        val hour = workTime.getHour()
-        val hourText = if (hour < 10) {
-            "0$hour"
-        } else {
-            hour.toString()
-        }
-
-        val minute = workTime.getRemainingMinuteFromHour()
-        val minuteText = if (minute < 10) {
-            "0$minute"
-        } else {
-            minute.toString()
-        }
-        "$hourText:$minuteText"
-    } else {
-        "--:--"
-    }
-    Text(modifier = modifier, text = textTime, style = Typography.body2)
+    val textTime = workTime.getTimeInStringFormat()
+    TextBodyLarge(modifier = modifier, text = textTime)
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StationElementItem(
     modifier: Modifier = Modifier, route: Route
@@ -150,17 +140,15 @@ fun StationElementItem(
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.Start
     ) {
-        Text(
+        TextBodyLarge(
+            modifier = Modifier.basicMarquee(animationMode = MarqueeAnimationMode.WhileFocused),
             text = textStation,
             overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
-            style = Typography.body2
         )
-        Text(
+        TextBodyLarge(
+            modifier = Modifier.basicMarquee(animationMode = MarqueeAnimationMode.WhileFocused),
             text = textLoco,
             overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
-            style = Typography.body2
         )
     }
 }
@@ -179,8 +167,8 @@ fun DateElementItem(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = day, style = Typography.body2)
-        Text(text = month, style = Typography.body2)
+        TextBodyLarge(text = day)
+        TextBodyLarge(text = month)
     }
 }
 

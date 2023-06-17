@@ -1,5 +1,6 @@
 package com.example.traindriver.ui.screen.signin_screen
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
@@ -8,11 +9,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -45,8 +43,9 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 fun SignInScreen(
     navController: NavController,
     activity: Activity,
@@ -57,8 +56,7 @@ fun SignInScreen(
     val loadingPhoneAuthState = remember { mutableStateOf(false) }
     val loadingGoogleAuthState = remember { mutableStateOf(false) }
 
-    val scaffoldState = rememberScaffoldState()
-    val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+    val sheetState = rememberBottomSheetScaffoldState()
 
     val scope = rememberCoroutineScope()
 
@@ -66,19 +64,22 @@ fun SignInScreen(
     val allowEntry = viewModel.allowEntry
     val localeState = viewModel.locale
 
-    if (localeState.value == LocaleUser.OTHER) {
-        scope.launch {
-            sheetState.show()
-        }
-    } else {
-        scope.launch {
-            sheetState.hide()
+    LaunchedEffect(key1 = localeState.value) {
+        if (localeState.value == LocaleUser.OTHER) {
+            scope.launch {
+                sheetState.bottomSheetState.show()
+            }
+        } else {
+            scope.launch {
+                sheetState.bottomSheetState.hide()
+            }
         }
     }
 
-    ModalBottomSheetLayout(sheetState = sheetState,
+    BottomSheetScaffold(
+        scaffoldState = sheetState,
         sheetShape = ShapeSurface.medium,
-        sheetBackgroundColor = MaterialTheme.colors.background,
+        containerColor = MaterialTheme.colorScheme.background,
         sheetContent = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -88,9 +89,9 @@ fun SignInScreen(
                     modifier = Modifier
                         .padding(start = primaryPadding, top = primaryPadding)
                         .align(Alignment.Start),
-                    color = MaterialTheme.colors.primary,
+                    color = MaterialTheme.colorScheme.primary,
                     text = stringResource(id = R.string.select_country),
-                    style = Typography.h4
+                    style = Typography.displaySmall
                 )
                 LazyColumn(
                     modifier = Modifier.padding(start = primaryPadding, top = secondaryPadding)
@@ -101,18 +102,19 @@ fun SignInScreen(
                             number.value = currentLocale.prefix()
                             allowEntry.value = (currentLocale == LocaleUser.OTHER)
                             scope.launch {
-                                sheetState.hide()
+                                sheetState.bottomSheetState.hide()
                             }
                         })
                     }
                 }
                 PrimarySpacer()
             }
-        }
+        },
+        snackbarHost = { sheetState.snackbarHostState }
     ) {
-        Scaffold(scaffoldState = scaffoldState, snackbarHost = {
+        Scaffold(snackbarHost = {
             SnackbarHost(
-                hostState = it
+                hostState = sheetState.snackbarHostState
             ) { snackBarData ->
                 TopSnackbar(snackBarData)
             }
@@ -140,8 +142,8 @@ fun SignInScreen(
                     }
                     .wrapContentSize(),
                     shape = ShapeSurface.medium,
-                    color = MaterialTheme.colors.background,
-                    elevation = dimensionResource(id = R.dimen.elevation_input_element)) {
+                    color = MaterialTheme.colorScheme.background,
+                    shadowElevation = dimensionResource(id = R.dimen.elevation_input_element)) {
                     Column(
                         modifier = Modifier
                             .padding(dimensionResource(id = R.dimen.padding_all_input_element))
@@ -151,8 +153,8 @@ fun SignInScreen(
                     ) {
                         Text(
                             text = stringResource(id = R.string.title_input_element),
-                            style = Typography.h3,
-                            color = MaterialTheme.colors.primary
+                            style = Typography.displaySmall,
+                            color = MaterialTheme.colorScheme.primary
                         )
 
                         PrimarySpacer()
@@ -166,7 +168,7 @@ fun SignInScreen(
                                     }
                                 }
                             } else null,
-                            sheetState = sheetState) {
+                            sheetState = sheetState.bottomSheetState) {
                             viewModel.phoneAuth.createUserWithPhone(activity)
                         }
 
@@ -217,7 +219,7 @@ fun SignInScreen(
                     viewModel.authWithGoogle.signIn(googleCredentials)
                 } catch (it: ApiException) {
                     scope.launch {
-                        scaffoldState.snackbarHostState.showSnackbar(ERROR_TRY_AGAIN_MSG)
+                        sheetState.snackbarHostState.showSnackbar(ERROR_TRY_AGAIN_MSG)
                     }
                 }
             }
@@ -230,7 +232,7 @@ fun SignInScreen(
 
     OneTapSignIn(
         oneTapResponse = viewModel.oneTapSignInResponse,
-        snackbarHostState = scaffoldState.snackbarHostState,
+        snackbarHostState = sheetState.snackbarHostState,
         loadingState = loadingGoogleAuthState,
         launch = {
             launch(it)
@@ -239,7 +241,7 @@ fun SignInScreen(
 
     SignInWithGoogle(
         signInWithGoogleResponse = viewModel.signInWithGoogleResponse,
-        snackbarHostState = scaffoldState.snackbarHostState,
+        snackbarHostState = sheetState.snackbarHostState,
         loadingState = loadingGoogleAuthState,
         navigateToMainScreen = { signedIn ->
             if (signedIn) {
@@ -250,7 +252,7 @@ fun SignInScreen(
 
     CreateUserWithPhone(
         createUserWithPhone = viewModel.createUserWithPhoneResponse,
-        snackbarHostState = scaffoldState.snackbarHostState,
+        snackbarHostState = sheetState.snackbarHostState,
         navController = navController,
         loadingState = loadingPhoneAuthState
     )

@@ -20,7 +20,5 @@ object Constants: KoinComponent {
 
     const val NETWORK_CONNECTED = "networkConnected"
 
-    const val ROUTE = "route"
-
     const val DURATION_CROSSFADE = 500
 }

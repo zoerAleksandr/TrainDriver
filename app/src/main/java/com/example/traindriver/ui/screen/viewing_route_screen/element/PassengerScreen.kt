@@ -9,9 +9,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,20 +18,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.traindriver.R
 import com.example.traindriver.data.util.ResultState
 import com.example.traindriver.domain.entity.Passenger
 import com.example.traindriver.domain.entity.Route
 import com.example.traindriver.ui.element_screen.LoadingElement
+import com.example.traindriver.ui.element_screen.SuperDivider
+import com.example.traindriver.ui.screen.signin_screen.elements.SecondarySpacer
 import com.example.traindriver.ui.screen.viewing_route_screen.RouteResponse
-import com.example.traindriver.ui.theme.ShapeBackground
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.Constants.DURATION_CROSSFADE
 import com.example.traindriver.ui.util.DateAndTimeFormat
 import com.example.traindriver.ui.util.EmptyDataText.DEFAULT_STATION_NAME
 import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun PassengerScreen(response: RouteResponse) {
@@ -82,6 +82,11 @@ private fun DataScreen(route: Route) {
                 }, state = scrollState
         ) {
             itemsIndexed(route.passengerList) { index, item ->
+                if (index == 0){
+                    SecondarySpacer()
+                } else {
+                    SuperDivider()
+                }
                 PassengerItem(item)
                 if (index == route.passengerList.lastIndex) {
                     Spacer(modifier = Modifier.height(60.dp))
@@ -92,87 +97,78 @@ private fun DataScreen(route: Route) {
 }
 
 @Composable
-fun PassengerItem(passenger: Passenger) {
-    Card(
+private fun PassengerItem(passenger: Passenger) {
+    val trainNumberText = "№ ${passenger.trainNumber ?: "0000"}"
+    val stArrivalText = passenger.stationArrival ?: DEFAULT_STATION_NAME
+    val stDepartureText = passenger.stationDeparture ?: DEFAULT_STATION_NAME
+    val timeArrivalText = passenger.timeArrival?.let { millis ->
+        SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT, Locale.getDefault()).format(millis)
+    } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
+    val timeDepartureText = passenger.timeDeparture?.let { millis ->
+        SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT, Locale.getDefault()).format(millis)
+    } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-        backgroundColor = MaterialTheme.colors.surface,
-        shape = ShapeBackground.medium,
-        elevation = 6.dp
+            .padding(horizontal = 32.dp, vertical = 18.dp)
     ) {
-        ConstraintLayout(
+        Text(
+            text = trainNumberText,
+            style = Typography.titleLarge.copy(color = setTextColor(passenger.trainNumber))
+        )
+        Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+                .fillMaxWidth()
+                .padding(top = 12.dp)
         ) {
-            val stArrivalText = passenger.stationArrival ?: DEFAULT_STATION_NAME
-            val stDepartureText = passenger.stationDeparture ?: DEFAULT_STATION_NAME
-            val timeArrivalText = passenger.timeArrival?.let { millis ->
-                SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT).format(millis)
-            } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
-            val timeDepartureText = passenger.timeDeparture?.let { millis ->
-                SimpleDateFormat(DateAndTimeFormat.TIME_FORMAT).format(millis)
-            } ?: DateAndTimeFormat.DEFAULT_TIME_TEXT
-            val trainNumberText = "№ ${passenger.trainNumber ?: "0000"}"
-
-            val (trainNumber, stArrival, stDeparture, timeArrival, timeDeparture, notes) = createRefs()
-
-            createHorizontalChain(stArrival, stDeparture, chainStyle = ChainStyle.SpreadInside)
-            createHorizontalChain(timeArrival, timeDeparture, chainStyle = ChainStyle.SpreadInside)
-
-            Text(
-                modifier = Modifier.constrainAs(trainNumber) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                },
-                text = trainNumberText,
-                style = Typography.subtitle2.copy(color = setTextColor(passenger.trainNumber))
-            )
-
-            Text(modifier = Modifier
-                .constrainAs(stArrival) {
-                    top.linkTo(trainNumber.bottom)
-                }
-                .padding(top = 8.dp), text = stArrivalText, style = Typography.body1.copy(
-                color = setTextColor(passenger.stationArrival)
-            ))
-
-            Text(modifier = Modifier
-                .constrainAs(stDeparture) {
-                    top.linkTo(trainNumber.bottom)
-                }
-                .padding(top = 8.dp), text = stDepartureText, style = Typography.body1.copy(
-                color = setTextColor(passenger.stationDeparture)
-            ))
-
-            Text(modifier = Modifier
-                .constrainAs(timeArrival) {
-                    top.linkTo(stArrival.bottom)
-                }
-                .padding(top = 8.dp), text = timeArrivalText, style = Typography.body1.copy(
-                color = setTextColor(passenger.timeArrival)
-            ))
-
-            Text(modifier = Modifier
-                .constrainAs(timeDeparture) {
-                    top.linkTo(stDeparture.bottom)
-                }
-                .padding(top = 8.dp), text = timeDepartureText, style = Typography.body1.copy(
-                color = setTextColor(passenger.timeDeparture)
-            ))
-
-            passenger.notes?.let { text ->
-                Text(modifier = Modifier
-                    .constrainAs(notes) {
-                        start.linkTo(parent.start)
-                        top.linkTo(timeArrival.bottom)
-                    }
-                    .padding(top = 8.dp),
-                    text = text,
-                    textAlign = TextAlign.Start,
-                    style = Typography.body2.copy(color = MaterialTheme.colors.primary))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stDepartureText,
+                    style = Typography.bodyLarge.copy(
+                        color = setTextColor(passenger.stationDeparture)
+                    )
+                )
+                Text(
+                    text = timeDepartureText,
+                    style = Typography.bodyLarge.copy(
+                        color = setTextColor(passenger.timeDeparture)
+                    )
+                )
             }
+            Row(
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stArrivalText,
+                    style = Typography.bodyLarge.copy(
+                        color = setTextColor(passenger.stationArrival)
+                    )
+                )
+                Text(
+                    text = timeArrivalText,
+                    style = Typography.bodyLarge.copy(
+                        color = setTextColor(passenger.timeArrival)
+                    )
+                )
+            }
+        }
+        passenger.notes?.let { text ->
+            Text(
+                modifier = Modifier
+                    .padding(top = 12.dp),
+                text = text,
+                textAlign = TextAlign.Start,
+                style = Typography.bodyMedium.copy(color = MaterialTheme.colorScheme.primary)
+            )
         }
     }
 }
@@ -180,6 +176,6 @@ fun PassengerItem(passenger: Passenger) {
 @Composable
 private fun FailureScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = stringResource(id = R.string.route_opening_error), style = Typography.h3)
+        Text(text = stringResource(id = R.string.route_opening_error), style = Typography.displaySmall)
     }
 }

@@ -1,6 +1,6 @@
 package com.example.traindriver.ui.screen.signin_screen.components
 
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -23,8 +23,10 @@ fun OneTapSignIn(
     when (oneTapResponse) {
         is ResultState.Loading -> {
             loadingState.value = true
-            scope.launch {
-                snackbarHostState.showSnackbar(SnackbarMessage.CONNECTING_TO_SERVER_MSG)
+            LaunchedEffect(oneTapResponse) {
+                scope.launch {
+                    snackbarHostState.showSnackbar(SnackbarMessage.CONNECTING_TO_SERVER_MSG)
+                }
             }
         }
         is ResultState.Success -> oneTapResponse.data?.let {

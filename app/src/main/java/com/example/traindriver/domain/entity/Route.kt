@@ -1,8 +1,6 @@
 package com.example.traindriver.domain.entity
 
-import com.example.traindriver.ui.util.double_util.differenceBetweenDouble
-import com.example.traindriver.ui.util.double_util.plusNullableValue
-import com.example.traindriver.ui.util.double_util.reverseDifferenceBetweenDouble
+import android.net.Uri
 import com.example.traindriver.ui.util.double_util.times
 import java.util.*
 
@@ -10,14 +8,15 @@ fun generateUid() = UUID.randomUUID().toString()
 
 data class Route(
     val id: String = generateUid(),
-    var number: Int? = null,
+    var number: String? = null,
     var timeStartWork: Long? = null,
-    val timeEndWork: Long? = null,
+    var timeEndWork: Long? = null,
 
     val locoList: MutableList<Locomotive> = mutableListOf(),
     val trainList: MutableList<Train> = mutableListOf(),
     val stationList: MutableList<Station> = mutableListOf(),
-    val passengerList: MutableList<Passenger> = mutableListOf()
+    val passengerList: MutableList<Passenger> = mutableListOf(),
+    var notes: Notes? = null
 ) {
     fun getWorkTime(): Long? {
         val timeEnd = timeEndWork
@@ -28,6 +27,25 @@ data class Route(
             null
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (other is Route){
+            return other.id == this.id
+        }
+        return super.equals(other)
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + (number?.hashCode() ?: 0)
+        result = 31 * result + (timeStartWork?.hashCode() ?: 0)
+        result = 31 * result + (timeEndWork?.hashCode() ?: 0)
+        result = 31 * result + locoList.hashCode()
+        result = 31 * result + trainList.hashCode()
+        result = 31 * result + stationList.hashCode()
+        result = 31 * result + passengerList.hashCode()
+        return result
+    }
 }
 
 data class Train(
@@ -36,18 +54,18 @@ data class Train(
     var weight: Int? = null,
     var axle: Int? = null,
     var conditionalLength: Int? = null,
-    var locomotive: Locomotive? = null,
+    @get:JvmName("locomotiveTrain") var locomotive: Locomotive? = null,
     var stations: MutableList<Station> = mutableListOf()
 )
 
 data class Passenger(
     val id: String = generateUid(),
-    val trainNumber: String? = null,
-    val stationDeparture: String? = null,
-    val stationArrival: String? = null,
-    val timeArrival: Long? = null,
-    val timeDeparture: Long? = null,
-    val notes: String? = null
+    var trainNumber: String? = null,
+    var stationDeparture: String? = null,
+    var stationArrival: String? = null,
+    var timeArrival: Long? = null,
+    var timeDeparture: Long? = null,
+    var notes: String? = null
 )
 
 data class Station(
@@ -81,8 +99,8 @@ data class SectionElectric(
     var deliveryRecovery: Double? = null
 ) : Section(id, acceptedEnergy, deliveryEnergy) {
 
-    override fun getConsumption() = differenceBetweenDouble(acceptedEnergy, deliveryEnergy)
-    fun getRecoveryResult() = differenceBetweenDouble(acceptedRecovery, deliveryRecovery)
+    override fun getConsumption() = Calculation.getTotalEnergyConsumption(acceptedEnergy, deliveryEnergy)
+    fun getRecoveryResult() = Calculation.getTotalEnergyConsumption(acceptedRecovery, deliveryRecovery)
 }
 
 data class SectionDiesel(
@@ -96,10 +114,9 @@ data class SectionDiesel(
     var coefficientSupply: Double? = null,
     var fuelSupplyInKilo: Double? = fuelSupply * coefficientSupply
 ) : Section(id, acceptedEnergy, deliveryEnergy) {
-    override fun getConsumption() =
-        reverseDifferenceBetweenDouble(acceptedEnergy, deliveryEnergy).plusNullableValue(fuelSupply)
+    override fun getConsumption() = Calculation.getTotalFuelConsumption(acceptedEnergy, deliveryEnergy, fuelSupply)
 
-    fun getConsumptionInKilo() = getConsumption() * coefficient
+    fun getConsumptionInKilo() = Calculation.getTotalFuelInKiloConsumption(getConsumption(), coefficient)
 }
 
 abstract class Section(
@@ -109,3 +126,9 @@ abstract class Section(
 ) {
     abstract fun getConsumption(): Double?
 }
+
+data class Notes(
+    val id: String = generateUid(),
+    var text: String? = null,
+    var photos: MutableList<Uri> = mutableListOf()
+)

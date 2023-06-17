@@ -6,8 +6,8 @@ import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -17,11 +17,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.example.traindriver.ui.theme.SpecialColor
 import com.example.traindriver.ui.theme.TrainDriverTheme
 import com.example.traindriver.ui.theme.Typography
 import com.example.traindriver.ui.util.DarkLightPreviews
@@ -33,9 +31,9 @@ fun CircularIndicator(
     valueHour: Int = 0,
     valueMinute: Int = 0,
     maxIndicatorValue: Int = 180,
-    backgroundIndicatorColor: Color = MaterialTheme.colors.surface,
+    backgroundIndicatorColor: Color = MaterialTheme.colorScheme.surface,
     backgroundIndicatorStrokeWidth: Float = 50f,
-    foregroundIndicatorColor: Color = SpecialColor,
+    foregroundIndicatorColor: Color = MaterialTheme.colorScheme.onBackground,
     foregroundIndicatorStrokeWidth: Float = 70f,
 ) {
     var allowedIndicatorValue by remember {
@@ -111,7 +109,7 @@ fun CircularIndicator(
                 }
                 .padding(bottom = canvasSize / 5),
             text = "$maxIndicatorValue",
-            style = MaterialTheme.typography.h3
+            style = MaterialTheme.typography.headlineSmall
         )
     }
 
@@ -183,14 +181,14 @@ fun EmbeddedText(
     Text(
         modifier = modifier,
         text = "$hour : $minute",
-        style = Typography.h1.copy(fontWeight = FontWeight.Bold)
+        style = Typography.displaySmall
     )
 }
 
 @Composable
 @FontScalePreviews
 @DarkLightPreviews
-private fun prevCircularIndicator() {
+private fun PrevCircularIndicator() {
     TrainDriverTheme {
         CircularIndicator(valueHour = 1)
     }

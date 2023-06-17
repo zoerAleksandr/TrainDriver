@@ -38,6 +38,7 @@
     <string name="locomotive">Лакаматыў</string>
     <string name="train">Цягнік</string>
     <string name="passenger">Пасажыр</string>
+    <string name="notes">Заметка</string>
     <string name="route_opening_error">Памылка адкрыцця маршруту</string>
     <string name="info_text_min_time_rest">
         Час мінімальнага адпачынку складае %1$s гадзіны.
