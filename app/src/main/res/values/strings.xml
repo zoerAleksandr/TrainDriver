@@ -38,6 +38,7 @@
     <string name="locomotive">Локомотив</string>
     <string name="train">Поезд</string>
     <string name="passenger">Пассажиром</string>
+    <string name="notes">Примечания</string>
     <string name="route_opening_error">Ошибка открытия маршрута</string>
     <string name="info_text_min_time_rest">
         Время минимального отдыха составляет %1$s часа.

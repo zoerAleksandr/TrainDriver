@@ -57,7 +57,7 @@ fun ViewingRouteScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     val pagerState = rememberPagerState(
-        pageCount = 4,
+        pageCount = 5,
         initialPage = 0
     )
     Scaffold(
@@ -163,6 +163,7 @@ private fun Tabs(pagerState: PagerState) {
         stringResource(id = R.string.locomotive),
         stringResource(id = R.string.train),
         stringResource(id = R.string.passenger),
+        stringResource(id = R.string.notes)
     )
     CustomScrollableTabRow(
         tabs = tabsLabel,
@@ -184,6 +185,7 @@ private fun TabContent(
             1 -> LocoScreen(viewModel.routeState)
             2 -> TrainScreen(viewModel.routeState)
             3 -> PassengerScreen(viewModel.routeState)
+            4 -> NotesScreen(viewModel.routeState, navController)
         }
     }
 }

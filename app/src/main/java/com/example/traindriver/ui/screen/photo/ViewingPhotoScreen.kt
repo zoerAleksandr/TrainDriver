@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.adding_screen.adding_notes.AddingNotesViewModel
 import com.example.traindriver.ui.screen.adding_screen.adding_notes.NotesEvent
 
@@ -22,7 +23,8 @@ import com.example.traindriver.ui.screen.adding_screen.adding_notes.NotesEvent
 fun ViewingPhotoScreen(
     navController: NavController,
     addingNotesViewModel: AddingNotesViewModel,
-    photo: String
+    photo: String,
+    tag: Screen.ViewingPhotoTag
 ) {
     Scaffold(
         topBar = {
@@ -39,16 +41,24 @@ fun ViewingPhotoScreen(
                     }
                 },
                 actions = {
-                    IconButton(
-                        onClick = {
-                            addingNotesViewModel.createEventNotes(NotesEvent.RemovePhoto(Uri.parse(photo)))
-                            navController.navigateUp()
+                    if (tag == Screen.ViewingPhotoTag.CHANGEABLE) {
+                        IconButton(
+                            onClick = {
+                                addingNotesViewModel.createEventNotes(
+                                    NotesEvent.RemovePhoto(
+                                        Uri.parse(
+                                            photo
+                                        )
+                                    )
+                                )
+                                navController.navigateUp()
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.DeleteOutline,
+                                contentDescription = "Удалить"
+                            )
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.DeleteOutline,
-                            contentDescription = "Удалить"
-                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

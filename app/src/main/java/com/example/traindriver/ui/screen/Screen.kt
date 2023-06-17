@@ -1,12 +1,12 @@
 package com.example.traindriver.ui.screen
 
-
 const val ROUTE = "route"
 const val LOCO_ID = "loco_id"
 const val TRAIN_ID = "train_id"
 const val PASSENGER_ID = "passenger_id"
 const val NOTES_ID = "notes_id"
 const val NOTES_TAG = "notes_tag"
+const val VIEWING_TAG = "viewing_tag"
 const val PHOTO = "photo"
 const val PREV_PHOTO = "prev_photo"
 
@@ -57,10 +57,16 @@ sealed class Screen(val route: String) {
         SET_LIST, NOT_LIST
     }
 
-    object ViewingPhoto: Screen(route = "viewing_photo/{$PHOTO}") {
-        fun openPhoto(photo: String): String {
-            return this.route.replace(oldValue = "{$PHOTO}", newValue = photo)
+    object ViewingPhoto: Screen(route = "viewing_photo/{$VIEWING_TAG}/{$PHOTO}") {
+        fun openPhoto(photo: String, tag: ViewingPhotoTag): String {
+            return this.route
+                .replace(oldValue = "{$VIEWING_TAG}", newValue = tag.name)
+                .replace(oldValue = "{$PHOTO}", newValue = photo)
         }
+    }
+
+    enum class ViewingPhotoTag {
+        ONLY_VIEW, CHANGEABLE
     }
 
     object CreatePhoto: Screen(route = "create_photo")

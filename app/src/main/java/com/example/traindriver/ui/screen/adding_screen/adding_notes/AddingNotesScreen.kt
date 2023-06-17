@@ -35,6 +35,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.traindriver.ui.screen.Screen
 import com.example.traindriver.ui.screen.adding_screen.AddingViewModel
+import com.example.traindriver.ui.screen.photo.CameraCapturePreview
 import com.example.traindriver.ui.screen.photo.EMPTY_IMAGE_URI
 import com.example.traindriver.ui.screen.viewing_route_screen.element.BottomShadow
 import com.example.traindriver.ui.screen.viewing_route_screen.element.isScrollInInitialState
@@ -78,9 +79,10 @@ fun AddingNotesScreen(
                     color = MaterialTheme.colorScheme.outline,
                     shape = ShapeBackground.extraSmall
                 ),
+            shape = ShapeBackground.extraSmall,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
             content = {
-                Box(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
                     Image(
                         modifier = Modifier.fillMaxSize(),
                         painter = rememberAsyncImagePainter(photo),
@@ -115,7 +117,12 @@ fun AddingNotesScreen(
                                 StandardCharsets.UTF_8.toString()
                             )
                         }
-                    navController.navigate(Screen.ViewingPhoto.openPhoto(encodeUri))
+                    navController.navigate(
+                        Screen.ViewingPhoto.openPhoto(
+                            photo = encodeUri,
+                            tag = Screen.ViewingPhotoTag.CHANGEABLE
+                        )
+                    )
                 }
             }
         )
@@ -132,6 +139,7 @@ fun AddingNotesScreen(
                     color = MaterialTheme.colorScheme.outline,
                     shape = ShapeBackground.extraSmall
                 ),
+            shape = ShapeBackground.extraSmall,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
             onClick = {
                 navController.navigate(Screen.CreatePhoto.route)
@@ -141,7 +149,10 @@ fun AddingNotesScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CameraCapturePreview()
+                CameraCapturePreview(
+                    modifier = Modifier
+                    .fillMaxSize()
+                )
                 Box(
                     modifier = Modifier
                         .fillMaxSize()

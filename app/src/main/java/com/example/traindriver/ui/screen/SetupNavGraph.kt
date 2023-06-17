@@ -156,14 +156,29 @@ fun SetupNavGraph(
             arguments = listOf(
                 navArgument(PHOTO) {
                     type = NavType.StringType
+                },
+                navArgument(VIEWING_TAG) {
+                    type = NavType.StringType
                 }
             )
         ) { backStackEntry ->
+            val tag = when (backStackEntry.arguments?.getString(VIEWING_TAG)) {
+                Screen.ViewingPhotoTag.CHANGEABLE.name -> {
+                    Screen.ViewingPhotoTag.CHANGEABLE
+                }
+                Screen.ViewingPhotoTag.ONLY_VIEW.name -> {
+                    Screen.ViewingPhotoTag.ONLY_VIEW
+                }
+                else -> {
+                    Screen.ViewingPhotoTag.ONLY_VIEW
+                }
+            }
             backStackEntry.arguments?.getString(PHOTO)?.let { photo ->
                 ViewingPhotoScreen(
                     navController = navController,
                     addingNotesViewModel = addingNotesViewModel,
-                    photo = photo
+                    photo = photo,
+                    tag = tag
                 )
             }
         }

@@ -97,7 +97,7 @@ private fun DataScreen(route: Route) {
 }
 
 @Composable
-fun PassengerItem(passenger: Passenger) {
+private fun PassengerItem(passenger: Passenger) {
     val trainNumberText = "№ ${passenger.trainNumber ?: "0000"}"
     val stArrivalText = passenger.stationArrival ?: DEFAULT_STATION_NAME
     val stDepartureText = passenger.stationDeparture ?: DEFAULT_STATION_NAME
